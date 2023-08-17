@@ -1,0 +1,21 @@
+/*.digitalobjectpage .body-container{
+	padding: 0;
+}*/
+
+.main-content{
+	padding-top: 4rem;
+}
+
+.sidebar{
+	background: #f6f7f2;
+}
+.sidebar ul{
+	padding: 0;
+    list-style-type: none;
+}
+.sidebar ul li{
+	padding-bottom: 1rem;
+}
+.sidebar .collections{
+	padding-bottom: 1.5rem;
+}
