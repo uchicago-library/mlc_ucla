@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
+  <h1>{{ title_slug }}</h1>
+          
+  <article>
+    <ul>
+      {% for b in browse_terms %}
+        <li><a href="#{{ b[0] }}">{{ b[1] }}</a></li>
+      {% endfor %}
+    </ul>
+  </article>
+
+  <div class="home-module" style="padding-left: 0;">
+    <h2 class="browse"> Collection Highlights</h2>
+    <span class="browse-links">
+      <span class="headline">Browse:&nbsp;</span>
+      <a href="/browse/?type=language">Language</a>
+      <a href="/browse/?type=location">Geographic Region</a>
+    </span>
+  </div>
+</div>
+{% endblock %}
