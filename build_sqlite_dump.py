@@ -2,7 +2,7 @@
     build_sqlite_dump.py --graph=<graph>
 """
 
-import json, os, rdflib, sqlite3, sqlite_dump, sys, timeit
+import json, os, rdflib, re, sqlite3, sqlite_dump, sys, timeit
 from docopt import docopt
 from rdflib.plugins.sparql import prepareQuery
 
@@ -78,10 +78,9 @@ def get_item_identifiers_for_series(g, i):
         results.add(row[0])
     return sorted(list(results))
 
-def get_series_snippet_info(g, i):
+def get_item_info(g, i):
     """
-    Get the title, contributors, languages, locations, dates, resource type and
-    access for a given series.
+    Get info for search snippets and page views for a given series.
 
     Parameters:
         g (rdflib.Graph): a graph to search.
@@ -93,13 +92,20 @@ def get_series_snippet_info(g, i):
     data = {}
 
     for label, p in {
-        'title': 'http://purl.org/dc/elements/1.1/title',
-        'contributors': 'http://purl.org/dc/terms/contributor',
-        'languages': 'http://purl.org/dc/elements/1.1/language',
-        'locations': 'http://purl.org/dc/terms/spatial',
-        'date': 'http://purl.org/dc/terms/date',
-        'content': 'http://id.loc.gov/ontologies/bibframe/',
-        'access_rights': 'http://purl.org/dc/terms/accessRights'
+        'content_type':         'http://id.loc.gov/ontologies/bibframe/content',
+        'linguistic_data_type': 'http://lib.uchicago.edu/dma/olacLinguisticDataType',
+        'creator':              'http://purl.org/dc/elements/1.1/creator',
+        'description':          'http://purl.org/dc/elements/1.1/description',
+        'identifier':           'http://purl.org/dc/elements/1.1/identifier',
+        'language':             'http://purl.org/dc/elements/1.1/language',
+        'title':                'http://purl.org/dc/elements/1.1/title',
+        'access_rights':        'http://purl.org/dc/terms/accessRights',
+        'alternative_title':    'http://purl.org/dc/terms/alternative',
+        'contributor':          'http://purl.org/dc/terms/contributor',
+        'date':                 'http://purl.org/dc/terms/date',
+        'is_part_of':           'http://purl.org/dc/terms/isPartOf',
+        'location':             'http://purl.org/dc/terms/spatial',
+        'discourse_type':       'http://www.language−archives.org/OLAC/metadata.htmldiscourseType'
     }.items():
         values = set()
         for row in g.query(
@@ -114,9 +120,176 @@ def get_series_snippet_info(g, i):
                 'series_id': rdflib.URIRef(i)
             }
         ):
-            values.add(row[0])
+            values.add(' '.join(row[0].split()))
+        data[label] = sorted(list(values))
+
+    # special processing
+    # 'http://lib.uchicago.edu/language where http://lib.uchicago.edu/icu/languageRole is 'Primary' or 'Both'
+    #  https://www.iso.org/standard/39534.htmliso639P3PCode
+
+    # Indigenous Language -> uchicago:language where icu:languageRole is 'Primary' or 'Both'
+    # Language -> uchicago:language where icu:languageRole is 'Subject' or 'Both'
+
+    # Location Where Indigenous Language is Spoken -> dcterms:spatial
+
+    return data
+
+def get_series_info(g, i):
+    """
+    Get info for search snippets and page views for a given series.
+
+    Parameters:
+        g (rdflib.Graph): a graph to search.
+        i (str): a series identifier.
+
+    Returns:
+        str: series title.
+    """
+    data = {}
+
+    # edm:datasetName translate "DMA" to "Digital Media Archive"
+    # language (indigenous and interview)
+
+    for label, p in {
+        'content_type':      'http://id.loc.gov/ontologies/bibframe/content',
+        'creator':           'http://purl.org/dc/elements/1.1/creator',
+        'description':       'http://purl.org/dc/elements/1.1/description',
+        'identifier':        'http://purl.org/dc/elements/1.1/identifier',
+        'language':          'http://purl.org/dc/elements/1.1/language',
+        'title':             'http://purl.org/dc/elements/1.1/title',
+        'access_rights':     'http://purl.org/dc/terms/accessRights',
+        'alternative_title': 'http://purl.org/dc/terms/alternative',
+        'contributor':       'http://purl.org/dc/terms/contributor',
+        'date':              'http://purl.org/dc/terms/date',
+        'location':          'http://purl.org/dc/terms/spatial'
+    }.items():
+        values = set()
+        for row in g.query(
+            prepareQuery('''
+                SELECT ?value
+                WHERE {
+                    ?series_id ?p ?value
+                }
+            '''),
+            initBindings={
+                'p': rdflib.URIRef(p),
+                'series_id': rdflib.URIRef(i)
+            }
+        ):
+            values.add(' '.join(row[0].split()))
         data[label] = sorted(list(values))
     return data
+
+def get_browse_terms(g, browse_type, sort_key='label'):
+    """
+    Get a dictionary of browse terms, along with the items for each term. It's
+    currently not documented whether a browse should return series nodes, item
+    nodes, or both - so this includes both. 
+
+    Paramters:
+        g (rdflib.Graph): a graph to search.
+        browse_type (str): e.g., 'contributor', 'date', 'language', 'location'
+        sort_key (str): e.g., 'count', 'label'
+
+    Returns:
+        dict: a Python dictionary, where the key is the browse term and the
+        value is a list of identifiers. 
+
+    Notes:
+        The date browse converts all dates into decades and is range-aware-
+        so an item with the date "1933/1955" will appear in "1930s", "1940s",
+        and "1950s".
+
+        When I try to match our dc:language to Glottolog's lexvo:iso639P3PCode,
+        I run into trouble in Python's rdflib because Glottolog's data has an
+        explicit datatype of xsd:string() and ours doesn't have an explicit
+        datatype. Making both match manually solves the problem. We may be able
+        to solve this in MarkLogic by casting the variable. 
+
+        Here I solved the problem by manually editing the glottolog triples 
+        so they match ours. 
+
+        I would like to get TGN data as triples. 
+
+        Go to http://vocab.getty.edu/sparql.
+    """
+    browse_types = {
+        'contributor': 'http://purl.org/dc/terms/contributor',
+        'date'       : 'http://purl.org/dc/terms/date',
+        'language'   : 'http://purl.org/dc/elements/1.1/language',
+        'location'   : 'http://purl.org/dc/terms/spatial'
+    }
+    assert browse_type in browse_types
+
+    browse_dict = {}
+    if browse_type == 'date':
+        qres = g.query(
+            prepareQuery('''
+                SELECT ?date_str ?identifier 
+                WHERE {{
+                    ?identifier ?browse_type ?date_str .
+                }}
+            '''),
+            initBindings={
+                'browse_type': rdflib.URIRef(browse_types[browse_type])
+            }
+        )
+        for date_str, identifier in qres:
+            dates = []
+            for s in date_str.split('/'):
+                m = re.search('([0-9]{4})', s)
+                if m:
+                    dates.append(int(m.group(0)))
+            if len(dates) == 1:
+                dates.append(dates[0])
+            if len(dates) > 2:
+                dates = dates[:2] 
+            d = dates[0]
+            while d <= dates[1]:
+                decade = str(d)[:3] + '0s'
+                if not decade in browse_dict:
+                    browse_dict[decade] = set()
+                browse_dict[decade].add(str(identifier))
+                d += 1
+    elif browse_type == 'language':
+        qres = g.query(
+            prepareQuery('''
+                SELECT ?browse_term ?identifier 
+                WHERE {
+                    ?identifier ?browse_type ?browse_term .
+                }
+            '''),
+            initBindings={
+                'browse_type': rdflib.URIRef(browse_types[browse_type])
+            }
+        )
+        for browse_term, identifier in qres:
+            label = GLOTTOLOG_LOOKUP[str(browse_term)]
+            if not label in browse_dict:
+                browse_dict[label] = set()
+            browse_dict[label].add(str(identifier))
+    else:
+        qres = g.query(
+            prepareQuery('''
+                SELECT ?browse_term ?identifier 
+                WHERE {
+                    ?identifier ?browse_type ?browse_term .
+                }
+            '''),
+            initBindings={
+                'browse_type': rdflib.URIRef(browse_types[browse_type])
+            }
+        )
+        for label, identifier in qres:
+            if not label in browse_dict:
+                browse_dict[label] = set()
+            browse_dict[label].add(str(identifier))
+
+    # convert identifiers set to a list.
+    for k in browse_dict.keys():
+        browse_dict[k] = sorted(list(browse_dict[k]))
+
+    return browse_dict
 
 def get_search_tokens_for_series_identifier(g, i):
     """
@@ -230,6 +403,23 @@ if __name__ == '__main__':
 
     con = sqlite3.connect(':memory:')
     cur = con.cursor()
+
+    # build tables
+    cur.execute('begin')
+
+    cur.execute('''
+        create table browse(
+            type text,
+            term text,
+            id text
+        );
+    ''')
+    cur.execute('''
+        create table item(
+            id text,
+            info text
+        );
+    ''')
     cur.execute('''
         create virtual table search using fts5(
             id,
@@ -243,19 +433,46 @@ if __name__ == '__main__':
             info text
         );
     ''')
-    cur.execute('''
-        create table item(
-            id text,
-            info text
-        );
-    ''')
-    cur.execute('''
-        create table browse(
-            id text,
-            type text,
-            text text
-        );
-    ''')
+    cur.execute('commit')
+
+    # load data
+    cur.execute('begin')
+
+    # load browses
+    for browse_type, sort_key in {
+        'contributor': 'count',
+        'date': 'label',
+        'language': 'count',
+        'location': 'count'
+    }.items():
+        for browse_term, identifiers in get_browse_terms(
+            g,
+            browse_type,
+            sort_key
+        ).items():
+            for identifier in identifiers:
+                cur.execute('''
+                    insert into browse (type, term, id)
+                    values (?, ?, ?);
+                    ''',
+                    (
+                        browse_type,
+                        browse_term,
+                        identifier
+                    )
+                )
+
+    # load item
+    for i in get_item_identifiers(g): 
+        cur.execute('''
+            insert into item (id, info) 
+            values (?, ?);
+            ''',
+            (
+                i,
+                json.dumps(get_item_info(g, i))
+            )
+        )
 
     # load search
     for i in get_series_identifiers(g): 
@@ -269,7 +486,6 @@ if __name__ == '__main__':
                 get_search_tokens_for_series_identifier(g, i)
             )
         )
-        con.commit()
 
     # load series 
     for i in get_series_identifiers(g): 
@@ -280,30 +496,10 @@ if __name__ == '__main__':
             ''',
             (
                 i,
-                json.dumps(get_series_snippet_info(g, i))
+                json.dumps(get_series_info(g, i))
             )
         )
-        con.commit()
-
-    # load item
-    for i in get_item_identifiers(g): 
-        cur.execute('''
-            insert into item (
-                id, 
-                info) values (?, ?);
-            ''',
-            (
-                i,
-                ''
-            )
-        )
-        con.commit()
-
-    # add browse for contributor
-    # add browse for date
-    # add browse for language
-    # add browse for location
-    # extend snippet info so it shows all information about an item. 
+    cur.execute('commit')
 
     for line in sqlite_dump.iterdump(con):
         print(line)
