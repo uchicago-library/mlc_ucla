@@ -1,14 +1,56 @@
 {% extends "base.html" %}
 
+{# Vitor hard placeholder content #}
+{% set title = 'The untimely lightness of sitting' %}
+{% set rights = 'Login Required' %}
+{% set panopto_identifier = 'fb972259-1699-4ff5-9af2-aa08015307da' %}
+{% set metadata = [
+  ['Contributor', [
+    {'string':'Vitor G.'},
+    {'string':'John J.'},
+    {'string':'Noam C.'}
+    ]
+  ],
+  ['Subject Language', [
+    {'code':'EN', 'label':'English'},
+    {'code':'PT', 'label':'Portuguese'}
+    ]
+  ],
+  ['Location of Language', [
+    {'identifier':'EN', 'label':'USA'},
+    {'identifier':'PT', 'label':'Portugal'}
+    ]
+  ],
+  ['Part of Series',  [
+    {'identifier':'64573657', 'title':'Some Series'},
+    {'identifier':'64573657', 'title':'More Series'},
+    {'identifier':'64573657', 'title':'Noop Series'},
+    {'identifier':'3673567367', 'title':'Other Series'}
+    ]
+  ]
+  ] %}
+{# END Vitor hard placeholder content #}
+
+{% if rights == 'By Request' %}
+  {% set accessbadgeclass = 'warning' %}
+{% elif rights == 'Login Required' %}
+  {% set accessbadgeclass = 'info' %}
+{% elif rights == 'Public' %}
+  {% set accessbadgeclass = 'success' %}
+{% endif %}
+
 {% block content %}
-  <div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
-    <h1>{{ title_slug }} <span class="badge badge-success">{{ rights }}</span></h1>
+  <div class="" id="content" role="main">
+    <div class="title-wrapper">
+      <h1>{{ title_slug }}</h1>
+      <span class="badge badge-{{ accessbadgeclass }}">Access: {{ rights }}</span>
+    </div>
     <div class="row">
       <!-- Main Content -->
       <div class="col-xs-12 col-md-9 centermain"> <!-- Center Content -->
         {% if panopto_identifier %}
           <div>
-            <iframe src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646;" allowfullscreen allow="autoplay"></iframe>
+            <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646;" allowfullscreen allow="autoplay"></iframe>
           </div>
         {% endif %}
         <dl>

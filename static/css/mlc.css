@@ -1,21 +1,110 @@
+/* Just removed the body-container class, 
+doesn't seem necessary. */
 /*.digitalobjectpage .body-container{
 	padding: 0;
 }*/
+html{
+	font-size: 14px;
+}
 
 .main-content{
-	padding-top: 4rem;
+	padding-top: 2rem;
 }
 
 .sidebar{
 	background: #f6f7f2;
+	padding: 0;
+	margin-bottom: 1rem;
+}
+.sidebar .navbar{
+	margin: 0;
+	min-height: unset;
+}
+.sidebar .btn.sidebar-collapse-btn{
+	background: transparent;
+	color: #800000;
+	font-weight: 600;
+}
+.sidebar .sidebar-collapse-btn .fa-plus{
+	display: none;
+}
+.sidebar .sidebar-collapse-btn.collpased .fa-plus{
+	display: block;
+}
+.sidebar .sidebar-collapse-btn.collpased .fa-minus{
+	display: none;
+}
+.sidebar .navbar .nav.navbar-nav{
+	margin: 0;
+	padding-left: 1rem;
 }
 .sidebar ul{
 	padding: 0;
-    list-style-type: none;
+	list-style-type: none;
 }
 .sidebar ul li{
 	padding-bottom: 1rem;
+	padding-bottom: 0;
+	float: unset;
 }
 .sidebar .collections{
 	padding-bottom: 1.5rem;
 }
+@media (min-width:992px){
+	.sidebar .collapse{
+		display: block !important;
+	}
+}
+
+/* ======= SIDEBAR RIGHT */
+.sidebar.sidebar-right{
+	padding: 1rem 1.5rem;
+}
+.sidebar.sidebar-right h2{
+	margin: 0;
+	font-size: 1.5rem;
+}
+.sidebar.sidebar-right h3{
+	font-size: 1.1rem;
+}
+
+
+/* =============== ITEM */
+/* Title Element */
+/* easy fix */
+/* 
+  * to have a more strudy solution,
+  * the default title styling needs to be changed
+  */
+.title-wrapper {
+	position: relative;
+}
+.title-wrapper h1{
+	padding-right: 150px;
+}
+.title-wrapper .badge{
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+/* Panopto */
+.panopto-iframe{
+	max-width: 100%;
+}
+
+/* Metadata Description List */ 
+/* fix default behaviour */ 
+@media (min-width: 62em){
+	dl {
+		padding-left: 0;
+	    /*display: block;
+	    flex-flow: unset;*/
+	  }
+	}
+	dl dt{
+		flex-basis: 30%;
+	}
+	dl dd{
+		flex-basis: 70%;
+	}

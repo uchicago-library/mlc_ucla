@@ -10,6 +10,7 @@
 	<link href="https://uchicago-library.github.io/LibPattern/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://uchicago-library.github.io/LibPattern/css/lib-main.css" rel="stylesheet">
     <link href="https://uchicago-library.github.io/LibPattern/css/collex.css" rel="stylesheet">
+    <link href="/static/css/mlc.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="https://uchicago-library.github.io/LibPattern/css/calendar/font-awesome.min.css">
 
     <style>
@@ -41,18 +42,24 @@
     {% include "header.html" %}
 
     <!-- Awesome Page Content -->
-    <div class="container-fluid main-container"> <!-- Main Container Wrapper -->
-      <div class="row row-offcanvas row-offcanvas-left"> <!-- Off Canvas Wrapper Row -->
+    <div class="container-fluid"> <!-- Main Container Wrapper -->
+      <div class="row"> <!-- Off Canvas Wrapper Row -->
         <div class="col-md-12 breadcrumbs hidden-xs hidden-sm">
           <a href="https://www.lib.uchicago.edu/collex/">Collections &amp; Exhibits</a> &gt;
           <a href="https://www.lib.uchicago.edu/collex/collections/">Collections</a> &gt;
           <a href="/">Indigenous Mesoamerican Languages Portal</a> &gt;
           {{ title_slug }}
         </div> <!-- // Breadcrumbs -->
-     
-        <div class="container body-container col-xs-12 col-lg-12">
-          {% block content %}{% endblock %}
-          {% include 'sidebar.html' %}
+
+        <div class="col-xs-12 pt-5 main-content">
+            <div class="row">
+              <div class="col-xs-12 col-md-9 col-lg-10">
+                {% block content %}{% endblock %}
+              </div>
+              <div class="col-xs-12 col-md-3 col-lg-2">
+                {% include 'sidebar-right.html' %}
+              </div>
+            </div>
         </div>
       </div> <!-- // Content Container -->
     </div> <!-- // Off Canvas Wrapper Row -->
