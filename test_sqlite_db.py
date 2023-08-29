@@ -1,16 +1,44 @@
 """Usage:
-    test_sqlite_db.py list-items [--verbose]
-    test_sqlite_db.py list-series [--verbose]
+    test_sqlite_db.py get-browse <type>
     test_sqlite_db.py get-item <item-identifier>
     test_sqlite_db.py get-series <series-identifier>
-    test_sqlite_db.py get-browse-terms-contributor [<term>] [--sort-by-count]
-    test_sqlite_db.py get-browse-terms-date [<term>] [--sort-by-count]
-    test_sqlite_db.py get-browse-terms-language [<term>] [--sort-by-count]
-    test_sqlite_db.py get-browse-terms-location [<term>] [--sort-by-count]
+    test_sqlite_db.py list-items [--verbose]
+    test_sqlite_db.py list-series [--verbose]
     test_sqlite_db.py search <term>
 """
 
 import docopt, json, sqlite3, sys
+
+def get_browse(cur, browse_type):
+    """
+    Get browse.
+
+    Parameters:
+        cur (sqlite3.Cursor): a cursor instance to query the db.
+        browse_type (str): type of browse terms to retrieve. 
+
+    Returns:
+        list: a list of browse terms.
+    """
+    assert browse_type in ('contributor', 'date', 'language', 'location')
+
+    return cur.execute(
+        '''
+            select term, count(id)
+            from browse
+            where type=?
+            group by term
+            order by {}
+        '''.format(
+            {
+                'contributor': 'count(id) desc',
+                'date': 'term',
+                'language': 'count(id) desc',
+                'location': 'count(id) desc'
+            }[browse_type]
+        ),
+        (browse_type,)
+    ).fetchall()
 
 def get_item(cur, identifier):
     """
@@ -83,46 +111,9 @@ if __name__ == '__main__':
     cur = con.cursor()
     cur.executescript(sys.stdin.read())
 
-    if args['get-browse-terms-contributor']:
-        cur.execute('''
-            select term, count(id)
-            from browse
-            where type=\'contributor\'
-            group by term
-            order by count(id) desc;
-        ''')
-        for row in cur.fetchall():
-            print(row)
-    elif args['get-browse-terms-date']:
-        cur.execute('''
-            select term, count(id) 
-            from browse 
-            where type=\'date\'
-            group by term
-            order by term;
-        ''')
-        for row in cur.fetchall():
-            print(row)
-    elif args['get-browse-terms-language']:
-        cur.execute('''
-            select term, count(id) 
-            from browse 
-            where type=\'language\'
-            group by term
-            order by count(id) desc;
-        ''')
-        for row in cur.fetchall():
-            print(row)
-    elif args['get-browse-terms-location']:
-        cur.execute('''
-            select term, count(id) 
-            from browse 
-            where type=\'location\'
-            group by term
-            order by count(id) desc;
-        ''')
-        for row in cur.fetchall():
-            print(row)
+    if args['get-browse']:
+        for row in get_browse(cur, args['<type>']):
+            print('{} ({})'.format(row[0], row[1]))
     elif args['get-item']:
         i = get_item(cur, args['<item-identifier>'])
         print(args['<item-identifier>'])
@@ -209,3 +200,7 @@ if __name__ == '__main__':
                     'Resource Type',
                     ' | '.join(i[1]['content_type'])
                 ))
+    elif args['search']:
+        for i in get_search(cur):
+            print('x')
+ 

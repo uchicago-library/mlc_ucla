@@ -228,6 +228,7 @@ def get_browse_terms(g, browse_type, sort_key='label'):
                 SELECT ?date_str ?identifier 
                 WHERE {{
                     ?identifier ?browse_type ?date_str .
+                    ?identifier <http://purl.org/dc/terms/hasPart> ?_
                 }}
             '''),
             initBindings={
@@ -257,6 +258,7 @@ def get_browse_terms(g, browse_type, sort_key='label'):
                 SELECT ?browse_term ?identifier 
                 WHERE {
                     ?identifier ?browse_type ?browse_term .
+                    ?identifier <http://purl.org/dc/terms/hasPart> ?_
                 }
             '''),
             initBindings={
@@ -274,16 +276,18 @@ def get_browse_terms(g, browse_type, sort_key='label'):
                 SELECT ?browse_term ?identifier 
                 WHERE {
                     ?identifier ?browse_type ?browse_term .
+                    ?identifier <http://purl.org/dc/terms/hasPart> ?_
                 }
             '''),
             initBindings={
                 'browse_type': rdflib.URIRef(browse_types[browse_type])
             }
         )
-        for label, identifier in qres:
-            if not label in browse_dict:
-                browse_dict[label] = set()
-            browse_dict[label].add(str(identifier))
+        for labels, identifier in qres:
+            for label in labels.split('\n'):
+                if not label in browse_dict:
+                    browse_dict[label] = set()
+                browse_dict[label].add(str(identifier))
 
     # convert identifiers set to a list.
     for k in browse_dict.keys():
