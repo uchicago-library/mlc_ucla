@@ -84,12 +84,12 @@ class MLCGraph:
             results.add(row[0])
         return sorted(list(results))
 
-    def get_item_info(self, i):
+    def get_item_info(self, item_id):
         """
         Get info for search snippets and page views for a given series.
     
         Parameters:
-            i (str): a series identifier.
+            item_id (str): a series identifier.
     
         Returns:
             str: series title.
@@ -102,7 +102,6 @@ class MLCGraph:
             'creator':              'http://purl.org/dc/terms/creator',
             'description':          'http://purl.org/dc/elements/1.1/description',
             'identifier':           'http://purl.org/dc/elements/1.1/identifier',
-            'language':             'http://purl.org/dc/elements/1.1/language',
             'titles':               'http://purl.org/dc/elements/1.1/title',
             'access_rights':        'http://purl.org/dc/terms/accessRights',
             'alternative_title':    'http://purl.org/dc/terms/alternative',
@@ -122,20 +121,11 @@ class MLCGraph:
                 '''),
                 initBindings={
                     'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(i)
+                    'series_id': rdflib.URIRef(item_id)
                 }
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
-
-        # convert language codes to preferred names. 
-        glottolog_codes = data['language']
-        data['language'] = []
-        for c in glottolog_codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
-                c
-            ):
-                data['language'].append(preferred_name)
 
         # convert TGN identifiers to preferred names.
         tgn_identifiers = set()
@@ -150,23 +140,72 @@ class MLCGraph:
             ):
                 data['location'].append(preferred_name)
    
-        # JEJ TODO 
+        # primary_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Primary'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(item_id)
+            }
+        ):
+            codes.add(row[0])
 
-        # special processing
-        # 'http://lib.uchicago.edu/language where http://lib.uchicago.edu/icu/languageRole is 'Primary' or 'Both'
-        #  https://www.iso.org/standard/39534.htmliso639P3PCode
-    
-        # Indigenous Language -> uchicago:language where icu:languageRole is 'Primary' or 'Both'
-        # Language -> uchicago:language where icu:languageRole is 'Subject' or 'Both'
-    
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['primary_language'] = []
+        for preferred_name in preferred_names:
+            data['primary_language'].append(preferred_name)
+
+        # subject_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Subject'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(item_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['subject_language'] = []
+        for preferred_name in preferred_names:
+            data['subject_language'].append(preferred_name)
+
         return data
 
-    def get_series_info(self, i):
+    def get_series_info(self, series_id):
         """
         Get info for search snippets and page views for a given series.
     
         Parameters:
-            i (str): a series identifier.
+            series_id (str): a series identifier.
     
         Returns:
             str: series title.
@@ -181,7 +220,6 @@ class MLCGraph:
             'creator':           'http://purl.org/dc/terms/creator',
             'description':       'http://purl.org/dc/elements/1.1/description',
             'identifier':        'http://purl.org/dc/elements/1.1/identifier',
-            'language':          'http://purl.org/dc/elements/1.1/language',
             'titles':            'http://purl.org/dc/elements/1.1/title',
             'access_rights':     'http://purl.org/dc/terms/accessRights',
             'alternative_title': 'http://purl.org/dc/terms/alternative',
@@ -199,20 +237,11 @@ class MLCGraph:
                 '''),
                 initBindings={
                     'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(i)
+                    'series_id': rdflib.URIRef(series_id)
                 }
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
-
-        # convert language codes to preferred names. 
-        glottolog_codes = data['language']
-        data['language'] = []
-        for c in glottolog_codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
-                c
-            ):
-                data['language'].append(preferred_name)
 
         # convert TGN identifiers to preferred names.
         tgn_identifiers = set()
@@ -226,6 +255,64 @@ class MLCGraph:
                 i
             ):
                 data['location'].append(preferred_name)
+
+        # primary_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Primary'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['primary_language'] = []
+        for preferred_name in preferred_names:
+            data['primary_language'].append(preferred_name)
+
+        # subject_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Subject'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['subject_language'] = []
+        for preferred_name in preferred_names:
+            data['subject_language'].append(preferred_name)
 
         return data
 

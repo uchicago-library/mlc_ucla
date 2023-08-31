@@ -50,20 +50,20 @@
             </dd>
           {% endif %}
 
-          {% if languages %}
+          {% if subject_language %}
             <dt>Indigenous Language:</dt>
             <dd>
-              {% for i in languages %}
-                <div>{{ i }}</div>
+              {% for i in subject_language %}
+                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
 
-          {% if languages %}
+          {% if primary_language %}
             <dt>Language:</dt>
             <dd>
-              {% for i in languages %}
-                <div>{{ i }}</div>
+              {% for i in primary_language %}
+                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -72,7 +72,7 @@
             <dt>Location Where Indigenous Language Is Spoken:</dt>
             <dd>
               {% for i in location %}
-                <div>{{ i }}</div>
+                <div><a href="/search?facet=location%3A{{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
