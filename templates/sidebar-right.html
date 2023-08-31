@@ -2,26 +2,10 @@
   <h2>Search &amp; Browse</h2>
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-12">
-      <div class="collections lang"><!-- search by language -->
-        <h3>Search by Language</h3>
+      <div class="collections">
         <div class="form-group">
           <form action="/search/" class="searchbox" method="GET">
-            <input type="hidden" name="query" value="language"/>
-            <input type="hidden" name="collection" value="mila"/>
-            <input name="language" placeholder="e.g., Quiché, K'iche'" required="required" type="search" aria-label="..." class="searchbox-input" value=""/>
-            <span class="searchbox-icon"><i title="search" class="fa fa-search"></i>
-              <input type="submit" class="searchbox-submit" style="background-color: transparent; color: transparent;"/>
-            </span>
-          </form>
-        </div>
-      </div>
-      <div class="collections geo"><!-- Search by Geographic Region -->
-        <h3>Search by Geographic Region</h3>
-        <div class="form-group">
-          <form action="/search/" class="searchbox" method="GET">
-            <input type="hidden" name="query" value="spatial"/>
-            <input type="hidden" name="collection" value="mila"/>
-            <input name="spatial" placeholder="e.g., Yucatán, yucatan" required="required" type="search" aria-label="..." class="searchbox-input" value=""/>
+            <input name="query" placeholder="Search language, location, people, etc." required="required" type="search" aria-label="..." class="searchbox-input" value=""/>
             <span class="searchbox-icon"><i title="search" class="fa fa-search"></i>
               <input type="submit" class="searchbox-submit" style="background-color: transparent; color: transparent;"/>
             </span>
@@ -31,8 +15,10 @@
       <div class="collections browse"><!-- Browse Collection by -->
         <span class="headline">Browse Collection by</span>
         <ul>
-          <li><a href="#">Language</a></li>
-          <li><a href="#">Geographic Region</a></li>
+          <li><a href="/browse/?type=language">Language</a></li>
+          <li><a href="/browse/?type=location">Location</a></li>
+          <li><a href="/browse/?type=contributor">Contributors</a></li>
+          <li><a href="/browse/?type=decade">Dates</a></li>
         </ul>
       </div>
       <div class="collections access"> <!-- Access -->

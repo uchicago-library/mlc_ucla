@@ -14,14 +14,43 @@
       {% for result in results %}
         <figure>
           <figcaption>
-            <a href="/object/{{ result.identifier }}/">
-              <h3>{{ result.title }} <span class="badge badge-info">[status]</span></h3>
+            <a href="/object/{{ result.0 }}/">
+              <h3>Series title: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }}</a> <span class="badge badge-info">[status]</span></h3>
             </a>
-            {% if result.subjectlanguage %}
-              <p>Subject Language(s): <a href="#">{{ result.subjectlanguage }}</a></p>
+            {% if result.1.contributor %}
+              <p>Contributor:
+                {% for contributor in result.1.contributor %}
+                    <span>{{ contributor }}</span>
+                {% endfor %}
+             </p>
             {% endif %}
-            {% if result.language %}
-              <p>Language(s): <a href="#">{{ result.language }}</a></p>
+            {% if result.1.language %}
+              <p>Indigenous Language(s): 
+                {% for language in result.1.language %}
+                    <span>{{ language }}</span>
+                {% endfor %}
+             </p>
+            {% endif %}
+            {% if result.1.location %}
+              <p>Location:
+                {% for location in result.1.location %}
+                    <span>{{ location }}</span>
+                {% endfor %}
+             </p>
+            {% endif %}
+            {% if result.1.date %}
+              <p>Date:
+                {% for date in result.1.date %}
+                    <span>{{ date }}</span>
+                {% endfor %}
+             </p>
+            {% endif %}
+            {% if result.1.content_type %}
+              <p>Resource Type:
+                {% for content_type in result.1.content_type %}
+                    <span>{{ content_type }}</span>
+                {% endfor %}
+             </p>
             {% endif %}
           </figcaption>
         </figure>

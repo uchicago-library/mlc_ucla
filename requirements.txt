@@ -1,7 +1,4 @@
+docopt
 flask
-lxml
-pysocks
 rdflib
-requests
-sqlite3
 sqlite_dump

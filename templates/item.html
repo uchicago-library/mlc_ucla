@@ -1,36 +1,5 @@
 {% extends "base.html" %}
 
-{# Vitor hard placeholder content #}
-{% set title = 'The untimely lightness of sitting' %}
-{% set rights = 'Login Required' %}
-{% set panopto_identifier = 'fb972259-1699-4ff5-9af2-aa08015307da' %}
-{% set metadata = [
-  ['Contributor', [
-    {'string':'Vitor G.'},
-    {'string':'John J.'},
-    {'string':'Noam C.'}
-    ]
-  ],
-  ['Subject Language', [
-    {'code':'EN', 'label':'English'},
-    {'code':'PT', 'label':'Portuguese'}
-    ]
-  ],
-  ['Location of Language', [
-    {'identifier':'EN', 'label':'USA'},
-    {'identifier':'PT', 'label':'Portugal'}
-    ]
-  ],
-  ['Part of Series',  [
-    {'identifier':'64573657', 'title':'Some Series'},
-    {'identifier':'64573657', 'title':'More Series'},
-    {'identifier':'64573657', 'title':'Noop Series'},
-    {'identifier':'3673567367', 'title':'Other Series'}
-    ]
-  ]
-  ] %}
-{# END Vitor hard placeholder content #}
-
 {% if rights == 'By Request' %}
   {% set accessbadgeclass = 'warning' %}
 {% elif rights == 'Login Required' %}
@@ -72,10 +41,10 @@
             </dd>
           {% endif %}
 
-          {% if contributors %}
-            <dt>Contributors:</dt>
+          {% if contributor %}
+            <dt>Contributor:</dt>
             <dd>
-              {% for i in contributors %}
+              {% for i in contributor %}
                 <div>{{ i }}</div>
               {% endfor %}
             </dd>
@@ -90,21 +59,28 @@
             </dd>
           {% endif %}
 
-          {# language #}
-
-          {% if locations %}
-            <dt>Location Where Indigenous Language Is Spoken:</dt>
+          {% if languages %}
+            <dt>Language:</dt>
             <dd>
-              {% for i in locations %}
+              {% for i in languages %}
                 <div>{{ i }}</div>
               {% endfor %}
             </dd>
           {% endif %}
 
-          {% if dates %}
+          {% if location %}
+            <dt>Location Where Indigenous Language Is Spoken:</dt>
+            <dd>
+              {% for i in location %}
+                <div>{{ i }}</div>
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if date %}
             <dt>Date:</dt>
             <dd>
-              {% for i in dates %}
+              {% for i in date %}
                 <div>{{ i }}</div>
               {% endfor %}
             </dd>
@@ -119,27 +95,40 @@
             </dd>
           {% endif %}
 
-          {% if olacLinguisticDataType %}
+          {% if linguistic_data_type %}
             <dt>Linguistic Data Type:</dt>
             <dd>
-              {% for i in olacLinguisticDataType %}
+              {% for i in linguistic_data_type %}
                 <div>{{ i }}</div>
               {% endfor %}
             </dd>
           {% endif %}
 
-          {% if discourseType %}
+          {% if discourse_type %}
             <dt>Discourse Type:</dt>
             <dd>
-              {% for i in discourseType %}
+              {% for i in discourse_type %}
                 <div>{{ i }}</div>
               {% endfor %}
             </dd>
           {% endif %}
 
-          {# itemContentType #}
+          {% if content_type %}
+            <dt>Item Content Type:</dt>
+            <dd>
+              {% for i in content_type %}
+                <div>{{ i }}</div>
+              {% endfor %}
+            </dd>
+          {% endif %}
 
           {# partOfSeries #}
+          <dt>Part of Series:</dt>
+          <dd>
+              <a href="/series/{{ series.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+                  {{ series.1.titles.0 }}
+              </a>
+          </dd>
 
         </dl>
 
