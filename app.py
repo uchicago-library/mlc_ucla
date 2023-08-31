@@ -33,7 +33,7 @@ def glotto_labels(code):
 )
 def cli_build_db():
     con = sqlite3.connect(':memory:')
-    build_sqlite_db(con.cursor(), app.config['GRAPH'])
+    build_sqlite_db(con.cursor())
 
     with open(app.config['DB'], 'w') as f:
         for line in sqlite_dump.iterdump(con):

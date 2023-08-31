@@ -6,7 +6,7 @@ class MLCGraph:
     def __init__(self, g):
         """
         Parameters:
-            g (rdflib.Graph): a graph to search.
+            g (rdflib.Graph): a graph containing triples for the project.
         """
         self.g = g
 
@@ -127,15 +127,37 @@ class MLCGraph:
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
-    
+
+        # convert language codes to preferred names. 
+        glottolog_codes = data['language']
+        data['language'] = []
+        for c in glottolog_codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                data['language'].append(preferred_name)
+
+        # convert TGN identifiers to preferred names.
+        tgn_identifiers = set()
+        for i in data['location']:
+            for j in i.split():
+                tgn_identifiers.add(j)
+
+        data['location'] = []
+        for i in tgn_identifiers:
+            for preferred_name in self.get_tgn_preferred_place_name(
+                i
+            ):
+                data['location'].append(preferred_name)
+   
+        # JEJ TODO 
+
         # special processing
         # 'http://lib.uchicago.edu/language where http://lib.uchicago.edu/icu/languageRole is 'Primary' or 'Both'
         #  https://www.iso.org/standard/39534.htmliso639P3PCode
     
         # Indigenous Language -> uchicago:language where icu:languageRole is 'Primary' or 'Both'
         # Language -> uchicago:language where icu:languageRole is 'Subject' or 'Both'
-    
-        # Location Where Indigenous Language is Spoken -> dcterms:spatial
     
         return data
 
@@ -182,6 +204,29 @@ class MLCGraph:
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
+
+        # convert language codes to preferred names. 
+        glottolog_codes = data['language']
+        data['language'] = []
+        for c in glottolog_codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                data['language'].append(preferred_name)
+
+        # convert TGN identifiers to preferred names.
+        tgn_identifiers = set()
+        for i in data['location']:
+            for j in i.split():
+                tgn_identifiers.add(j)
+
+        data['location'] = []
+        for i in tgn_identifiers:
+            for preferred_name in self.get_tgn_preferred_place_name(
+                i
+            ):
+                data['location'].append(preferred_name)
+
         return data
 
     def get_browse_terms(self, browse_type, sort_key='label'):
@@ -272,10 +317,33 @@ class MLCGraph:
                 }
             )
             for browse_term, identifier in qres:
-                label = self.glottolog_lookup[str(browse_term)]
-                if not label in browse_dict:
-                    browse_dict[label] = set()
-                browse_dict[label].add(str(identifier))
+                for label in self.get_glottolog_language_preferred_names(
+                    str(browse_term)
+                ):
+                    if not label in browse_dict:
+                        browse_dict[label] = set()
+                    browse_dict[label].add(str(identifier))
+        elif browse_type == 'location':
+            qres = self.g.query(
+                prepareQuery('''
+                    SELECT ?browse_term ?identifier 
+                    WHERE {
+                        ?identifier ?browse_type ?browse_term .
+                        ?identifier <http://purl.org/dc/terms/hasPart> ?_
+                    }
+                '''),
+                initBindings={
+                    'browse_type': rdflib.URIRef(browse_types[browse_type])
+                }
+            )
+            for browse_terms, identifier in qres:
+                for browse_term in browse_terms.split():
+                    for label in self.get_tgn_preferred_place_name(
+                        str(browse_term)
+                    ):
+                        if not label in browse_dict:
+                            browse_dict[label] = set()
+                        browse_dict[label].add(str(identifier))
         else:
             qres = self.g.query(
                 prepareQuery('''
@@ -359,7 +427,6 @@ class MLCGraph:
             search_tokens.append(lookup[str(row[0])])
     
         # series-level dc:language 
-        # NOTE: this currently only retrieves English-language labels. 
         r = self.g.query(
             prepareQuery('''
                 SELECT ?o
@@ -372,12 +439,27 @@ class MLCGraph:
             }
         )
         for row in r:
-            search_tokens.append(self.glottolog_lookup[str(row[0])])
+            for label in self.get_glottolog_language_names(str(row[0])):
+                search_tokens.append(label)
        
-        # series-level dcterms:spatial (get every place name)
-        # TODO
+        # series-level dcterms:spatial 
+        r = self.g.query(
+            prepareQuery('''
+                SELECT ?o
+                    WHERE {
+                        ?series_id <http://purl.org/dc/terms/spatial> ?o
+                    }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(i)
+            }
+        )
+        for row in r:
+            for tgn_identifier in str(row[0]).split():
+                for label in self.get_tgn_place_names(tgn_identifier):
+                    search_tokens.append(label)
     
-        # series-level dc:date (expand ranges)
+        # series-level dc:date
         # TODO
     
         # item-level description
@@ -399,6 +481,176 @@ class MLCGraph:
         # replace all whitespace with single spaces and return all search tokens in
         # a single string.
         return ' '.join([' '.join(s.split()) for s in search_tokens])
+
+    def get_tgn_identifiers(self):
+        """Get all TGN identifiers from the TGN graph.
+    
+        Parameters:
+            (None)
+    
+        Returns:
+            list: all identifiers. 
+    
+        Notes:
+            There are only 157 identifiers in the data as of August, 2023. 
+        """
+        results = set()
+        for row in self.g.query('''
+            SELECT ?identifier
+            WHERE {
+                ?identifier <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .
+                FILTER (?type IN (
+                    <http://vocab.getty.edu/ontology#Subject>,
+                    <http://vocab.getty.edu/ontology#PhysPlaceConcept>,
+                    <http://www.w3.org/2004/02/skos/core#Concept>,
+                    <http://vocab.getty.edu/ontology#AdminPlaceConcept>
+                ))
+            }
+        '''):
+            results.add(str(row[0]).replace('http://vocab.getty.edu/tgn/', ''))
+        return list(results)
+    
+    def get_tgn_place_names(self, i):
+        """Get all place names from TGN for a given identifier. 
+     
+        Parameters:
+            i (str): TGN identifier, e.g., '7005493'
+    
+        Returns:
+            list: a list of place names as unicode strings.
+        """
+        results = set()
+        for row in self.g.query(
+            prepareQuery(''' 
+                SELECT ?label
+                WHERE {
+                    ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label
+                }
+            '''),
+            initBindings={
+                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
+            }
+        ):
+            results.add(str(row[0]))
+        return list(results)
+    
+    def get_tgn_place_name_en(self, i):
+        """Get a list of English-language place names from TGN.
+    
+        Parameters:
+            i (str): TGN identifier, e.g., '7005493'
+    
+        Returns:
+            list: a list of strings, e.g., "Guatemala"
+    
+        Notes:
+            This data is spotty- English-language names are not always available.
+        """
+        results = set()
+        for row in self.g.query(
+            prepareQuery(''' 
+                SELECT ?label
+                WHERE {
+                    ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+                    FILTER langMatches(lang(?label), "EN")
+                }
+            '''),
+            initBindings={
+                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
+            }
+        ):
+            results.add(str(row[0]))
+        return list(results)
+    
+    def get_tgn_preferred_place_name(self, i):
+        """Get English-language place names if we can, otherwise get a list of all
+           place names.
+    
+        Parameters:
+            i (str): TGN identifier, e.g., '7005493'
+    
+        Returns:
+            list: a list of strings, e.g., "Guatemala"
+        """
+        place_names = self.get_tgn_place_name_en(i)
+        if len(place_names) > 0:
+            return place_names
+        else:
+            return self.get_tgn_place_names(i)
+    
+    def get_glottolog_codes(self):
+        """Get all ISO639P3P Codes from the Glottolog graph.
+    
+        Parameters:
+            (none)
+    
+        Returns:
+            list: all identifiers. 
+        """
+        results = set()
+        for row in self.g.query('''
+            SELECT ?code
+            WHERE {
+                ?_ <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code
+            }
+        '''):
+            results.add(str(row[0]))
+        return results
+    
+    def get_glottolog_language_names(self, c):
+        """Get all language names from Glottolog for a given identifier. 
+     
+        Parameters:
+            c (str): ISO 639P3P code, e.g., "eng"
+    
+        Returns:
+            list: a list of language names as unicode strings.
+        """
+        results = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?label
+                WHERE {
+                    ?identifier <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    {
+                        ?identifier <http://www.w3.org/2004/02/skos/core#altLabel> ?label
+                    } UNION {
+                        ?identifier <http://www.w3.org/2004/02/skos/core#prefLabel> ?label
+                    }
+                    
+                }
+            '''),
+            initBindings={
+                'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
+            }
+        ):
+            results.add(str(row[0]))
+        return list(results)
+      
+    def get_glottolog_language_preferred_names(self, c):
+        """Get preferred language names from Glottolog.
+    
+        Parameters:
+            c (str): ISO 639P3P code, e.g., "eng"
+    
+        Returns:
+            list: a list of language names, e.g., "English"
+        """
+        results = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?label
+                WHERE {
+                    ?identifier <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    ?identifier <http://www.w3.org/2004/02/skos/core#prefLabel> ?label
+                }
+            '''),
+            initBindings={
+                'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
+            }
+        ):
+            results.add(str(row[0]))
+        return list(results)
 
 
 class MLCDB:
@@ -644,9 +896,11 @@ class MLCDB:
         return results
 
 
-def build_sqlite_db(cur, graph_file):
+def build_sqlite_db(cur):
     g = rdflib.Graph()
-    g.parse(graph_file, format='turtle')
+    g.parse('meso.big.20230816.ttl', format='turtle')
+    g.parse('glottolog_language.ttl', format='turtle')
+    g.parse('TGN.ttl')
     mlc_graph = MLCGraph(g)
 
     # build tables
