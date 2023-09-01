@@ -1,9 +1,16 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
 from flask import abort, Flask, render_template, request
 from utils import MLCDB, build_sqlite_db
+from flask_babel import Babel, gettext, get_locale
 
 app = Flask(__name__)
+babel = Babel(app, default_locale='es')
 app.config.from_pyfile('local.py')
+
+# These strings are being extracted, but they are not translated live.
+# Probably they need to be set as lazy.
+proj_nav_var = gettext(u'Project navigation')
+site_title_var = gettext(u'Indigenous Mesoamerican Languages Portal')
 
 app.logger.setLevel(logging.DEBUG)
 
@@ -207,7 +214,10 @@ def bad_request(e):
 @app.route('/')
 def home():
     return render_template(
-        'home.html'
+        'home.html',
+        site_title = site_title_var,
+        locale = get_locale(),
+        proj_nav = proj_nav_var
     )
 
 # =============================== hard routing by Vitor
