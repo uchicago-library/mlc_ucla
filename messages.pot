@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-08-31 23:10-0500\n"
+"POT-Creation-Date: 2023-09-01 14:10-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: app.py:12 templates/sidebar-left.html:4
-msgid "Project navigation"
+#: templates/home.html:9
+msgid "Indigenous Mesoamerican Languages Portal"
 msgstr ""
 
-#: app.py:13 templates/home.html:9
-msgid "Indigenous Mesoamerican Languages Portal"
+#: templates/sidebar-left.html:4
+msgid "Project navigation"
 msgstr ""
 

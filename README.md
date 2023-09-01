@@ -34,7 +34,7 @@ Get a copy of local.py from another developer or from one of the production
 servers and place it in the mlc directory.
 
 Build an SQlite data dump from triples:
-```cosole
+```console
 flask build-db
 ```
 

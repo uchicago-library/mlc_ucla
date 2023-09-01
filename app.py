@@ -1,16 +1,29 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
-from flask import abort, Flask, render_template, request
+from flask import abort, Flask, render_template, request, session, redirect
+from flask_session import Session
 from utils import MLCDB, build_sqlite_db
-from flask_babel import Babel, gettext, get_locale
+from flask_babel import Babel, gettext, lazy_gettext, get_locale
 
 app = Flask(__name__)
-babel = Babel(app, default_locale='es')
+
+def get_locale():
+    return session.get('language', 'en')
+@app.route('/language-change', methods=["POST"])
+def change_language():
+    if (session['language'] == 'en'):
+        session['language'] = 'es'
+    else:
+        session['language'] = 'en'
+    return redirect(request.referrer) 
+
+babel = Babel(app, locale_selector=get_locale)
 app.config.from_pyfile('local.py')
 
-# These strings are being extracted, but they are not translated live.
-# Probably they need to be set as lazy.
-proj_nav_var = gettext(u'Project navigation')
-site_title_var = gettext(u'Indigenous Mesoamerican Languages Portal')
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+# To define strings in code, it has to be with lazy_gettext()
+# test_string_lazy = lazy_gettext(u'Test Lazy String Original') 
 
 app.logger.setLevel(logging.DEBUG)
 
@@ -42,7 +55,7 @@ def cli_build_db():
     con = sqlite3.connect(':memory:')
     build_sqlite_db(con.cursor())
 
-    with open(app.config['DB'], 'w') as f:
+    with open(app.config['DB'], 'w', encoding="utf-8") as f:
         for line in sqlite_dump.iterdump(con):
             f.write(line + '\n')
 
@@ -213,11 +226,11 @@ def bad_request(e):
 
 @app.route('/')
 def home():
+    session['language'] = get_locale()
     return render_template(
         'home.html',
-        site_title = site_title_var,
         locale = get_locale(),
-        proj_nav = proj_nav_var
+        lang = session['language']
     )
 
 # =============================== hard routing by Vitor
