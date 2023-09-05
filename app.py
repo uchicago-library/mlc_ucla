@@ -216,16 +216,6 @@ def item_vmg():
     return render_template(
         'item.html'
     )
-@app.route('/browse-vmg/') # Normal route givess 400
-def browse_vmg():
-    return render_template(
-        'browse.html'
-    )
-@app.route('/browse-kathy/') # To compare with Kathy's Mock
-def browse_kathy():
-    return render_template(
-        'browse-kathy.html'
-    )
 # =============================== END hard routing by Vitor
 
 @app.route('/browse/')
