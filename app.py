@@ -35,7 +35,7 @@ def cli_build_db():
     con = sqlite3.connect(':memory:')
     build_sqlite_db(con.cursor())
 
-    with open(app.config['DB'], 'w') as f:
+    with open(app.config['DB'], 'w', encoding="utf-8") as f:
         for line in sqlite_dump.iterdump(con):
             f.write(line + '\n')
 
