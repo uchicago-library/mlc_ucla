@@ -1,14 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
+<div class="" id="content" role="main">
   <h1>{{ title_slug }}</h1>
           
   <article>
-    <ul>
-      {% for b in browse_terms %}
-        <li><a href="/search?facet={{ browse_type }}%3A{{ b[0]|urlencode }}">{{ b[0] }} ({{ b[1] }})</a></li>
-      {% endfor %}
+    <h2>Cells</h2>
+    <div class=" browse-list-wrapper">
+      <ul style="padding: .5rem">
+        {% for b in browse_terms|sort() %}
+          <li class="inline-item">
+            <a href="/search?facet={{ browse_type }}%3A{{ b[0]|urlencode }}">
+              {{ b[0] }} ({{ b[1] }})
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
     </ul>
   </article>
 

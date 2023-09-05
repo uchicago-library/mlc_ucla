@@ -67,8 +67,36 @@ html{
 .sidebar.sidebar-right h3{
 	font-size: 1.1rem;
 }
+.sidebar.sidebar-right dl{
+	display: block;
+}
+.sidebar.sidebar-right dt{
+  border-top: 1px solid #ddd;
+  border: none;
+	padding-top: 0.7rem;
+	padding-bottom: 0.3rem;
+}
+.sidebar.sidebar-right dd{
+	padding-left: 0;
+	padding-top: 0;
+	padding-bottom: 1rem;
+  border: none;
+}
 
 
+/* =============== BROWSE */
+.browse-list-wrapper ul{
+	list-style-type: none;
+	padding: .5rem;
+}
+.browse-list-wrapper .inline-item{
+	display: inline-block;
+	width: 150px;
+	height: 2rem; 
+	vertical-align: top;
+	margin: .3rem .5rem;
+	line-height: 1rem;
+}
 /* =============== ITEM */
 /* Title Element */
 /* easy fix */
