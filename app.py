@@ -210,14 +210,6 @@ def home():
         'home.html'
     )
 
-# =============================== hard routing by Vitor
-@app.route('/item-vmg/') # Normal route givess 400
-def item_vmg():
-    return render_template(
-        'item.html'
-    )
-# =============================== END hard routing by Vitor
-
 @app.route('/browse/')
 def browse():
     mlc_db = MLCDB(app.config)
@@ -282,10 +274,16 @@ def search():
 
     results = mlc_db.get_search(query, facets)
 
+    if( facets ):
+        title_stub = facets[0]
+    else:
+        title_stub = "'"+query+"'"
+
     return render_template(
         'search.html',
         facets = [],
-        results = results
+        results = results,
+        title_slug = 'Search Results for '+title_stub
     )
     
 @app.route('/series/<noid>/')

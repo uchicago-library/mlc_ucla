@@ -6,37 +6,23 @@ doesn't seem necessary. */
 html{
 	font-size: 14px;
 }
-
 .main-content{
 	padding-top: 2rem;
+}
+/*@media (min-width:500px){
+	.main-content{
+    padding: 2rem 2rem 2rem 3rem;
+  }
+}*/
+
+h1{
+	margin-bottom: 2rem;
 }
 
 .sidebar{
 	background: #f6f7f2;
 	padding: 0;
 	margin-bottom: 1rem;
-}
-.sidebar .navbar{
-	margin: 0;
-	min-height: unset;
-}
-.sidebar .btn.sidebar-collapse-btn{
-	background: transparent;
-	color: #800000;
-	font-weight: 600;
-}
-.sidebar .sidebar-collapse-btn .fa-plus{
-	display: none;
-}
-.sidebar .sidebar-collapse-btn.collpased .fa-plus{
-	display: block;
-}
-.sidebar .sidebar-collapse-btn.collpased .fa-minus{
-	display: none;
-}
-.sidebar .navbar .nav.navbar-nav{
-	margin: 0;
-	padding-left: 1rem;
 }
 .sidebar ul{
 	padding: 0;
@@ -47,18 +33,55 @@ html{
 	padding-bottom: 0;
 	float: unset;
 }
-.sidebar .collections{
-	padding-bottom: 1.5rem;
+
+/* ======= SIDEBAR LEFT */
+
+.sidebar.sidebar-left .navbar{
+	margin: 0;
+	min-height: unset;
 }
-@media (min-width:992px){
-	.sidebar .collapse{
+.sidebar.sidebar-left .btn.sidebar-collapse-btn{
+	background: transparent;
+	color: #800000;
+	font-weight: 600;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn .fa-plus{
+	display: none;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-plus{
+	display: block;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-minus{
+	display: none;
+}
+.sidebar.sidebar-left .navbar .nav.navbar-nav{
+	margin: 0;
+	padding-left: 1rem;
+	padding-left: 0;
+}
+.sidebar.sidebar-left .navbar .nav.navbar-nav li a{
+  padding: .8rem 1rem !important;
+}
+@media (min-width:768px){
+	.sidebar.sidebar-left .collapse{
 		display: block !important;
 	}
+}
+	.no-left-column{
+		padding-left: 3rem;
+	}
+@media (min-width:992px){
 }
 
 /* ======= SIDEBAR RIGHT */
 .sidebar.sidebar-right{
 	padding: 1rem 1.5rem;
+}
+.sidebar.sidebar-right .form-group{
+	margin: 0;
+}
+.sidebar.sidebar-right .collections{
+	padding-bottom: 1.5rem;
 }
 .sidebar.sidebar-right h2{
 	margin: 0;
@@ -84,6 +107,10 @@ html{
 }
 
 
+/* =============== SEARCH */
+.search-results-facet{
+	padding-right: .8rem;
+}
 /* =============== BROWSE */
 .browse-list-wrapper ul{
 	list-style-type: none;

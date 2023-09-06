@@ -1,47 +1,60 @@
 {% extends "base.html" %}
 
+
 {% block content %}
-  <div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
+  <div class="" id="content" role="main">
     <!-- Main Content -->
     <h1>Indigenous Mesoamerican Languages Portal</h1>
 
     <!-- Main Content -->
     <div class="search-results">
-      <h2>Search Results for <em>"K'iche'"</em></h2>
+      <h2>{{ title_slug }}</h2>
     </div><!-- // search-results -->
 
     <section class="listing" role="main">
       {% for result in results %}
+
+        {% set status = result.1.access_rights|trim() %}
+        {% if status == "['Restricted']" %}
+          {% set statusclass = 'warning' %}
+        {% elif status == "['Public domain']" %}
+          {% set statusclass = 'success' %}
+        {% else %}
+          {% set statusclass = 'info' %}
+        {% endif %}
         <figure>
           <figcaption>
-            <a href="/object/{{ result.0 }}/">
-              <h3>Series title: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }}</a> <span class="badge badge-info">[status]</span></h3>
+            <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+              <h3>
+                Series: {{ result.1.titles.0 }}
+                <span class="badge badge-{{ statusclass }}">{{ status }}</span>
+              </h3>
             </a>
             {% if result.1.contributor %}
-              <p>Contributor:
+              <p><b>Contributor:</b>
                 {% for contributor in result.1.contributor %}
-                    <span>{{ contributor }}</span>
+                    <span class="search-results-facet">{{ contributor }};</span>
                 {% endfor %}
              </p>
             {% endif %}
             {% if result.1.language %}
-              <p>Indigenous Language(s): 
+              <p><b>Indigenous Language(s): </b>
                 {% for language in result.1.language %}
-                    <span>{{ language }}</span>
+                  <a href="/search?facet=language%3A{{ language|urlencode }}" class="search-results-facet">{{ language }}</a>
                 {% endfor %}
              </p>
             {% endif %}
             {% if result.1.location %}
-              <p>Location:
+              <p><b>Location:</b>
                 {% for location in result.1.location %}
-                    <span>{{ location }}</span>
+                  <a href="/search?facet=location%3A{{ location|urlencode }}" class="search-results-facet">{{ location }}</a>
                 {% endfor %}
              </p>
             {% endif %}
             {% if result.1.date %}
-              <p>Date:
+              <p><b>Date:</b>
                 {% for date in result.1.date %}
-                    <span>{{ date }}</span>
+                  <a href="/search?facet=date%3A{{ date|urlencode }}" class="search-results-facet">{{ date }}</a>
                 {% endfor %}
              </p>
             {% endif %}
