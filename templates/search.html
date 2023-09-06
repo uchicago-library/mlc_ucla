@@ -14,9 +14,7 @@
       {% for result in results %}
         <figure>
           <figcaption>
-            <a href="/object/{{ result.0 }}/">
-              <h3>Series title: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }}</a> <span class="badge badge-info">[status]</span></h3>
-            </a>
+            <h3>Series title: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }}</a> <span class="badge badge-info">[status]</span></h3>
             {% if result.1.contributor %}
               <p>Contributor:
                 {% for contributor in result.1.contributor %}
