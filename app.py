@@ -226,8 +226,8 @@ def browse():
     title_slugs = {
         'contributor': 'Browse by Contributors',
         'creator':     'Browse by Creator',
-        'date':        'Browse by Date',
-        'decade':      'Browse by Decade',
+        'date':        'Browse by Dates',
+        'decade':      'Browse by Dates',
         'language':    'Browse by Language',
         'location':    'Browse by Location'
     }
