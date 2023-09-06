@@ -818,12 +818,12 @@ class MLCDB:
                 order by {}
             '''.format(
                 {
-                    'contributor': 'count(id) desc',
-                    'creator':     'count(id) desc',
+                    'contributor': 'term',
+                    'creator':     'term',
                     'date':        'term',
                     'decade':      'term',
-                    'language':    'count(id) desc',
-                    'location':    'count(id) desc'
+                    'language':    'term',
+                    'location':    'term'
                 }[browse_type]
             ),
             (browse_type,)
