@@ -2,6 +2,17 @@ import json, os, rdflib, re, sqlite3, sys, timeit
 from docopt import docopt
 from rdflib.plugins.sparql import prepareQuery
 
+def regularize_string(s):
+    """Regularize a string for browses by trimming excess whitespace, 
+       converting all whitespace to a single space, etc.
+  
+       Parameters: s(str) - a string to regularize.
+ 
+       Returns:
+           str: 
+    """
+    return ' '.join(s.split())
+
 class MLCGraph:
     def __init__(self, g):
         """
@@ -404,12 +415,16 @@ class MLCGraph:
                 }
             )
             for browse_term, identifier in qres:
+                browse_term = regularize_string(str(browse_term))
                 for label in self.get_glottolog_language_preferred_names(
-                    str(browse_term)
+                    browse_term
                 ):
+                    label = regularize_string(label)
+                    if not label:
+                        continue
                     if not label in browse_dict:
                         browse_dict[label] = set()
-                    browse_dict[label].add(str(identifier))
+                    browse_dict[label].add(regularize_string(str(identifier)))
         elif browse_type == 'location':
             qres = self.g.query(
                 prepareQuery('''
@@ -425,12 +440,16 @@ class MLCGraph:
             )
             for browse_terms, identifier in qres:
                 for browse_term in browse_terms.split():
+                    browse_term = regularize_string(browse_term)
                     for label in self.get_tgn_preferred_place_name(
-                        str(browse_term)
+                        browse_term
                     ):
+                        label = regularize_string(label)
+                        if not label:
+                            continue
                         if not label in browse_dict:
                             browse_dict[label] = set()
-                        browse_dict[label].add(str(identifier))
+                        browse_dict[label].add(regularize_string(str(identifier)))
         else:
             qres = self.g.query(
                 prepareQuery('''
@@ -446,9 +465,12 @@ class MLCGraph:
             )
             for labels, identifier in qres:
                 for label in labels.split('\n'):
+                    label = regularize_string(label)
+                    if not label:
+                        continue
                     if not label in browse_dict:
                         browse_dict[label] = set()
-                    browse_dict[label].add(str(identifier))
+                    browse_dict[label].add(regularize_string(str(identifier)))
     
         # convert identifiers set to a list.
         for k in browse_dict.keys():
@@ -646,7 +668,7 @@ class MLCGraph:
                 'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
     
     def get_tgn_preferred_place_name(self, i):
@@ -711,7 +733,7 @@ class MLCGraph:
                 'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
       
     def get_glottolog_language_preferred_names(self, c):
@@ -736,7 +758,7 @@ class MLCGraph:
                 'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
 
 
