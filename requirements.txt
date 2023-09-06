@@ -2,3 +2,5 @@ docopt
 flask
 rdflib
 sqlite_dump
+flask_babel
+flask_session
