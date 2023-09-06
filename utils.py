@@ -21,9 +21,6 @@ class MLCGraph:
         """
         self.g = g
 
-        with open('glottolog_lookup.json') as f:
-            self.glottolog_lookup = json.load(f)
-
     def get_series_identifiers(self):
         """
         Get all series identifiers from the graph.
@@ -127,12 +124,12 @@ class MLCGraph:
                 prepareQuery('''
                     SELECT ?value
                     WHERE {
-                        ?series_id ?p ?value
+                        ?item_id ?p ?value
                     }
                 '''),
                 initBindings={
                     'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(item_id)
+                    'item_id': rdflib.URIRef(item_id)
                 }
             ):
                 values.add(' '.join(row[0].split()))
@@ -157,14 +154,14 @@ class MLCGraph:
             prepareQuery('''
                 SELECT ?code
                 WHERE {
-                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?item_id <http://lib.uchicago.edu/language> ?l .
                     ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
                     ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
                     FILTER (?role IN ('Both', 'Primary'))
                 }
             '''),
             initBindings={
-                'series_id': rdflib.URIRef(item_id)
+                'item_id': rdflib.URIRef(item_id)
             }
         ):
             codes.add(row[0])
@@ -186,14 +183,14 @@ class MLCGraph:
             prepareQuery('''
                 SELECT ?code
                 WHERE {
-                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?item_id <http://lib.uchicago.edu/language> ?l .
                     ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
                     ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
                     FILTER (?role IN ('Both', 'Subject'))
                 }
             '''),
             initBindings={
-                'series_id': rdflib.URIRef(item_id)
+                'item_id': rdflib.URIRef(item_id)
             }
         ):
             codes.add(row[0])
@@ -208,6 +205,23 @@ class MLCGraph:
         data['subject_language'] = []
         for preferred_name in preferred_names:
             data['subject_language'].append(preferred_name)
+
+        # panopto links
+        panopto_links = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?panopto_link
+                WHERE {
+                    ?aggregation <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?item_id .
+                    ?aggregation <http://www.europeana.eu/schemas/edm/isShownBy> ?panopto_link
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            panopto_links.add(str(row[0]))
+        data['panopto_links'] = list(panopto_links)
 
         return data
 
@@ -771,7 +785,7 @@ class MLCDB:
         self.con = sqlite3.connect(':memory:')
         self.cur = self.con.cursor()
 
-        with open(config['DB'], encoding='utf-8') as f:
+        with open(config['DB']) as f:
             self.cur.executescript(f.read())
 
         # build the search table after loading data to avoid issues dumping and
@@ -818,12 +832,12 @@ class MLCDB:
                 order by {}
             '''.format(
                 {
-                    'contributor': 'term',
-                    'creator':     'term',
+                    'contributor': 'count(id) desc',
+                    'creator':     'count(id) desc',
                     'date':        'term',
                     'decade':      'term',
-                    'language':    'term',
-                    'location':    'term'
+                    'language':    'count(id) desc',
+                    'location':    'count(id) desc'
                 }[browse_type]
             ),
             (browse_type,)

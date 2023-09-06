@@ -49,7 +49,9 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 12 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 13 + '\n').format(
+        'Panopto Links',
+        ' '.join(i['panopto_links']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -226,8 +228,8 @@ def browse():
     title_slugs = {
         'contributor': 'Browse by Contributors',
         'creator':     'Browse by Creator',
-        'date':        'Browse by Dates',
-        'decade':      'Browse by Dates',
+        'date':        'Browse by Date',
+        'decade':      'Browse by Decade',
         'language':    'Browse by Language',
         'location':    'Browse by Location'
     }
