@@ -771,7 +771,7 @@ class MLCDB:
         self.con = sqlite3.connect(':memory:')
         self.cur = self.con.cursor()
 
-        with open(config['DB']) as f:
+        with open(config['DB'], encoding='utf-8') as f:
             self.cur.executescript(f.read())
 
         # build the search table after loading data to avoid issues dumping and
