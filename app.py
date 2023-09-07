@@ -41,6 +41,17 @@ def cli_get_browse(browse_type):
         print('{} ({})'.format(row[0], row[1]))
 
 @app.cli.command(
+    'get-browse-term',
+    short_help='Get series for a specific browse term.'
+)
+@click.argument('browse_type')
+@click.argument('browse_term')
+def cli_get_browse_term(browse_type, browse_term):
+    mlc_db = MLCDB(app.config)
+    for row in mlc_db.get_browse_term(browse_type, browse_term):
+        print(row)
+
+@app.cli.command(
     'get-item',
     short_help='Get item info for an item identifier.'
 )
@@ -116,13 +127,15 @@ def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 7 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
+                'Panopto Links',
+                ' | '.join(i[1]['panopto_links']),
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
@@ -243,12 +256,23 @@ def browse():
         )
         abort(400)
 
-    return render_template(
-        'browse.html',
-        title_slug = title_slugs[browse_type],
-        browse_terms = mlc_db.get_browse(browse_type),
-        browse_type = browse_type
-    )
+    browse_term = request.args.get('term')
+    if browse_term:
+        results = mlc_db.get_browse_term(browse_type, browse_term)
+        return render_template(
+            'search.html',
+            facets = [],
+            query = browse_term,
+            query_field = browse_type,
+            results = results
+        )
+    else:
+        return render_template(
+            'browse.html',
+            title_slug = title_slugs[browse_type],
+            browse_terms = mlc_db.get_browse(browse_type),
+            browse_type = browse_type
+        )
 
 @app.route('/item/<noid>/')
 def item(noid):
@@ -288,6 +312,8 @@ def search():
     return render_template(
         'search.html',
         facets = [],
+        query = query,
+        query_field = '',
         results = results
     )
     
