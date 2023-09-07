@@ -1,6 +1,8 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
 from flask import abort, Flask, render_template, request
 from utils import MLCDB, build_sqlite_db
+import requests
+from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
 app.config.from_pyfile('local.py')
@@ -250,9 +252,19 @@ def browse():
         browse_type = browse_type
     )
 
-# MT: somewhere in here is where the sound file code would go
 @app.route('/item/<noid>/')
 def item(noid):
+    def ark_to_panopto(ark_url):
+        req = requests.head(ark_url, allow_redirects=True)
+        percent_url = req.url
+        return parse_qs(
+            urlparse(
+                parse_qs(
+                    urlparse(percent_url).query
+                )['ReturnUrl'][0]
+            ).query
+        )["id"][0]
+
     mlc_db = MLCDB(app.config)
 
     if not re.match('^[a-z0-9]{12}$', noid):
@@ -265,6 +277,11 @@ def item(noid):
 
     item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
+    if item_data['panopto_links']:
+        panopto_identifier = ark_to_panopto(item_data['panopto_links'][0])
+    else:
+        panopto_identifier = ''
+
     series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
     try:
@@ -274,8 +291,11 @@ def item(noid):
         
     return render_template(
         'item.html',
-        **(item_data | {'series': series, 'title_stub': title_stub})
+        **(item_data | {'series': series,
+                        'title_stub': title_stub,
+                        'panopto_identifier': panopto_identifier })
     )
+
 
 @app.route('/search/')
 def search():
