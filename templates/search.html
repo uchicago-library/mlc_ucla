@@ -14,20 +14,13 @@
     <section class="listing" role="main">
       {% for result in results %}
 
-        {% set status = result.1.access_rights|trim() %}
-        {% if status == "['Restricted']" %}
-          {% set statusclass = 'warning' %}
-        {% elif status == "['Public domain']" %}
-          {% set statusclass = 'success' %}
-        {% else %}
-          {% set statusclass = 'info' %}
-        {% endif %}
         <figure>
           <figcaption>
             <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
               <h3>
                 Series: {{ result.1.titles.0 }}
-                <span class="badge badge-{{ statusclass }}">{{ status }}</span>
+                {% set status = result.1.access_rights|trim() %}
+                {% include 'element-status-label.html' %}
               </h3>
             </a>
             {% if result.1.contributor %}

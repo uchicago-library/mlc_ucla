@@ -207,7 +207,8 @@ def bad_request(e):
 @app.route('/')
 def home():
     return render_template(
-        'home.html'
+        'home.html',
+        ishome = True
     )
 
 @app.route('/browse/')
@@ -275,15 +276,15 @@ def search():
     results = mlc_db.get_search(query, facets)
 
     if( facets ):
-        title_stub = facets[0]
+        title_stub = 'Search Results for '+facets[0]
     else:
-        title_stub = "'"+query+"'"
+        title_stub = "Search Results for '"+query+"'"
 
     return render_template(
         'search.html',
         facets = [],
         results = results,
-        title_slug = 'Search Results for '+title_stub
+        title_slug = title_stub
     )
     
 @app.route('/series/<noid>/')

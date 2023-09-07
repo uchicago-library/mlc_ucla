@@ -121,8 +121,8 @@ h1{
 	width: 150px;
 	height: 2rem; 
 	vertical-align: top;
-	margin: .3rem .5rem;
-	line-height: 1rem;
+  margin: .5rem;
+  line-height: 1.1rem;
 }
 /* =============== ITEM */
 /* Title Element */
