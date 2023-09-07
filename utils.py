@@ -2,6 +2,17 @@ import json, os, rdflib, re, sqlite3, sys, timeit
 from docopt import docopt
 from rdflib.plugins.sparql import prepareQuery
 
+def regularize_string(s):
+    """Regularize a string for browses by trimming excess whitespace, 
+       converting all whitespace to a single space, etc.
+  
+       Parameters: s(str) - a string to regularize.
+ 
+       Returns:
+           str: 
+    """
+    return ' '.join(s.split())
+
 class MLCGraph:
     def __init__(self, g):
         """
@@ -9,9 +20,6 @@ class MLCGraph:
             g (rdflib.Graph): a graph containing triples for the project.
         """
         self.g = g
-
-        with open('glottolog_lookup.json') as f:
-            self.glottolog_lookup = json.load(f)
 
     def get_series_identifiers(self):
         """
@@ -84,12 +92,12 @@ class MLCGraph:
             results.add(row[0])
         return sorted(list(results))
 
-    def get_item_info(self, i):
+    def get_item_info(self, item_id):
         """
         Get info for search snippets and page views for a given series.
     
         Parameters:
-            i (str): a series identifier.
+            item_id (str): a series identifier.
     
         Returns:
             str: series title.
@@ -102,7 +110,6 @@ class MLCGraph:
             'creator':              'http://purl.org/dc/terms/creator',
             'description':          'http://purl.org/dc/elements/1.1/description',
             'identifier':           'http://purl.org/dc/elements/1.1/identifier',
-            'language':             'http://purl.org/dc/elements/1.1/language',
             'titles':               'http://purl.org/dc/elements/1.1/title',
             'access_rights':        'http://purl.org/dc/terms/accessRights',
             'alternative_title':    'http://purl.org/dc/terms/alternative',
@@ -117,25 +124,16 @@ class MLCGraph:
                 prepareQuery('''
                     SELECT ?value
                     WHERE {
-                        ?series_id ?p ?value
+                        ?item_id ?p ?value
                     }
                 '''),
                 initBindings={
                     'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(i)
+                    'item_id': rdflib.URIRef(item_id)
                 }
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
-
-        # convert language codes to preferred names. 
-        glottolog_codes = data['language']
-        data['language'] = []
-        for c in glottolog_codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
-                c
-            ):
-                data['language'].append(preferred_name)
 
         # convert TGN identifiers to preferred names.
         tgn_identifiers = set()
@@ -150,23 +148,89 @@ class MLCGraph:
             ):
                 data['location'].append(preferred_name)
    
-        # JEJ TODO 
+        # primary_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?item_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Primary'))
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            codes.add(row[0])
 
-        # special processing
-        # 'http://lib.uchicago.edu/language where http://lib.uchicago.edu/icu/languageRole is 'Primary' or 'Both'
-        #  https://www.iso.org/standard/39534.htmliso639P3PCode
-    
-        # Indigenous Language -> uchicago:language where icu:languageRole is 'Primary' or 'Both'
-        # Language -> uchicago:language where icu:languageRole is 'Subject' or 'Both'
-    
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['primary_language'] = []
+        for preferred_name in preferred_names:
+            data['primary_language'].append(preferred_name)
+
+        # subject_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?item_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Subject'))
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['subject_language'] = []
+        for preferred_name in preferred_names:
+            data['subject_language'].append(preferred_name)
+
+        # panopto links
+        panopto_links = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?panopto_link
+                WHERE {
+                    ?aggregation <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?item_id .
+                    ?aggregation <http://www.europeana.eu/schemas/edm/isShownBy> ?panopto_link
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            panopto_links.add(str(row[0]))
+        data['panopto_links'] = list(panopto_links)
+
         return data
 
-    def get_series_info(self, i):
+    def get_series_info(self, series_id):
         """
         Get info for search snippets and page views for a given series.
     
         Parameters:
-            i (str): a series identifier.
+            series_id (str): a series identifier.
     
         Returns:
             str: series title.
@@ -181,7 +245,6 @@ class MLCGraph:
             'creator':           'http://purl.org/dc/terms/creator',
             'description':       'http://purl.org/dc/elements/1.1/description',
             'identifier':        'http://purl.org/dc/elements/1.1/identifier',
-            'language':          'http://purl.org/dc/elements/1.1/language',
             'titles':            'http://purl.org/dc/elements/1.1/title',
             'access_rights':     'http://purl.org/dc/terms/accessRights',
             'alternative_title': 'http://purl.org/dc/terms/alternative',
@@ -199,20 +262,11 @@ class MLCGraph:
                 '''),
                 initBindings={
                     'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(i)
+                    'series_id': rdflib.URIRef(series_id)
                 }
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
-
-        # convert language codes to preferred names. 
-        glottolog_codes = data['language']
-        data['language'] = []
-        for c in glottolog_codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
-                c
-            ):
-                data['language'].append(preferred_name)
 
         # convert TGN identifiers to preferred names.
         tgn_identifiers = set()
@@ -226,6 +280,64 @@ class MLCGraph:
                 i
             ):
                 data['location'].append(preferred_name)
+
+        # primary_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Primary'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['primary_language'] = []
+        for preferred_name in preferred_names:
+            data['primary_language'].append(preferred_name)
+
+        # subject_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Subject'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['subject_language'] = []
+        for preferred_name in preferred_names:
+            data['subject_language'].append(preferred_name)
 
         return data
 
@@ -317,12 +429,16 @@ class MLCGraph:
                 }
             )
             for browse_term, identifier in qres:
+                browse_term = regularize_string(str(browse_term))
                 for label in self.get_glottolog_language_preferred_names(
-                    str(browse_term)
+                    browse_term
                 ):
+                    label = regularize_string(label)
+                    if not label:
+                        continue
                     if not label in browse_dict:
                         browse_dict[label] = set()
-                    browse_dict[label].add(str(identifier))
+                    browse_dict[label].add(regularize_string(str(identifier)))
         elif browse_type == 'location':
             qres = self.g.query(
                 prepareQuery('''
@@ -338,12 +454,16 @@ class MLCGraph:
             )
             for browse_terms, identifier in qres:
                 for browse_term in browse_terms.split():
+                    browse_term = regularize_string(browse_term)
                     for label in self.get_tgn_preferred_place_name(
-                        str(browse_term)
+                        browse_term
                     ):
+                        label = regularize_string(label)
+                        if not label:
+                            continue
                         if not label in browse_dict:
                             browse_dict[label] = set()
-                        browse_dict[label].add(str(identifier))
+                        browse_dict[label].add(regularize_string(str(identifier)))
         else:
             qres = self.g.query(
                 prepareQuery('''
@@ -359,9 +479,12 @@ class MLCGraph:
             )
             for labels, identifier in qres:
                 for label in labels.split('\n'):
+                    label = regularize_string(label)
+                    if not label:
+                        continue
                     if not label in browse_dict:
                         browse_dict[label] = set()
-                    browse_dict[label].add(str(identifier))
+                    browse_dict[label].add(regularize_string(str(identifier)))
     
         # convert identifiers set to a list.
         for k in browse_dict.keys():
@@ -559,7 +682,7 @@ class MLCGraph:
                 'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
     
     def get_tgn_preferred_place_name(self, i):
@@ -624,7 +747,7 @@ class MLCGraph:
                 'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
       
     def get_glottolog_language_preferred_names(self, c):
@@ -649,7 +772,7 @@ class MLCGraph:
                 'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
             }
         ):
-            results.add(str(row[0]))
+            results.add(str(row[0]).strip())
         return list(results)
 
 
@@ -662,7 +785,7 @@ class MLCDB:
         self.con = sqlite3.connect(':memory:')
         self.cur = self.con.cursor()
 
-        with open(config['DB']) as f:
+        with open(config['DB'], encoding='utf-8') as f:
             self.cur.executescript(f.read())
 
         # build the search table after loading data to avoid issues dumping and

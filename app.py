@@ -16,15 +16,6 @@ class SetEncoder(json.JSONEncoder):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
 
-def glotto_labels(code):
-    #with open('glotto.json') as f:
-    with open(app.config['GLOTTO_JSON']) as f:
-        lookup = json.load(f)
-    try:
-        return lookup[code]
-    except KeyError:
-        return ''
-
 # CLI
 
 @app.cli.command(
@@ -58,7 +49,9 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 12 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 13 + '\n').format(
+        'Panopto Links',
+        ' '.join(i['panopto_links']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -66,11 +59,11 @@ def cli_get_item(item_identifier):
         'Contributor',
         ' | '.join(i['contributor']),
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['language']),
+        ' | '.join(i['location']),
         'Date',
         ' | '.join(i['date']),
         'Description',
@@ -102,9 +95,9 @@ def cli_get_series(series_identifier):
         'Collection',
         '',
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
         ' | '.join(i['location']),
         'Date',
