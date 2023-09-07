@@ -146,6 +146,7 @@ h1{
 /* Panopto */
 .panopto-iframe{
 	max-width: 100%;
+  margin: 0 auto 1rem;
 }
 
 /* Metadata Description List */ 

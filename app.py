@@ -263,7 +263,7 @@ def item(noid):
         
     return render_template(
         'item.html',
-        **(item_data | {'series': series, 'title_stub': title_stub})
+        **(item_data | {'series': series, 'title_slug': title_stub})
     )
 
 @app.route('/search/')
