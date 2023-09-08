@@ -1,6 +1,8 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
 from flask import abort, Flask, render_template, request
 from utils import MLCDB, build_sqlite_db
+import requests
+from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
 app.config.from_pyfile('local.py')
@@ -15,15 +17,6 @@ class SetEncoder(json.JSONEncoder):
         if isinstance(obj, set):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
-
-def glotto_labels(code):
-    #with open('glotto.json') as f:
-    with open(app.config['GLOTTO_JSON']) as f:
-        lookup = json.load(f)
-    try:
-        return lookup[code]
-    except KeyError:
-        return ''
 
 # CLI
 
@@ -50,6 +43,17 @@ def cli_get_browse(browse_type):
         print('{} ({})'.format(row[0], row[1]))
 
 @app.cli.command(
+    'get-browse-term',
+    short_help='Get series for a specific browse term.'
+)
+@click.argument('browse_type')
+@click.argument('browse_term')
+def cli_get_browse_term(browse_type, browse_term):
+    mlc_db = MLCDB(app.config)
+    for row in mlc_db.get_browse_term(browse_type, browse_term):
+        print(row)
+
+@app.cli.command(
     'get-item',
     short_help='Get item info for an item identifier.'
 )
@@ -58,7 +62,9 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 12 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 13 + '\n').format(
+        'Panopto Links',
+        ' '.join(i['panopto_links']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -66,11 +72,11 @@ def cli_get_item(item_identifier):
         'Contributor',
         ' | '.join(i['contributor']),
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['language']),
+        ' | '.join(i['location']),
         'Date',
         ' | '.join(i['date']),
         'Description',
@@ -102,9 +108,9 @@ def cli_get_series(series_identifier):
         'Collection',
         '',
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
         ' | '.join(i['location']),
         'Date',
@@ -123,13 +129,15 @@ def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 7 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
+                'Panopto Links',
+                ' | '.join(i[1]['panopto_links']),
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
@@ -250,15 +258,37 @@ def browse():
         )
         abort(400)
 
-    return render_template(
-        'browse.html',
-        title_slug = title_slugs[browse_type],
-        browse_terms = mlc_db.get_browse(browse_type),
-        browse_type = browse_type
-    )
+    browse_term = request.args.get('term')
+    if browse_term:
+        results = mlc_db.get_browse_term(browse_type, browse_term)
+        return render_template(
+            'search.html',
+            facets = [],
+            query = browse_term,
+            query_field = browse_type,
+            results = results
+        )
+    else:
+        return render_template(
+            'browse.html',
+            title_slug = title_slugs[browse_type],
+            browse_terms = mlc_db.get_browse(browse_type),
+            browse_type = browse_type
+        )
 
 @app.route('/item/<noid>/')
 def item(noid):
+    def ark_to_panopto(ark_url):
+        req = requests.head(ark_url, allow_redirects=True)
+        percent_url = req.url
+        return parse_qs(
+            urlparse(
+                parse_qs(
+                    urlparse(percent_url).query
+                )['ReturnUrl'][0]
+            ).query
+        )["id"][0]
+
     mlc_db = MLCDB(app.config)
 
     if not re.match('^[a-z0-9]{12}$', noid):
@@ -271,6 +301,11 @@ def item(noid):
 
     item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
+    if item_data['panopto_links']:
+        panopto_identifier = ark_to_panopto(item_data['panopto_links'][0])
+    else:
+        panopto_identifier = ''
+
     series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
     try:
@@ -280,8 +315,11 @@ def item(noid):
         
     return render_template(
         'item.html',
-        **(item_data | {'series': series, 'title_stub': title_stub})
+        **(item_data | {'series': series,
+                        'title_stub': title_stub,
+                        'panopto_identifier': panopto_identifier })
     )
+
 
 @app.route('/search/')
 def search():
@@ -295,6 +333,8 @@ def search():
     return render_template(
         'search.html',
         facets = [],
+        query = query,
+        query_field = '',
         results = results
     )
     
