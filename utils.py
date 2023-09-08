@@ -1,6 +1,8 @@
-import json, os, rdflib, re, sqlite3, sys, timeit
+import json, os, rdflib, sqlite3, sys, timeit
 from docopt import docopt
 from rdflib.plugins.sparql import prepareQuery
+
+import regex as re
 
 def regularize_string(s):
     """Regularize a string for browses by trimming excess whitespace, 
@@ -842,7 +844,43 @@ class MLCDB:
             ),
             (browse_type,)
         ).fetchall()
-    
+
+    def get_browse_term(self, browse_type, browse_term):
+        """
+        Get a list of series for a specific browse term.
+
+        Parameters:
+            browse_type (str): type of browse term.
+            browse_term (str): browse term.
+
+        Returns:
+	    list: a list of browse results. This should contain all the
+            information that search results contain.
+        """
+        assert browse_type in (
+            'contributor', 
+            'creator',
+            'date', 
+            'decade', 
+            'language',
+            'location'
+        )
+
+        results = []
+        for row in self.cur.execute(
+            '''
+                select browse.id, series.info, 0.0
+                from browse
+                inner join series on series.id = browse.id
+                where type=?
+                and term=?
+                order by browse.id
+            ''',
+            (browse_type, browse_term)
+        ).fetchall():
+            results.append((row[0], json.loads(row[1]), row[2]))
+        return results
+
     def get_item(self, identifier):
         """
         Get item metadata.
@@ -936,6 +974,18 @@ class MLCDB:
                   series identifier, a series info dictionary for constructing
                   search snippets, and a rank. 
         """
+        # replace all punctuation with a single space.
+        query = re.sub(u"\p{P}+", " ", str(query))
+
+        # replace all whitespace with a single space.
+        query = ' '.join(query.split())
+
+        # join all search terms with AND. 
+        match_string = []
+        for q in query.split(' '):
+            match_string.append(q)
+        match_string = ' AND '.join(match_string)
+
         subqueries = []
         for f in facets:
             subqueries.append('''
