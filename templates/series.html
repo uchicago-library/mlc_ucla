@@ -32,7 +32,7 @@
             <dt>Creator:</dt>
             <dd>
               {% for i in creator %}
-                <div><a href="/search?facet=creator%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -41,7 +41,7 @@
             <dt>Indigenous Language:</dt>
             <dd>
               {% for i in subject_language %}
-                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -50,7 +50,7 @@
             <dt>Language:</dt>
             <dd>
               {% for i in primary_language %}
-                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -59,7 +59,7 @@
             <dt>Location Where Indigenous Language Is Spoken:</dt>
             <dd>
               {% for i in location %}
-                <div><a href="/search?facet=location%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -68,7 +68,7 @@
             <dt>Date:</dt>
             <dd>
               {% for i in date %}
-                <div><a href="/search?facet=date%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
