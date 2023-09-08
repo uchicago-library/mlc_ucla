@@ -1,18 +1,13 @@
 {% extends "base.html" %}
 
-{% if rights == 'By Request' %}
-  {% set accessbadgeclass = 'warning' %}
-{% elif rights == 'Login Required' %}
-  {% set accessbadgeclass = 'info' %}
-{% elif rights == 'Public' %}
-  {% set accessbadgeclass = 'success' %}
-{% endif %}
-
 {% block content %}
   <div class="" id="content" role="main">
     <div class="title-wrapper">
-      <h1>{{ title_slug }}</h1>
-      <span class="badge badge-{{ accessbadgeclass }}">Access: {{ rights }}</span>
+      <h1>
+        {{ title_slug }}
+        {% set status = access_rights|trim() %}
+        {% include 'element-status-label.html' %}
+      </h1>
     </div>
     <div class="row">
       <!-- Main Content -->
@@ -54,7 +49,7 @@
             <dt>Indigenous Language:</dt>
             <dd>
               {% for i in subject_language %}
-                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -63,7 +58,7 @@
             <dt>Language:</dt>
             <dd>
               {% for i in primary_language %}
-                <div><a href="/search?facet=language%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=language{{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}
@@ -72,7 +67,7 @@
             <dt>Location Where Indigenous Language Is Spoken:</dt>
             <dd>
               {% for i in location %}
-                <div><a href="/search?facet=location%3A{{ i|urlencode }}">{{ i }}</a></div>
+                <div><a href="/browse?type=location{{ i|urlencode }}">{{ i }}</a></div>
               {% endfor %}
             </dd>
           {% endif %}

@@ -1,58 +1,72 @@
 {% extends "base.html" %}
 
+
 {% block content %}
-  <div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
+  <div class="" id="content" role="main">
     <!-- Main Content -->
-    <h1>Mesoamerican Languages Collections</h1>
+    <h1>Indigenous Mesoamerican Languages Portal</h1>
 
     <!-- Main Content -->
     <div class="search-results">
-      <h2>Search Results for <em>"K'iche'"</em></h2>
+      <h2>{{ title_slug }}</h2>
     </div><!-- // search-results -->
 
     <section class="listing" role="main">
-      {% for result in results %}
-        <figure>
-          <figcaption>
-            <h3>Series title: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }}</a> <span class="badge badge-info">[status]</span></h3>
-            {% if result.1.contributor %}
-              <p>Contributor:
-                {% for contributor in result.1.contributor %}
-                    <span>{{ contributor }}</span>
-                {% endfor %}
-             </p>
-            {% endif %}
-            {% if result.1.language %}
-              <p>Indigenous Language(s): 
-                {% for language in result.1.language %}
-                    <span>{{ language }}</span>
-                {% endfor %}
-             </p>
-            {% endif %}
-            {% if result.1.location %}
-              <p>Location:
-                {% for location in result.1.location %}
-                    <span>{{ location }}</span>
-                {% endfor %}
-             </p>
-            {% endif %}
-            {% if result.1.date %}
-              <p>Date:
-                {% for date in result.1.date %}
-                    <span>{{ date }}</span>
-                {% endfor %}
-             </p>
-            {% endif %}
-            {% if result.1.content_type %}
-              <p>Resource Type:
-                {% for content_type in result.1.content_type %}
-                    <span>{{ content_type }}</span>
-                {% endfor %}
-             </p>
-            {% endif %}
-          </figcaption>
-        </figure>
-      {% endfor %}
+      {% if results %}
+        {% for result in results %}
+
+          <figure>
+            <figcaption>
+              <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+                <h3>
+                  Series: {{ result.1.titles.0 }}
+                  {% set status = result.1.access_rights|trim() %}
+                  {% include 'element-status-label.html' %}
+                </h3>
+              </a>
+              {% if result.1.contributor %}
+                <p><b>Contributor:</b>
+                  {% for contributor in result.1.contributor %}
+                      <span class="search-results-facet">{{ contributor }};</span>
+                  {% endfor %}
+               </p>
+              {% endif %}
+              {% if result.1.language %}
+                <p><b>Indigenous Language(s): </b>
+                  {% for language in result.1.language %}
+                    <a href="/browse/?type=language&term={{ language|urlencode }}" class="search-results-facet">{{ language }}</a>
+                  {% endfor %}
+               </p>
+              {% endif %}
+              {% if result.1.location %}
+                <p><b>Location:</b>
+                  {% for location in result.1.location %}
+                    <a href="/browse/?type=location&term={{ location|urlencode }}" class="search-results-facet">{{ location }}</a>
+                  {% endfor %}
+               </p>
+              {% endif %}
+              {% if result.1.date %}
+                <p><b>Date:</b>
+                  {% for date in result.1.date %}
+                    <a href="/browse/?type=date&term={{ date|urlencode }}" class="search-results-facet">{{ date }}</a>
+                  {% endfor %}
+               </p>
+              {% endif %}
+              {% if result.1.content_type %}
+                <p>Resource Type:
+                  {% for content_type in result.1.content_type %}
+                      <span>{{ content_type }}</span>
+                  {% endfor %}
+               </p>
+              {% endif %}
+            </figcaption>
+          </figure>
+        {% endfor %}
+      {% else %}
+        <p class="lead">
+          <em>No results found.</em>
+        </p>
+      {% endif %}
     </section>
   </div>
 {% endblock %}

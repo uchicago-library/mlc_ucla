@@ -3,3 +3,5 @@ flask
 rdflib
 regex
 sqlite_dump
+flask_babel
+flask_session

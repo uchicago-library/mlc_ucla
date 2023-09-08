@@ -113,7 +113,6 @@ class MLCGraph:
             'description':          'http://purl.org/dc/elements/1.1/description',
             'identifier':           'http://purl.org/dc/elements/1.1/identifier',
             'titles':               'http://purl.org/dc/elements/1.1/title',
-            'access_rights':        'http://purl.org/dc/terms/accessRights',
             'alternative_title':    'http://purl.org/dc/terms/alternative',
             'contributor':          'http://purl.org/dc/terms/contributor',
             'date':                 'http://purl.org/dc/terms/date',
@@ -224,6 +223,23 @@ class MLCGraph:
         ):
             panopto_links.add(str(row[0]))
         data['panopto_links'] = list(panopto_links)
+
+        # access rights
+        access_rights = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?access_rights
+                WHERE {
+                    ?item_id <http://purl.org/dc/terms/isPartOf> ?series_id .
+                    ?series_id <http://purl.org/dc/terms/accessRights> ?access_rights
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            access_rights.add(str(row[0]))
+        data['access_rights'] = list(access_rights)
 
         return data
 
@@ -831,17 +847,8 @@ class MLCDB:
                 from browse
                 where type=?
                 group by term
-                order by {}
-            '''.format(
-                {
-                    'contributor': 'count(id) desc',
-                    'creator':     'count(id) desc',
-                    'date':        'term',
-                    'decade':      'term',
-                    'language':    'count(id) desc',
-                    'location':    'count(id) desc'
-                }[browse_type]
-            ),
+                order by term
+            ''',
             (browse_type,)
         ).fetchall()
 

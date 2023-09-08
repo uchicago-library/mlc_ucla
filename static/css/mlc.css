@@ -6,37 +6,31 @@ doesn't seem necessary. */
 html{
 	font-size: 14px;
 }
-
 .main-content{
 	padding-top: 2rem;
+}
+/*@media (min-width:500px){
+	.main-content{
+    padding: 2rem 2rem 2rem 3rem;
+  }
+}*/
+.main-content>.row>[class^='col']{
+	margin-bottom: 2rem;
+}
+
+.gray-surface{
+  background: #f6f7f2;
+	padding: 1rem 1.5rem;
+}
+
+h1{
+	margin-bottom: 2rem;
 }
 
 .sidebar{
 	background: #f6f7f2;
 	padding: 0;
 	margin-bottom: 1rem;
-}
-.sidebar .navbar{
-	margin: 0;
-	min-height: unset;
-}
-.sidebar .btn.sidebar-collapse-btn{
-	background: transparent;
-	color: #800000;
-	font-weight: 600;
-}
-.sidebar .sidebar-collapse-btn .fa-plus{
-	display: none;
-}
-.sidebar .sidebar-collapse-btn.collpased .fa-plus{
-	display: block;
-}
-.sidebar .sidebar-collapse-btn.collpased .fa-minus{
-	display: none;
-}
-.sidebar .navbar .nav.navbar-nav{
-	margin: 0;
-	padding-left: 1rem;
 }
 .sidebar ul{
 	padding: 0;
@@ -47,18 +41,62 @@ html{
 	padding-bottom: 0;
 	float: unset;
 }
-.sidebar .collections{
-	padding-bottom: 1.5rem;
+
+/* ======= UTILS */
+.mb-1{
+	margin-bottom: 1rem;
 }
-@media (min-width:992px){
-	.sidebar .collapse{
+.mb-2{
+	margin-bottom: 2rem;
+}
+
+/* ======= SIDEBAR LEFT */
+
+.sidebar.sidebar-left .navbar{
+	margin: 0;
+	min-height: unset;
+}
+.sidebar.sidebar-left .btn.sidebar-collapse-btn{
+	background: transparent;
+	color: #800000;
+	font-weight: 600;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn .fa-plus{
+	display: none;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-plus{
+	display: block;
+}
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-minus{
+	display: none;
+}
+.sidebar.sidebar-left .navbar .nav.navbar-nav{
+	margin: 0;
+	padding-left: 1rem;
+	padding-left: 0;
+}
+.sidebar.sidebar-left .navbar .nav.navbar-nav li a{
+  padding: .8rem 1rem !important;
+}
+@media (min-width: 992px){
+	/* force menu to be open when in larger screens */
+	.sidebar.sidebar-left .collapse{
 		display: block !important;
 	}
+}
+#content{
+	padding-left: 3rem;
 }
 
 /* ======= SIDEBAR RIGHT */
 .sidebar.sidebar-right{
 	padding: 1rem 1.5rem;
+}
+.sidebar.sidebar-right .form-group{
+	margin: 0;
+}
+.sidebar.sidebar-right .collections{
+	padding-bottom: 1.5rem;
 }
 .sidebar.sidebar-right h2{
 	margin: 0;
@@ -67,8 +105,39 @@ html{
 .sidebar.sidebar-right h3{
 	font-size: 1.1rem;
 }
+.sidebar.sidebar-right dl{
+	display: block;
+}
+.sidebar.sidebar-right dt{
+  border-top: 1px solid #ddd;
+  border: none;
+	padding-top: 0.7rem;
+	padding-bottom: 0.3rem;
+}
+.sidebar.sidebar-right dd{
+	padding-left: 0;
+	padding-top: 0;
+	padding-bottom: 1rem;
+  border: none;
+}
 
-
+/* =============== SEARCH */
+.search-results-facet{
+	padding-right: .8rem;
+}
+/* =============== BROWSE */
+.browse-list-wrapper ul{
+	list-style-type: none;
+	padding: .5rem;
+}
+.browse-list-wrapper .inline-item{
+	display: inline-block;
+	width: 150px;
+	height: 2rem; 
+	vertical-align: top;
+  margin: .5rem;
+  line-height: 1.1rem;
+}
 /* =============== ITEM */
 /* Title Element */
 /* easy fix */
@@ -91,6 +160,7 @@ html{
 /* Panopto */
 .panopto-iframe{
 	max-width: 100%;
+  margin: 0 auto 1rem;
 }
 
 /* Metadata Description List */ 
@@ -108,3 +178,9 @@ html{
 	dl dd{
 		flex-basis: 70%;
 	}
+
+
+/* =============== Suggestions */
+.suggest-corrections-main{
+	padding: 1rem;
+}

@@ -28,7 +28,7 @@ def cli_build_db():
     con = sqlite3.connect(':memory:')
     build_sqlite_db(con.cursor())
 
-    with open(app.config['DB'], 'w') as f:
+    with open(app.config['DB'], 'w', encoding='utf-8') as f:
         for line in sqlite_dump.iterdump(con):
             f.write(line + '\n')
 
@@ -62,9 +62,11 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 13 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 14 + '\n').format(
         'Panopto Links',
         ' '.join(i['panopto_links']),
+        'Access Rights',
+        ' | '.join(i['access_rights']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -129,11 +131,13 @@ def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 7 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
                 'Panopto Links',
                 ' | '.join(i[1]['panopto_links']),
+                'Access Rights',
+                ' | '.join(i[1]['access_rights']),
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
@@ -162,7 +166,7 @@ def cli_list_series(verbose):
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
@@ -218,23 +222,13 @@ def home():
         'home.html'
     )
 
-# =============================== hard routing by Vitor
-@app.route('/item-vmg/') # Normal route givess 400
-def item_vmg():
+@app.route('/suggest-corrections/')
+def suggest_corrections():
     return render_template(
-        'item.html'
+        'suggest-corrections.html',
+        title_slug = 'Suggest Corrections',
+        hide_right_column = True
     )
-@app.route('/browse-vmg/') # Normal route givess 400
-def browse_vmg():
-    return render_template(
-        'browse.html'
-    )
-@app.route('/browse-kathy/') # To compare with Kathy's Mock
-def browse_kathy():
-    return render_template(
-        'browse-kathy.html'
-    )
-# =============================== END hard routing by Vitor
 
 @app.route('/browse/')
 def browse():
@@ -259,14 +253,20 @@ def browse():
         abort(400)
 
     browse_term = request.args.get('term')
+
     if browse_term:
+        if browse_type:
+            title_slug = "Results with "+browse_type+": "+browse_term+""
+        else:
+            title_slug = "Results for search: "+browse_term+""
         results = mlc_db.get_browse_term(browse_type, browse_term)
         return render_template(
             'search.html',
             facets = [],
             query = browse_term,
             query_field = browse_type,
-            results = results
+            results = results,
+            title_slug = title_slug
         )
     else:
         return render_template(
@@ -316,7 +316,7 @@ def item(noid):
     return render_template(
         'item.html',
         **(item_data | {'series': series,
-                        'title_stub': title_stub,
+                        'title_slug': title_stub,
                         'panopto_identifier': panopto_identifier })
     )
 
@@ -330,12 +330,18 @@ def search():
 
     results = mlc_db.get_search(query, facets)
 
+    if( facets ):
+        title_slug = 'Search Results for '+facets[0]
+    else:
+        title_slug = "Search Results for '"+query+"'"
+
     return render_template(
         'search.html',
         facets = [],
         query = query,
         query_field = '',
-        results = results
+        results = results,
+        title_slug = title_slug
     )
     
 @app.route('/series/<noid>/')
@@ -364,7 +370,7 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_stub': title_stub
+            'title_slug': title_stub
         })
     )
 
