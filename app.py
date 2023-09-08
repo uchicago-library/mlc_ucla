@@ -162,7 +162,7 @@ def cli_list_series(verbose):
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
