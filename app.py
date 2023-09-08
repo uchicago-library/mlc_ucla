@@ -270,8 +270,6 @@ def item(noid):
         
     return render_template(
         'item.html',
-        item_data_vmg = item_data,
-        series_vmg = series,
         **(item_data | {'series': series, 'title_slug': title_stub})
     )
 
