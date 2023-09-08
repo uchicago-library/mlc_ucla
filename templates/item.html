@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 
-{% if rights == 'By Request' %}
-  {% set accessbadgeclass = 'warning' %}
-{% elif rights == 'Login Required' %}
-  {% set accessbadgeclass = 'info' %}
-{% elif rights == 'Public' %}
+{% if rights == 'Restricted' %}
+{% set accessbadgeclass = 'info' %}
+{% elif rights == 'Public domain' %}
   {% set accessbadgeclass = 'success' %}
 {% endif %}
 
 {% block content %}
+
   <div class="" id="content" role="main">
     <div class="title-wrapper">
       <h1>{{ title_slug }}</h1>

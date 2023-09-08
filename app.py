@@ -310,20 +310,28 @@ def item(noid):
     else:
         panopto_identifier = ''
 
+    if item_data['access_rights']:
+        rights = item_data['access_rights'][0]
+    else:
+        rights = ''
+
     series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
     try:
         title_stub = item_data['titles'][0]
     except (IndexError, KeyError):
         title_stub = ''
-        
+
+    shibbed_in = "REMOTE_USER" in request.environ
+
     return render_template(
         'item.html',
         **(item_data | {'series': series,
                         'title_stub': title_stub,
-                        'panopto_identifier': panopto_identifier })
+                        'panopto_identifier': panopto_identifier,
+                        'rights': rights,
+                        'shibbed_in': shibbed_in, })
     )
-
 
 @app.route('/search/')
 def search():
