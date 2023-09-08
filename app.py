@@ -207,8 +207,7 @@ def bad_request(e):
 @app.route('/')
 def home():
     return render_template(
-        'home.html',
-        show_left_column = True
+        'home.html'
     )
 
 @app.route('/suggest-corrections/')

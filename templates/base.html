@@ -72,30 +72,13 @@
 
         <div class="col-xs-12 pt-5 main-content">
             <div class="row">
-              {% set show_right_column = not hide_right_column %}
-              {% if ( show_left_column and show_right_column ) %}
-                {% set main_col_class = "col-sm-8 col-md-6 col-lg-8" %}
-                {# home #}
-              {% elif ( not show_left_column and show_right_column ) %}
-                {% set main_col_class = "col-sm-12 col-md-9 col-lg-10 no-left-column" %}
-                {# default #}
-              {% elif ( not show_left_column and not show_right_column ) %}
-                {% set main_col_class = "no-left-column" %}
-                {# suggestions #}
-              {% endif %}
-              
-              {% if ( show_left_column ) %}
-                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-                  {% include 'sidebar-left.html' %}
-                </div>
-              {% endif %}
 
-              <div class="col-xs-12 {{ main_col_class }}">
+              <div class="col-xs-12 {{ 'col-sm-8 col-md-8 col-lg-9' if not hide_right_column else 'col-md-12' }}">
                 {% block content %}{% endblock %}
               </div>
 
-              {% if ( show_right_column ) %}
-                <div class="col-xs-12 col-md-3 col-lg-2">
+              {% if ( not hide_right_column ) %}
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                   {% include 'sidebar-right.html' %}
                 </div>
               {% endif %}
