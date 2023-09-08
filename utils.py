@@ -831,17 +831,8 @@ class MLCDB:
                 from browse
                 where type=?
                 group by term
-                order by {}
-            '''.format(
-                {
-                    'contributor': 'count(id) desc',
-                    'creator':     'count(id) desc',
-                    'date':        'term',
-                    'decade':      'term',
-                    'language':    'count(id) desc',
-                    'location':    'count(id) desc'
-                }[browse_type]
-            ),
+                order by term
+            ''',
             (browse_type,)
         ).fetchall()
 
