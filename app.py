@@ -62,9 +62,11 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 13 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 14 + '\n').format(
         'Panopto Links',
         ' '.join(i['panopto_links']),
+        'Access Rights',
+        ' | '.join(i['access_rights']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -129,11 +131,13 @@ def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 7 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
                 'Panopto Links',
                 ' | '.join(i[1]['panopto_links']),
+                'Access Rights',
+                ' | '.join(i[1]['access_rights']),
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
