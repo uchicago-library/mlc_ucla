@@ -4,51 +4,57 @@
 {% set url = "<i>auto-filled</i>" %}
 
 {% block content %}
-  <div class="suggest-corrections-main" id="content" role="main">
-    <div class="title-wrapper">
-      <h1>{{ title_slug }}</h1>
-    </div>
-    <dl>
-      {% if title %}
+<div class="suggest-corrections-main" id="content" role="main">
+  <div class="title-wrapper">
+    <h1>{{ title_slug }}</h1>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-sm-push-6">
+      <dl>
+        {% if title %}
         <dt>Item Title:</dt>
         <dd>
           {{ title|safe }}
         </dd>
-      {% endif %}
-      {% if rec_id %}
+        {% endif %}
+        {% if rec_id %}
         <dt>Record Identifier:</dt>
         <dd>
           {{ rec_id|safe }}
         </dd>
-      {% endif %}
-      {% if url %}
+        {% endif %}
+        {% if url %}
         <dt>URL</dt>
         <dd>
           {{ url|safe }}
         </dd>
-      {% endif %}
-    </dl>
-    <form id="suggestCorrections" class="gray-surface" action="" method="">
-      <div class="form-group">
-        <label for="scName">Name</label>
-        <input type="email" class="form-control" id="scName" placeholder="Enter your name">
-      </div>
-      <div class="form-group">
-        <label for="scEmail">Email address</label>
-        <input type="email" class="form-control" id="scEmail" placeholder="Enter your email address">
-      </div>
-      <div class="form-group">
-        <label for="scSuggestions">Problems/comments/questions/suggestions*</label>
-        <p>
-          Please use the area below to report errors, omissions, 
-          or other issues in the description of this collection. 
-          Corrections may include misspellings, incorrect or missing dates, 
-          misidentified languages, individuals, locations, 
-          pointing out outdated or harmful terminology/language, etc.
-        </p>
-        <textarea class="form-control" rows="3" id="scSuggestions" placeholder="Provide a description of the correction"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+        {% endif %}
+      </dl>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-sm-pull-6">
+      <form id="suggestCorrections" class="gray-surface" action="" method="">
+        <div class="form-group">
+          <label for="scName">Name</label>
+          <input type="email" class="form-control" id="scName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="scEmail">Email address</label>
+          <input type="email" class="form-control" id="scEmail" placeholder="Enter your email address">
+        </div>
+        <div class="form-group">
+          <label for="scSuggestions">Problems/comments/questions/suggestions*</label>
+          <p>
+            Please use the area below to report errors, omissions, 
+            or other issues in the description of this collection. 
+            Corrections may include misspellings, incorrect or missing dates, 
+            misidentified languages, individuals, locations, 
+            pointing out outdated or harmful terminology/language, etc.
+          </p>
+          <textarea class="form-control" rows="3" id="scSuggestions" placeholder="Provide a description of the correction"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
   </div>
+</div>
 {% endblock %}

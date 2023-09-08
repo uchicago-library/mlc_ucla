@@ -42,6 +42,14 @@ h1{
 	float: unset;
 }
 
+/* ======= UTILS */
+.mb-1{
+	margin-bottom: 1rem;
+}
+.mb-2{
+	margin-bottom: 2rem;
+}
+
 /* ======= SIDEBAR LEFT */
 
 .sidebar.sidebar-left .navbar{
@@ -70,15 +78,14 @@ h1{
 .sidebar.sidebar-left .navbar .nav.navbar-nav li a{
   padding: .8rem 1rem !important;
 }
-@media (min-width:768px){
+@media (min-width: 992px){
+	/* force menu to be open when in larger screens */
 	.sidebar.sidebar-left .collapse{
 		display: block !important;
 	}
 }
-	.no-left-column{
-		padding-left: 3rem;
-	}
-@media (min-width:992px){
+#content{
+	padding-left: 3rem;
 }
 
 /* ======= SIDEBAR RIGHT */
@@ -113,7 +120,6 @@ h1{
 	padding-bottom: 1rem;
   border: none;
 }
-
 
 /* =============== SEARCH */
 .search-results-facet{
@@ -174,7 +180,7 @@ h1{
 	}
 
 
-/* =============== ITEM */
+/* =============== Suggestions */
 .suggest-corrections-main{
 	padding: 1rem;
 }
