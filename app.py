@@ -208,7 +208,15 @@ def bad_request(e):
 def home():
     return render_template(
         'home.html',
-        ishome = True
+        show_left_column = True
+    )
+
+@app.route('/suggest-corrections/')
+def suggest_corrections():
+    return render_template(
+        'suggest-corrections.html',
+        title_slug = 'Suggest Corrections',
+        hide_right_column = True
     )
 
 @app.route('/browse/')
@@ -263,6 +271,8 @@ def item(noid):
         
     return render_template(
         'item.html',
+        item_data_vmg = item_data,
+        series_vmg = series,
         **(item_data | {'series': series, 'title_slug': title_stub})
     )
 
@@ -313,7 +323,7 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_stub': title_stub
+            'title_slug': title_stub
         })
     )
 

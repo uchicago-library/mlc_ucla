@@ -55,26 +55,50 @@
           <a href="/">Indigenous Mesoamerican Languages Portal</a> &gt;
           {{ title_slug }}
         </div> <!-- // Breadcrumbs -->
+        <div class="col-xs-12 breadcrumbs" style="opacity: 0.5;">
+          For Vitor: 
+          <a href="/">home </a> -- 
+          <a href="/search/?facet=language%3ATzeltal">Search</a> --
+          <a href="/browse/?type=language">Browse Lang</a> --
+          <a href="/series/b2017dn7r70h/">Series</a> --
+          <a href="/item/b2fw1dg4j83d/">Some Item</a> --
+          <a href="/item/b20119x3bv34/">Ppto Item</a> --
+          <a href="/suggest-corrections">Sug Corr</a> <br>
+          panopto_identifier {{ panopto_identifier }} <br>
+          title_stub {{ title_stub }}<br>
+          title_slug {{ title_slug }}
+        </div>
+        <!-- // Vitor Shortcuts -->
 
         <div class="col-xs-12 pt-5 main-content">
             <div class="row">
+              {% set show_right_column = not hide_right_column %}
+              {% if ( show_left_column and show_right_column ) %}
+                {% set main_col_class = "col-sm-8 col-md-6 col-lg-8" %}
+                {# home #}
+              {% elif ( not show_left_column and show_right_column ) %}
+                {% set main_col_class = "col-sm-12 col-md-9 col-lg-10 no-left-column" %}
+                {# default #}
+              {% elif ( not show_left_column and not show_right_column ) %}
+                {% set main_col_class = "no-left-column" %}
+                {# suggestions #}
+              {% endif %}
               
-              {% if ( ishome ) %}
+              {% if ( show_left_column ) %}
                 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
                   {% include 'sidebar-left.html' %}
                 </div>
               {% endif %}
-              {% if ( ishome ) %}
-                <div class="col-xs-12 col-sm-8 col-md-6 col-lg-8">
-              {% else %}
-                <div class="col-xs-12 col-md-9 col-lg-10 no-left-column">
-              {% endif %}
-                  {% block content %}{% endblock %}
-                </div>
 
-              <div class="col-xs-12 col-md-3 col-lg-2">
-                {% include 'sidebar-right.html' %}
+              <div class="col-xs-12 {{ main_col_class }}">
+                {% block content %}{% endblock %}
               </div>
+
+              {% if ( show_right_column ) %}
+                <div class="col-xs-12 col-md-3 col-lg-2">
+                  {% include 'sidebar-right.html' %}
+                </div>
+              {% endif %}
             </div>
         </div>
       </div> <!-- // Content Container -->
