@@ -1,18 +1,13 @@
 {% extends "base.html" %}
 
-{% if rights == 'By Request' %}
-  {% set accessbadgeclass = 'warning' %}
-{% elif rights == 'Login Required' %}
-  {% set accessbadgeclass = 'info' %}
-{% elif rights == 'Public' %}
-  {% set accessbadgeclass = 'success' %}
-{% endif %}
-
 {% block content %}
   <div class="" id="content" role="main">
     <div class="title-wrapper">
-      <h1>{{ title_slug }}</h1>
-      <span class="badge badge-{{ accessbadgeclass }}">Access: {{ rights }}</span>
+      <h1>
+        {{ title_slug }}
+        {% set status = access_rights|trim() %}
+        {% include 'element-status-label.html' %}
+      </h1>
     </div>
     <div class="row">
       <!-- Main Content -->

@@ -222,23 +222,13 @@ def home():
         'home.html'
     )
 
-# =============================== hard routing by Vitor
-@app.route('/item-vmg/') # Normal route givess 400
-def item_vmg():
+@app.route('/suggest-corrections/')
+def suggest_corrections():
     return render_template(
-        'item.html'
+        'suggest-corrections.html',
+        title_slug = 'Suggest Corrections',
+        hide_right_column = True
     )
-@app.route('/browse-vmg/') # Normal route givess 400
-def browse_vmg():
-    return render_template(
-        'browse.html'
-    )
-@app.route('/browse-kathy/') # To compare with Kathy's Mock
-def browse_kathy():
-    return render_template(
-        'browse-kathy.html'
-    )
-# =============================== END hard routing by Vitor
 
 @app.route('/browse/')
 def browse():
@@ -263,14 +253,20 @@ def browse():
         abort(400)
 
     browse_term = request.args.get('term')
+
     if browse_term:
+        if browse_type:
+            title_slug = "Results with "+browse_type+": "+browse_term+""
+        else:
+            title_slug = "Results for search: "+browse_term+""
         results = mlc_db.get_browse_term(browse_type, browse_term)
         return render_template(
             'search.html',
             facets = [],
             query = browse_term,
             query_field = browse_type,
-            results = results
+            results = results,
+            title_slug = title_slug
         )
     else:
         return render_template(
@@ -320,7 +316,7 @@ def item(noid):
     return render_template(
         'item.html',
         **(item_data | {'series': series,
-                        'title_stub': title_stub,
+                        'title_slug': title_stub,
                         'panopto_identifier': panopto_identifier })
     )
 
@@ -334,12 +330,18 @@ def search():
 
     results = mlc_db.get_search(query, facets)
 
+    if( facets ):
+        title_slug = 'Search Results for '+facets[0]
+    else:
+        title_slug = "Search Results for '"+query+"'"
+
     return render_template(
         'search.html',
         facets = [],
         query = query,
         query_field = '',
-        results = results
+        results = results,
+        title_slug = title_slug
     )
     
 @app.route('/series/<noid>/')
@@ -368,7 +370,7 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_stub': title_stub
+            'title_slug': title_stub
         })
     )
 
