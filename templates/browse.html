@@ -4,20 +4,18 @@
 <div class="" id="content" role="main">
   <h1>{{ title_slug }}</h1>
           
-  <article>
-    <div class="browse-list-wrapper">
-      <ul style="padding: .5rem">
-        {% for b in browse_terms|sort() %}
-          <li class="inline-item">
-            <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
-              {{ b[0] }} ({{ b[1] }})
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
+  <div class="browse-list-wrapper container-fluid">
+    <ul class="row">
+      {% for b in browse_terms|sort() %}
+        <li class="col-xs-6 col-md-4 col-lg-3">
+          <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
+            {{ b[0] }} ({{ b[1] }})
+          </a>
+        </li>
+      {% endfor %}
     </ul>
-  </article>
+  </div>
+  </ul>
 
   {% include 'elements-browse-bar.html' %}
 </div>

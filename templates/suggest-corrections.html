@@ -1,60 +1,53 @@
 {% extends "base.html" %}
-{% set title = "<i>auto-filled</i>" %}
-{% set rec_id = "<i>auto-filled</i>" %}
-{% set url = "<i>auto-filled</i>" %}
 
 {% block content %}
 <div class="suggest-corrections-main" id="content" role="main">
   <div class="title-wrapper">
     <h1>{{ title_slug }}</h1>
   </div>
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-sm-push-6">
-      <dl>
-        {% if title %}
-        <dt>Item Title:</dt>
-        <dd>
-          {{ title|safe }}
-        </dd>
-        {% endif %}
+  <form id="suggestCorrections" class="gray-surface" action="" method="">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-sm-push-6">
+          
+        <div class="form-group">
+          <label for="scItemTitle">Item Title</label>
+          <input type="text" class="form-control" id="scItemTitle" value="{{ item_title }}" readonly>
+        </div>
         {% if rec_id %}
-        <dt>Record Identifier:</dt>
-        <dd>
-          {{ rec_id|safe }}
-        </dd>
+          <div class="form-group">
+            <label for="scRecordIdentifier">Record Identifier</label>
+            <input type="number" class="form-control" id="scRecordIdentifier" value="{{ rec_id }}" readonly>
+          </div>
         {% endif %}
-        {% if url %}
-        <dt>URL</dt>
-        <dd>
-          {{ url|safe }}
-        </dd>
-        {% endif %}
-      </dl>
+        <div class="form-group">
+          <label for="scItemURL">Item URL</label>
+          <input type="url" class="form-control" id="scItemURL" value="{{ item_url }}" readonly>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-sm-pull-6">
+
+          <div class="form-group">
+            <label for="scName">Name*</label>
+            <input type="text" class="form-control" id="scName" placeholder="Enter your name" required>
+          </div>
+          <div class="form-group">
+            <label for="scEmail">Email address*</label>
+            <input type="email" class="form-control" id="scEmail" placeholder="Enter your email address" required>
+          </div>
+          <div class="form-group">
+            <label for="scSuggestions">Problems, comments, questions, or suggestions*</label>
+            <p>
+              Please use the area below to report errors, omissions, 
+              or other issues in the description of this collection. 
+              Corrections may include misspellings, incorrect or missing dates, 
+              misidentified languages, individuals, locations, 
+              pointing out outdated or harmful terminology/language, etc.
+            </p>
+            <textarea class="form-control" rows="3" id="scSuggestions" placeholder="Provide a description of the correction" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
     </div>
-    <div class="col-xs-12 col-sm-6 col-sm-pull-6">
-      <form id="suggestCorrections" class="gray-surface" action="" method="">
-        <div class="form-group">
-          <label for="scName">Name</label>
-          <input type="email" class="form-control" id="scName" placeholder="Enter your name">
-        </div>
-        <div class="form-group">
-          <label for="scEmail">Email address</label>
-          <input type="email" class="form-control" id="scEmail" placeholder="Enter your email address">
-        </div>
-        <div class="form-group">
-          <label for="scSuggestions">Problems/comments/questions/suggestions*</label>
-          <p>
-            Please use the area below to report errors, omissions, 
-            or other issues in the description of this collection. 
-            Corrections may include misspellings, incorrect or missing dates, 
-            misidentified languages, individuals, locations, 
-            pointing out outdated or harmful terminology/language, etc.
-          </p>
-          <textarea class="form-control" rows="3" id="scSuggestions" placeholder="Provide a description of the correction"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </div>
-  </div>
+  </form>
 </div>
 {% endblock %}

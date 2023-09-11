@@ -224,8 +224,14 @@ def home():
 
 @app.route('/suggest-corrections/')
 def suggest_corrections():
+    item_title = request.args.get('ittt')
+    rec_id = request.args.get('rcid')
+    item_url = request.args.get('iurl')
     return render_template(
         'suggest-corrections.html',
+        item_title = item_title,
+        rec_id = rec_id,
+        item_url = item_url,
         title_slug = 'Suggest Corrections',
         hide_right_column = True
     )
