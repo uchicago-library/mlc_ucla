@@ -1,94 +1,93 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
-    <h1><strong>Series Title:</strong> {% for i in titles %}{{ i }} {% endfor %}</h1>
-    <div class="row">
-      <!-- Main Content -->
-      <div class="col-xs-12 col-md-9 centermain"> <!-- Center Content -->
-        <dl>
-          {% if alternative_title %}
-            <dt>Alternative Series Title:</dt>
-            <dd>
-              {% for i in alternative_title %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+  <div class="" id="content" role="main">
+    <h1>
+      <strong>Series Title:</strong> {% for i in titles %}{{ i }} {% endfor %}
+      {% set status = access_rights|trim() %}
+      {% include 'element-status-label.html' %}
+    </h1>
+    <dl>
+      {% if alternative_title %}
+        <dt>Alternative Series Title:</dt>
+        <dd>
+          {% for i in alternative_title %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if identifier %}
-            <dt>Series Identifier:</dt>
-            <dd>
-              {% for i in identifier %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if identifier %}
+        <dt>Series Identifier:</dt>
+        <dd>
+          {% for i in identifier %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          <dt>Collection:</dt>
-          <dd>Digital Media Archive</dd>
+      <dt>Collection:</dt>
+      <dd>Digital Media Archive</dd>
 
-          {% if creator %}
-            <dt>Creator:</dt>
-            <dd>
-              {% for i in creator %}
-                <div><a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if creator %}
+        <dt>Creator:</dt>
+        <dd>
+          {% for i in creator %}
+            <div><a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if subject_language %}
-            <dt>Indigenous Language:</dt>
-            <dd>
-              {% for i in subject_language %}
-                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if subject_language %}
+        <dt>Indigenous Language:</dt>
+        <dd>
+          {% for i in subject_language %}
+            <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if primary_language %}
-            <dt>Language:</dt>
-            <dd>
-              {% for i in primary_language %}
-                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if primary_language %}
+        <dt>Language:</dt>
+        <dd>
+          {% for i in primary_language %}
+            <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if location %}
-            <dt>Location Where Indigenous Language Is Spoken:</dt>
-            <dd>
-              {% for i in location %}
-                <div><a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if location %}
+        <dt>Location Where Indigenous Language Is Spoken:</dt>
+        <dd>
+          {% for i in location %}
+            <div><a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if date %}
-            <dt>Date:</dt>
-            <dd>
-              {% for i in date %}
-                <div><a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if date %}
+        <dt>Date:</dt>
+        <dd>
+          {% for i in date %}
+            <div><a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if description %}
-            <dt>Description:</dt>
-            <dd>
-              {% for i in description %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if description %}
+        <dt>Description:</dt>
+        <dd>
+          {% for i in description %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-        </dl>
+    </dl>
 
-        <h2>Items in the Series</h2>
-        {% for i in items %}
-            <p>{{ i.1.identifier.0 }} <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ i.1.titles.0 }}</a></p>
-        {% endfor %}
-      </div> <!-- // Center Content -->
-    </div> <!-- // .row -->
+    <h2>Items in the Series</h2>
+    {% for i in items %}
+        <p>{{ i.1.identifier.0 }} <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ i.1.titles.0 }}</a></p>
+    {% endfor %}
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

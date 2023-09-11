@@ -9,129 +9,118 @@
         {% include 'element-status-label.html' %}
       </h1>
     </div>
-    <div class="row">
-      <!-- Main Content -->
-      <div class="col-xs-12 col-md-9 centermain"> <!-- Center Content -->
-        {% if panopto_identifier %}
-          <div>
-            <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646;" allowfullscreen allow="autoplay"></iframe>
-          </div>
-        {% endif %}
-        <dl>
-          {% if titles %}
-            <dt>Item Title:</dt>
-            <dd>
-              {% for i in titles %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+    {% if panopto_identifier %}
+      <div>
+        <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646;" allowfullscreen allow="autoplay"></iframe>
+      </div>
+    {% endif %}
+    <dl>
+      {% if titles %}
+        <dt>Item Title:</dt>
+        <dd>
+          {% for i in titles %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if identifier %}
-            <dt>Item Identifier:</dt>
-            <dd>
-              {% for i in identifier %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if identifier %}
+        <dt>Item Identifier:</dt>
+        <dd>
+          {% for i in identifier %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if contributor %}
-            <dt>Contributor:</dt>
-            <dd>
-              {% for i in contributor %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if contributor %}
+        <dt>Contributor:</dt>
+        <dd>
+          {% for i in contributor %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if subject_language %}
-            <dt>Indigenous Language:</dt>
-            <dd>
-              {% for i in subject_language %}
-                <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if subject_language %}
+        <dt>Indigenous Language:</dt>
+        <dd>
+          {% for i in subject_language %}
+            <div><a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if primary_language %}
-            <dt>Language:</dt>
-            <dd>
-              {% for i in primary_language %}
-                <div><a href="/browse?type=language{{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if primary_language %}
+        <dt>Language:</dt>
+        <dd>
+          {% for i in primary_language %}
+            <div><a href="/browse?type=language{{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if location %}
-            <dt>Location Where Indigenous Language Is Spoken:</dt>
-            <dd>
-              {% for i in location %}
-                <div><a href="/browse?type=location{{ i|urlencode }}">{{ i }}</a></div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if location %}
+        <dt>Location Where Indigenous Language Is Spoken:</dt>
+        <dd>
+          {% for i in location %}
+            <div><a href="/browse?type=location{{ i|urlencode }}">{{ i }}</a></div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if date %}
-            <dt>Date:</dt>
-            <dd>
-              {% for i in date %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if date %}
+        <dt>Date:</dt>
+        <dd>
+          {% for i in date %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if description %}
-            <dt>Description:</dt>
-            <dd>
-              {% for i in description %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if description %}
+        <dt>Description:</dt>
+        <dd>
+          {% for i in description %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if linguistic_data_type %}
-            <dt>Linguistic Data Type:</dt>
-            <dd>
-              {% for i in linguistic_data_type %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if linguistic_data_type %}
+        <dt>Linguistic Data Type:</dt>
+        <dd>
+          {% for i in linguistic_data_type %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if discourse_type %}
-            <dt>Discourse Type:</dt>
-            <dd>
-              {% for i in discourse_type %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if discourse_type %}
+        <dt>Discourse Type:</dt>
+        <dd>
+          {% for i in discourse_type %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {% if content_type %}
-            <dt>Item Content Type:</dt>
-            <dd>
-              {% for i in content_type %}
-                <div>{{ i }}</div>
-              {% endfor %}
-            </dd>
-          {% endif %}
+      {% if content_type %}
+        <dt>Item Content Type:</dt>
+        <dd>
+          {% for i in content_type %}
+            <div>{{ i }}</div>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-          {# partOfSeries #}
-          <dt>Part of Series:</dt>
-          <dd>
-              <a href="/series/{{ series.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-                  {{ series.1.titles.0 }}
-              </a>
-          </dd>
-
-        </dl>
-
-        <p>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/></p>
-        <p>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/></p>
-        <p>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/></p>
-        <p>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/></p>
-      </div> <!-- // Center Content -->
-    </div> <!-- // .row -->
-  </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
+      {# partOfSeries #}
+      <dt>Part of Series:</dt>
+      <dd>
+          <a href="/series/{{ series.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+              {{ series.1.titles.0 }}
+          </a>
+      </dd>
+    </dl>
+  </div> <!-- // .main -->
 {% endblock %}

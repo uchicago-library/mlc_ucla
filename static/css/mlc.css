@@ -182,6 +182,7 @@ h1{
 
 /* Panopto */
 .panopto-iframe{
+	display: block;
 	max-width: 100%;
   margin: 0 auto 1rem;
 }
