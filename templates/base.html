@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}">
+<html lang="{{ locale }}">
 <head>
     <meta charset="UTF-8">
     {% if title_slug %}
@@ -59,18 +59,17 @@
           <div class="col-xs-3 text-right">
             <form action="/language-change" method="POST">
               <button type="submit"class="btn language-selector-btn">
-                <span class="lang-es">ES</span>/<span class="lang-en">EN</span>
+                <span class="lang-en">EN</span>/<span class="lang-es">ES</span>
               </button>
             </form>
+            <!-- locale is:{{ locale }} -->
           </div>
         </div>
 
         <div class="row">
           <div class="col-xs-12 pb-5 hidden">
             <h2>Testing</h2>
-            <span>Lang: {{ lang }}.</span>
             <span>locale: {{ locale }}.</span>
-            <!-- locale is:{{ locale }} -->
           </div>
           <div class="col-xs-12 pt-5 main-content">
             <div class="row">

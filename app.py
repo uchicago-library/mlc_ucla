@@ -9,23 +9,32 @@ from urllib.parse import parse_qs, urlparse
 app = Flask(__name__)
 
 def get_locale():
-    return session.get('language', 'en')
-@app.route('/language-change', methods=["POST"])
-def change_language():
-    if (session['language'] == 'en'):
-        session['language'] = 'es'
-    else:
-        session['language'] = 'en'
-    return redirect(request.referrer) 
+    if (session):
+        if( 'language' in session):
+            return session.get('language', 'en')
+        else:
+            session['language'] = 'en'
+            return session.get('language', 'en')
 
-babel = Babel(app, locale_selector=get_locale)
 app.config.from_pyfile('local.py')
+babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 # To define strings in code, it has to be with lazy_gettext()
 # test_string_lazy = lazy_gettext(u'Test Lazy String Original') 
+@app.context_processor
+def inject_locale():
+    return dict(locale = get_locale())
+
+@app.route('/language-change', methods=["POST"])
+def change_language():
+    if( 'language' in session and session['language'] == 'en'):
+        session['language'] = 'es'
+    else:
+        session['language'] = 'en'
+    return redirect(request.referrer) 
 
 app.logger.setLevel(logging.DEBUG)
 
@@ -238,11 +247,8 @@ def bad_request(e):
 
 @app.route('/')
 def home():
-    session['language'] = get_locale()
     return render_template(
-        'home.html',
-        locale = get_locale(),
-        lang = session['language']
+        'home.html'
     )
 
 @app.route('/suggest-corrections/')
