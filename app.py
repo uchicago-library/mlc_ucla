@@ -3,6 +3,8 @@ from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
 from utils import MLCDB, build_sqlite_db
 from flask_babel import Babel, gettext, lazy_gettext, get_locale
+import requests
+from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
 
@@ -36,15 +38,6 @@ class SetEncoder(json.JSONEncoder):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
 
-def glotto_labels(code):
-    #with open('glotto.json') as f:
-    with open(app.config['GLOTTO_JSON']) as f:
-        lookup = json.load(f)
-    try:
-        return lookup[code]
-    except KeyError:
-        return ''
-
 # CLI
 
 @app.cli.command(
@@ -55,7 +48,7 @@ def cli_build_db():
     con = sqlite3.connect(':memory:')
     build_sqlite_db(con.cursor())
 
-    with open(app.config['DB'], 'w', encoding="utf-8") as f:
+    with open(app.config['DB'], 'w', encoding='utf-8') as f:
         for line in sqlite_dump.iterdump(con):
             f.write(line + '\n')
 
@@ -70,6 +63,17 @@ def cli_get_browse(browse_type):
         print('{} ({})'.format(row[0], row[1]))
 
 @app.cli.command(
+    'get-browse-term',
+    short_help='Get series for a specific browse term.'
+)
+@click.argument('browse_type')
+@click.argument('browse_term')
+def cli_get_browse_term(browse_type, browse_term):
+    mlc_db = MLCDB(app.config)
+    for row in mlc_db.get_browse_term(browse_type, browse_term):
+        print(row)
+
+@app.cli.command(
     'get-item',
     short_help='Get item info for an item identifier.'
 )
@@ -78,7 +82,11 @@ def cli_get_item(item_identifier):
     mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 12 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 14 + '\n').format(
+        'Panopto Links',
+        ' '.join(i['panopto_links']),
+        'Access Rights',
+        ' | '.join(i['access_rights']),
         'Item Title',
         ' '.join(i['titles']),
         'Item Identifier',
@@ -86,11 +94,11 @@ def cli_get_item(item_identifier):
         'Contributor',
         ' | '.join(i['contributor']),
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['language']),
+        ' | '.join(i['location']),
         'Date',
         ' | '.join(i['date']),
         'Description',
@@ -122,9 +130,9 @@ def cli_get_series(series_identifier):
         'Collection',
         '',
         'Indigenous Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['subject_language']),
         'Language',
-        ' | '.join(i['language']),
+        ' | '.join(i['primary_language']),
         'Location Where Indigenous Language is Spoken',
         ' | '.join(i['location']),
         'Date',
@@ -143,13 +151,17 @@ def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
+                'Panopto Links',
+                ' | '.join(i[1]['panopto_links']),
+                'Access Rights',
+                ' | '.join(i[1]['access_rights']),
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
@@ -174,7 +186,7 @@ def cli_list_series(verbose):
                 'Contributor',
                 ' | '.join(i[1]['contributor']),
                 'Indigenous Language',
-                ' | '.join(i[1]['language']),
+                ' | '.join(i[1]['subject_language']),
                 'Location',
                 ' | '.join(i[1]['location']),
                 'Date',
@@ -233,23 +245,19 @@ def home():
         lang = session['language']
     )
 
-# =============================== hard routing by Vitor
-@app.route('/item-vmg/') # Normal route givess 400
-def item_vmg():
+@app.route('/suggest-corrections/')
+def suggest_corrections():
+    item_title = request.args.get('ittt')
+    rec_id = request.args.get('rcid')
+    item_url = request.args.get('iurl')
     return render_template(
-        'item.html'
+        'suggest-corrections.html',
+        item_title = item_title,
+        rec_id = rec_id,
+        item_url = item_url,
+        title_slug = 'Suggest Corrections',
+        hide_right_column = True
     )
-@app.route('/browse-vmg/') # Normal route givess 400
-def browse_vmg():
-    return render_template(
-        'browse.html'
-    )
-@app.route('/browse-kathy/') # To compare with Kathy's Mock
-def browse_kathy():
-    return render_template(
-        'browse-kathy.html'
-    )
-# =============================== END hard routing by Vitor
 
 @app.route('/browse/')
 def browse():
@@ -273,15 +281,43 @@ def browse():
         )
         abort(400)
 
-    return render_template(
-        'browse.html',
-        title_slug = title_slugs[browse_type],
-        browse_terms = mlc_db.get_browse(browse_type),
-        browse_type = browse_type
-    )
+    browse_term = request.args.get('term')
+
+    if browse_term:
+        if browse_type:
+            title_slug = "Results with "+browse_type+": "+browse_term+""
+        else:
+            title_slug = "Results for search: "+browse_term+""
+        results = mlc_db.get_browse_term(browse_type, browse_term)
+        return render_template(
+            'search.html',
+            facets = [],
+            query = browse_term,
+            query_field = browse_type,
+            results = results,
+            title_slug = title_slug
+        )
+    else:
+        return render_template(
+            'browse.html',
+            title_slug = title_slugs[browse_type],
+            browse_terms = mlc_db.get_browse(browse_type),
+            browse_type = browse_type
+        )
 
 @app.route('/item/<noid>/')
 def item(noid):
+    def ark_to_panopto(ark_url):
+        req = requests.head(ark_url, allow_redirects=True)
+        percent_url = req.url
+        return parse_qs(
+            urlparse(
+                parse_qs(
+                    urlparse(percent_url).query
+                )['ReturnUrl'][0]
+            ).query
+        )["id"][0]
+
     mlc_db = MLCDB(app.config)
 
     if not re.match('^[a-z0-9]{12}$', noid):
@@ -294,6 +330,11 @@ def item(noid):
 
     item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
+    if item_data['panopto_links']:
+        panopto_identifier = ark_to_panopto(item_data['panopto_links'][0])
+    else:
+        panopto_identifier = ''
+
     series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
     try:
@@ -303,8 +344,11 @@ def item(noid):
         
     return render_template(
         'item.html',
-        **(item_data | {'series': series, 'title_stub': title_stub})
+        **(item_data | {'series': series,
+                        'title_slug': title_stub,
+                        'panopto_identifier': panopto_identifier })
     )
+
 
 @app.route('/search/')
 def search():
@@ -315,10 +359,18 @@ def search():
 
     results = mlc_db.get_search(query, facets)
 
+    if( facets ):
+        title_slug = 'Search Results for '+facets[0]
+    else:
+        title_slug = "Search Results for '"+query+"'"
+
     return render_template(
         'search.html',
         facets = [],
-        results = results
+        query = query,
+        query_field = '',
+        results = results,
+        title_slug = title_slug
     )
     
 @app.route('/series/<noid>/')
@@ -347,7 +399,7 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_stub': title_stub
+            'title_slug': title_stub
         })
     )
 

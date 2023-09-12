@@ -1,24 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container body-container col-xs-9 col-lg-9" id="content" role="main">
+<div class="" id="content" role="main">
   <h1>{{ title_slug }}</h1>
           
-  <article>
-    <ul>
-      {% for b in browse_terms %}
-        <li><a href="/search?facet={{ browse_type }}%3A{{ b[0]|urlencode }}">{{ b[0] }} ({{ b[1] }})</a></li>
+  <div class="browse-list-wrapper container-fluid">
+    <ul class="row">
+      {% for b in browse_terms|sort() %}
+        <li class="col-xs-6 col-md-4 col-lg-3">
+          <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
+            {{ b[0] }} ({{ b[1] }})
+          </a>
+        </li>
       {% endfor %}
     </ul>
-  </article>
-
-  <div class="home-module" style="padding-left: 0;">
-    <h2 class="browse"> Collection Highlights</h2>
-    <span class="browse-links">
-      <span class="headline">Browse:&nbsp;</span>
-      <a href="/browse/?type=language">Language</a>
-      <a href="/browse/?type=location">Geographic Region</a>
-    </span>
   </div>
+  </ul>
+
+  {% include 'elements-browse-bar.html' %}
 </div>
 {% endblock %}
