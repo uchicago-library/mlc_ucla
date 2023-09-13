@@ -338,7 +338,7 @@ def get_access_label_obj(item):
             access_key[ar[0].lower()]['class']
             ]
     else:
-        return ['emtpy','empty','info']
+        return ['emtpy','By Request','info']
 
 @app.route('/item/<noid>/')
 def item(noid):
