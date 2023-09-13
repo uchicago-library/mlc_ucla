@@ -79,3 +79,32 @@ flask get-browse decade
 flask get-browse language
 flask get-browse location
 ```
+## Translating
+- Strings can be labelled in templates with 
+	`{% trans %}string to be translated{% endtrans %}`
+	or in the code with	`gettet(u'string to be translated')` 
+	or	`lazy_gettet(u'string to be translated')` if outside a request
+- Two identical strings will be labeled together for translation.
+- Strings can be injected into all templates through `@app.context_processor`. There is a `dict()` that is already being injected.
+- The doc for the translation package is [Flask Babel](https://python-babel.github.io/flask-babel/)
+- sheet being used for translation https://docs.google.com/spreadsheets/d/18m-8sN6Gqu6HFgZNIp1QST-3hy_ul_sm3QQCr_z4W6k/edit?usp=sharing
+- [po2csv](https://docs.translatehouse.org/projects/translate-toolkit/en/latest/commands/csv2po.html) is being used to convert the output `.po` files to `.csv` for easily translation. That's why the `translation-toolkit` required package.
+- The current strings were translated using `=GOOGLETRANSLATE()`function from the Google Sheet.
+
+extract all strings
+`pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .`
+
+create the first translation or update the translation
+`pybabel init -i messages.pot -d translations -l es`
+`pybabel update -i messages.pot -d translations`
+
+convert file to CSV
+`po2csv .\translations\es\LC_MESSAGES\messages.po .\translations-csv\messages-to-translate.csv`
+
+translate csv file into new file named `messages-translated.csv` in the same location
+
+convert csv back to po 
+`csv2po .\translations-csv\messages-translated.csv .\translations\es\LC_MESSAGES\messages.po`
+
+compile the translations
+`pybabel compile -d translations`
