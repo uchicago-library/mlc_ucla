@@ -9,11 +9,29 @@ html{
 .main-content{
 	padding-top: 2rem;
 }
-/*@media (min-width:500px){
-	.main-content{
-    padding: 2rem 2rem 2rem 3rem;
-  }
-}*/
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+.language-selector-btn{
+	background: #7a7270;
+	color: white;
+	font-weight: 500;
+	border-radius: 0 0 4px 4px;
+	padding: 4px 8px;
+}
+.language-selector-btn:hover,
+.language-selector-btn:active,
+.language-selector-btn:focus{
+	opacity: 0.85;
+	background: #7a7270;
+	color: white;
+}
+html[lang="es"] .language-selector-btn .lang-en{
+	opacity: .5;
+}
+html[lang="en"] .language-selector-btn .lang-es{
+	opacity: .5;
+}
 .main-content>.row>[class^='col']{
 	margin-bottom: 2rem;
 }

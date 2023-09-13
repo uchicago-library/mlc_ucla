@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ locale }}">
 <head>
     <meta charset="UTF-8">
     {% if title_slug %}
@@ -18,25 +18,25 @@
 	<link rel="stylesheet" type="text/css" href="https://uchicago-library.github.io/LibPattern/css/calendar/font-awesome.min.css">
   <link rel="icon" type="image/x-icon" href="/static/favicon-black.ico">
 
-    <style>
-      .rightside dl {
-        display: block;
-        padding-left: 0;
-      }
-      .rightside dl dd {
-          border-bottom: none;
-          display: block;
-          flex-basis: auto;
-          padding-left: 0;
-          padding-top: 0;
-      }
-      .rightside dl dt {
-          border-bottom: none;
-          display: block;
-          flex-basis: auto;
-          padding-bottom: 0;
-      }
-    </style>
+  <style>
+    .rightside dl {
+      display: block;
+      padding-left: 0;
+    }
+    .rightside dl dd {
+      border-bottom: none;
+      display: block;
+      flex-basis: auto;
+      padding-left: 0;
+      padding-top: 0;
+    }
+    .rightside dl dt {
+      border-bottom: none;
+      display: block;
+      flex-basis: auto;
+      padding-bottom: 0;
+    }
+  </style>
 </head>
 
 <body class="digitalobjectpage">
@@ -49,14 +49,25 @@
     <!-- Awesome Page Content -->
     <div class="container-fluid"> <!-- Main Container Wrapper -->
       <div class="row"> <!-- Off Canvas Wrapper Row -->
-        <div class="col-md-12 breadcrumbs hidden-xs hidden-sm">
-          <a href="https://www.lib.uchicago.edu/collex/">Collections &amp; Exhibits</a> &gt;
-          <a href="https://www.lib.uchicago.edu/collex/collections/">Collections</a> &gt;
-          <a href="/">Mesoamerican Languages Collections</a> &gt;
-          {{ title_slug }}
-        </div> <!-- // Breadcrumbs -->
+        <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
+          <div class="col-xs-9 breadcrumbs">
+            <a href="https://www.lib.uchicago.edu/collex/">Collections &amp; Exhibits</a> &gt;
+            <a href="https://www.lib.uchicago.edu/collex/collections/">Collections</a> &gt;
+            <a href="/">Indigenous Mesoamerican Languages Portal</a> &gt;
+            {{ title_slug }}
+          </div> <!-- // Breadcrumbs -->
+          <div class="col-xs-3 text-right">
+            <form action="/language-change" method="POST">
+              <button type="submit"class="btn language-selector-btn">
+                <span class="lang-en">EN</span>/<span class="lang-es">ES</span>
+              </button>
+            </form>
+            <!-- locale is:{{ locale }} -->
+          </div>
+        </div>
 
-        <div class="col-xs-12 pt-5 main-content">
+        <div class="row">
+          <div class="col-xs-12 pt-5 main-content">
             <div class="row">
 
               <div class="col-xs-12 {{ 'col-sm-8 col-md-8 col-lg-9' if not hide_right_column else 'col-md-12' }}">
@@ -69,19 +80,19 @@
                 </div>
               {% endif %}
             </div>
-        </div>
-      </div> <!-- // Content Container -->
-    </div> <!-- // Off Canvas Wrapper Row -->
-    <!-- // Awesome Page Content -->
-    <div id="push"></div>
-    {% include 'footer.html' %}
+          </div>
+        </div> <!-- // Content Container -->
+      </div> <!-- // Off Canvas Wrapper Row -->
+      <!-- // Awesome Page Content -->
+      <div id="push"></div>
+      {% include 'footer.html' %}
 
-    <!-- Scripts -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://uchicago-library.github.io/LibPattern/js/jquery.min.js"></script>
-    <script src="https://uchicago-library.github.io/LibPattern/js/bootstrap.min.js"></script>
-    <script src="https://uchicago-library.github.io/LibPattern/js/lib-main.min.js"></script>
-    <!-- // Scripts -->
-  </div>
-</body>
-</html>
+      <!-- Scripts -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script src="https://uchicago-library.github.io/LibPattern/js/jquery.min.js"></script>
+      <script src="https://uchicago-library.github.io/LibPattern/js/bootstrap.min.js"></script>
+      <script src="https://uchicago-library.github.io/LibPattern/js/lib-main.min.js"></script>
+      <!-- // Scripts -->
+    </div>
+  </body>
+  </html>

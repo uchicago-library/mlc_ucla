@@ -1,11 +1,40 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
-from flask import abort, Flask, render_template, request
+from flask import abort, Flask, render_template, request, session, redirect
+from flask_session import Session
 from utils import MLCDB, build_sqlite_db
+from flask_babel import Babel, gettext, lazy_gettext, get_locale
 import requests
 from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
+
+def get_locale():
+    if (session):
+        if( 'language' in session):
+            return session.get('language', 'en')
+        else:
+            session['language'] = 'en'
+            return session.get('language', 'en')
+
 app.config.from_pyfile('local.py')
+babel = Babel(app, default_locale='en', locale_selector=get_locale)
+
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+# To define strings in code, it has to be with lazy_gettext()
+# test_string_lazy = lazy_gettext(u'Test Lazy String Original') 
+@app.context_processor
+def inject_locale():
+    return dict(locale = get_locale())
+
+@app.route('/language-change', methods=["POST"])
+def change_language():
+    if( 'language' in session and session['language'] == 'en'):
+        session['language'] = 'es'
+    else:
+        session['language'] = 'en'
+    return redirect(request.referrer) 
 
 app.logger.setLevel(logging.DEBUG)
 
@@ -282,6 +311,35 @@ def browse():
             browse_type = browse_type
         )
 
+access_key = {
+    'restricted': {
+        'trans': lazy_gettext(u'Restricted'),
+        'class': 'warning'
+    },
+    'public domain':  {
+        'trans': lazy_gettext(u'Public Domain'),
+        'class': 'success'
+    }
+}
+
+def get_access_label_obj(item):
+    # list of results
+        # tuple for item
+            # string for url
+            # dictionary of data
+                # list of values
+    ar = item['access_rights']
+
+    # [<string from database>, <translated string>, <bootstrap label class>]
+    if( len(ar) > 0 and ar[0].lower() in access_key):
+        return [
+            ar[0], 
+            access_key[ar[0].lower()]['trans'], 
+            access_key[ar[0].lower()]['class']
+            ]
+    else:
+        return ['emtpy','By Request','info']
+
 @app.route('/item/<noid>/')
 def item(noid):
     def ark_to_panopto(ark_url):
@@ -323,9 +381,9 @@ def item(noid):
         'item.html',
         **(item_data | {'series': series,
                         'title_slug': title_stub,
+                        'access_rights': get_access_label_obj(item_data),
                         'panopto_identifier': panopto_identifier })
     )
-
 
 @app.route('/search/')
 def search():
@@ -335,6 +393,12 @@ def search():
     query = request.args.get('query')
 
     results = mlc_db.get_search(query, facets)
+    mod_results = []
+    
+    for item in results:
+        item_data = item[1]
+        item_data['access_rights'] = get_access_label_obj(item_data)
+        mod_results.append( (item[0], item_data ) )
 
     if( facets ):
         title_slug = 'Search Results for '+facets[0]
@@ -346,7 +410,7 @@ def search():
         facets = [],
         query = query,
         query_field = '',
-        results = results,
+        results = mod_results,
         title_slug = title_slug
     )
     
@@ -376,7 +440,8 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_slug': title_stub
+            'title_slug': title_stub,
+            'access_rights': get_access_label_obj(series_data)
         })
     )
 
