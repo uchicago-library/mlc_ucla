@@ -4,8 +4,7 @@
   <div class="" id="content" role="main">
     <h1>
       <strong>Series Title:</strong> {% for i in titles %}{{ i }} {% endfor %}
-      {% set status = access_rights|trim() %}
-      {% include 'element-status-label.html' %}
+      <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </h1>
     <dl>
       {% if alternative_title %}

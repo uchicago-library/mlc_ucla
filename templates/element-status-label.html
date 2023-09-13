@@ -1,11 +1,10 @@
-{% if status %}
-	{% set status = status|replace("[","")|replace("]","")|replace("'","") %}
-	{% if status == "Restricted" %}
-	  {% set statusclass = 'warning' %}
-	{% elif status == "Public domain" %}
-	  {% set statusclass = 'success' %}
-	{% else %}
-	  {% set statusclass = 'info' %}
-	{% endif %}
-	<span class="badge badge-{{ statusclass }}">{{ status }}</span>
+{% if access_status == "Restricted" %}
+	{% set statusclass = 'warning' %}
+{% elif access_status == "Public domain" %}
+	{% set statusclass = 'success' %}
+{% else %}
+	{% set statusclass = 'info' %}
+{% endif %}
+{% if access_string %}
+	<span class="badge badge-{{ statusclass }}">{{ access_string }}</span>
 {% endif %}

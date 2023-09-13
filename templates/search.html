@@ -19,9 +19,8 @@
             <figcaption>
               <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
                 <h3>
-                  Series: {{ result.1.titles.0 }}
-                  {% set status = result.1.access_rights|trim() %}
-                  {% include 'element-status-label.html' %}
+                  Series: {{ result.1.titles.0 }} 
+  <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
                 </h3>
               </a>
               {% if result.1.contributor %}

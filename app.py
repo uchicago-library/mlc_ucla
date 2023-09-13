@@ -311,6 +311,35 @@ def browse():
             browse_type = browse_type
         )
 
+access_key = {
+    'restricted': {
+        'trans': lazy_gettext(u'Restricted'),
+        'class': 'warning'
+    },
+    'public domain':  {
+        'trans': lazy_gettext(u'Public Domain'),
+        'class': 'success'
+    }
+}
+
+def get_access_label_obj(item):
+    # list of results
+        # tuple for item
+            # string for url
+            # dictionary of data
+                # list of values
+    ar = item['access_rights']
+
+    # [<string from database>, <translated string>, <bootstrap label class>]
+    if( len(ar) > 0 and ar[0].lower() in access_key):
+        return [
+            ar[0], 
+            access_key[ar[0].lower()]['trans'], 
+            access_key[ar[0].lower()]['class']
+            ]
+    else:
+        return ['emtpy','empty','info']
+
 @app.route('/item/<noid>/')
 def item(noid):
     def ark_to_panopto(ark_url):
@@ -352,9 +381,9 @@ def item(noid):
         'item.html',
         **(item_data | {'series': series,
                         'title_slug': title_stub,
+                        'access_rights': get_access_label_obj(item_data),
                         'panopto_identifier': panopto_identifier })
     )
-
 
 @app.route('/search/')
 def search():
@@ -364,6 +393,12 @@ def search():
     query = request.args.get('query')
 
     results = mlc_db.get_search(query, facets)
+    mod_results = []
+    
+    for item in results:
+        item_data = item[1]
+        item_data['access_rights'] = get_access_label_obj(item_data)
+        mod_results.append( (item[0], item_data ) )
 
     if( facets ):
         title_slug = 'Search Results for '+facets[0]
@@ -375,7 +410,7 @@ def search():
         facets = [],
         query = query,
         query_field = '',
-        results = results,
+        results = mod_results,
         title_slug = title_slug
     )
     
@@ -405,7 +440,8 @@ def series(noid):
         'series.html',
         **(series_data | {
             'items': items,
-            'title_slug': title_stub
+            'title_slug': title_stub,
+            'access_rights': get_access_label_obj(series_data)
         })
     )
 
