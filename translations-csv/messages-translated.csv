@@ -1,0 +1,67 @@
+location,source,target
+app.py:31,Mesoamerican Language Collections,Colecciones de idiomas mesoamericanos
+app.py:242,Restricted,Restringido
+app.py:246,Public Domain,Dominio publico
+app.py:292 templates/sidebar-right.html:51,Suggest Corrections,Sugerir correcciones
+templates/base.html:45,Skip to Main Content,Saltar al contenido principal
+templates/base.html:55,Collections & Exhibits,Colecciones y exhibiciones
+templates/base.html:56,Collections,Colecciones
+templates/elements-browse-bar.html:2 templates/sidebar-right.html:16,Browse Collection by,Browse Collection por
+templates/elements-browse-bar.html:4 templates/item.html:66 templates/series.html:50 templates/sidebar-right.html:19,Language,Idioma
+templates/elements-browse-bar.html:5 templates/search.html:41 templates/sidebar-right.html:22,Location,Ubicación
+templates/elements-browse-bar.html:6 templates/sidebar-right.html:25,Contributors,Colaboradores
+templates/elements-browse-bar.html:7 templates/sidebar-right.html:28,Dates,fechas
+templates/home.html:9,Indigenous Mesoamerican Languages Portal,Portal de idiomas mesoamericanos indígenas
+templates/item.html:19,Panopto Links,Enlaces de panopto
+templates/item.html:30 templates/suggest-corrections.html:13,Item Title,Título de artículo
+templates/item.html:39,Item Identifier,Identificador de artículos
+templates/item.html:48,Contributor,Contribuyente
+templates/item.html:57 templates/series.html:41,Indigenous Language,Lengua indígena
+templates/item.html:75 templates/series.html:59,Location Where Indigenous Language Is Spoken,Ubicación donde se habla el idioma indígena
+templates/item.html:93 templates/series.html:77,Description,Descripción
+templates/item.html:102,Linguistic Data Type,Tipo de datos lingüísticos
+templates/item.html:111,Discourse Type,Tipo de discurso
+templates/item.html:120,Item Content Type,Tipo de contenido del elemento
+templates/item.html:129,Part of Series,Parte de la serie
+templates/search.html:22,Series,Serie
+templates/search.html:34,Indigenous Language(s),Lenguas indigenas)
+templates/search.html:48 templates/series.html:68,Date,Fecha
+templates/search.html:55,Resource Type,Tipo de recurso
+templates/search.html:66,No results found,No se han encontrado resultados
+templates/series.html:6,Series Title,Título de la serie
+templates/series.html:11,Alternative Series Title,Título de la serie alternativa
+templates/series.html:20,Series Identifier,Identificador de la serie
+templates/series.html:28,Collection,Recopilación
+templates/series.html:29,Digital Media Archive,Archivo de medios digitales
+templates/series.html:32,Creator,Creador
+templates/series.html:87,Items in the Series,Elementos de la serie
+templates/sidebar-left.html:4,Project navigation,Navegación de proyectos
+templates/sidebar-left.html:10,About the Project,Sobre el proyecto
+templates/sidebar-left.html:11,About the Collections,Sobre las colecciones
+templates/sidebar-left.html:12,Terms of Access,Términos de acceso
+templates/sidebar-left.html:13,How to Deposit Materials,Cómo depositar los materiales
+templates/sidebar-left.html:14,Related Collections at UChicago,Colecciones relacionadas en Uchicago
+templates/sidebar-left.html:15,Additional Resources,Recursos adicionales
+templates/sidebar-right.html:33,Access,Acceso
+templates/sidebar-right.html:34,Logged In,Conectado
+templates/sidebar-right.html:38,Feedback,Comentario
+templates/sidebar-right.html:56,Subject Specialist,Especialista en sujeto
+templates/sidebar-right.html:59,Latin American and Caribbean Studies Librarian,Bibliotecario de Estudios Latinoamericanos y del Caribe
+templates/sidebar-right.html:65,Credits,Créditos
+templates/sidebar-right.html:66,The presentation of this material is based upon work supported by the National Science Foundation under Grant No. 1953104.,La presentación de este material se basa en un trabajo apoyado por la National Science Foundation bajo la subvención No. 1953104.
+templates/sidebar-right.html:69,Principal Investigators,Investigadores principales
+templates/sidebar-right.html:74,Project Manager,Gerente de proyecto
+templates/sidebar-right.html:79,Senior Personnel,Personal superior
+templates/sidebar-right.html:84,Senior Developer,Desarrollador Senior
+templates/sidebar-right.html:89,Post-doctoral Fellow,Becario postdoctoral
+templates/sidebar-right.html:94,Graduate Student Fellow,Estudiante graduado
+templates/sidebar-right.html:99,"User Experience and Digital Collections Design Intern, and Metcalf Odyssey Intern","Experiencia del usuario y pasante de diseño de colecciones digitales, y pasante de Metcalf Odyssey"
+templates/sidebar-right.html:104,"Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern","Pasante de portal de idiomas mesoamericanos indígenas, y pasante de metcalf Odyssey"
+templates/suggest-corrections.html:18,Record Identifier,Identificador de registro
+templates/suggest-corrections.html:23,Item URL,URL de artículos
+templates/suggest-corrections.html:30,Name,Nombre
+templates/suggest-corrections.html:34,Email address,Dirección de correo electrónico
+templates/suggest-corrections.html:38,"Problems, comments, questions, or suggestions","Problemas, comentarios, preguntas o sugerencias"
+templates/suggest-corrections.html:40,"Please use the area below to report errors, omissions, or other issues in the description of this collection.","Utilice el área a continuación para informar errores, omisiones u otros problemas en la descripción de esta colección."
+templates/suggest-corrections.html:41,"Corrections may include misspellings, incorrect or missing dates, misidentified languages, individuals, locations, pointing out outdated or harmful terminology/language, etc.","Las correcciones pueden incluir errores ortográficos, fechas incorrectas o faltantes, idiomas mal identificados, individuos, ubicaciones, señalización de terminología/idioma obsoleto o dañino, etc."
+templates/suggest-corrections.html:45,Submit,Entregar

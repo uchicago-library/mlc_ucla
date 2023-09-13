@@ -10,42 +10,39 @@
       <div class="col-xs-12 col-sm-6 col-sm-push-6">
           
         <div class="form-group">
-          <label for="scItemTitle">Item Title</label>
+          <label for="scItemTitle">{% trans %}Item Title{% endtrans %}</label>
           <input type="text" class="form-control" id="scItemTitle" value="{{ item_title }}" readonly>
         </div>
         {% if rec_id %}
           <div class="form-group">
-            <label for="scRecordIdentifier">Record Identifier</label>
+            <label for="scRecordIdentifier">{% trans %}Record Identifier{% endtrans %}</label>
             <input type="number" class="form-control" id="scRecordIdentifier" value="{{ rec_id }}" readonly>
           </div>
         {% endif %}
         <div class="form-group">
-          <label for="scItemURL">Item URL</label>
+          <label for="scItemURL">{% trans %}Item URL{% endtrans %}</label>
           <input type="url" class="form-control" id="scItemURL" value="{{ item_url }}" readonly>
         </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-sm-pull-6">
 
           <div class="form-group">
-            <label for="scName">Name*</label>
-            <input type="text" class="form-control" id="scName" placeholder="Enter your name" required>
+            <label for="scName">{% trans %}Name{% endtrans %}*</label>
+            <input type="text" class="form-control" id="scName" placeholder="{% trans %}Enter your name{% endtrans %}" required>
           </div>
           <div class="form-group">
-            <label for="scEmail">Email address*</label>
-            <input type="email" class="form-control" id="scEmail" placeholder="Enter your email address" required>
+            <label for="scEmail">{% trans %}Email address{% endtrans %}*</label>
+            <input type="email" class="form-control" id="scEmail" placeholder="{% trans %}Enter your email address{% endtrans %}" required>
           </div>
           <div class="form-group">
-            <label for="scSuggestions">Problems, comments, questions, or suggestions*</label>
+            <label for="scSuggestions">{% trans %}Problems, comments, questions, or suggestions{% endtrans %}*</label>
             <p>
-              Please use the area below to report errors, omissions, 
-              or other issues in the description of this collection. 
-              Corrections may include misspellings, incorrect or missing dates, 
-              misidentified languages, individuals, locations, 
-              pointing out outdated or harmful terminology/language, etc.
+              {% trans %}Please use the area below to report errors, omissions, or other issues in the description of this collection.{% endtrans %} 
+              {% trans %}Corrections may include misspellings, incorrect or missing dates, misidentified languages, individuals, locations, pointing out outdated or harmful terminology/language, etc.{% endtrans %}
             </p>
-            <textarea class="form-control" rows="3" id="scSuggestions" placeholder="Provide a description of the correction" required></textarea>
+            <textarea class="form-control" rows="3" id="scSuggestions" placeholder="{% trans %}Provide a description of the correction{% endtrans %}" required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
       </div>
     </div>
   </form>

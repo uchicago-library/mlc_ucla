@@ -2,11 +2,12 @@
 <html lang="{{ locale }}">
 <head>
     <meta charset="UTF-8">
+      <title>
     {% if title_slug %}
-      <title>{{ title_slug }} | Mesoamerican Language Collections</title>
-    {% else %}
-      <title>Mesoamerican Language Collections</title>
+      {{ title_slug }} |
     {% endif %}
+     {{ trans.collection_title }}
+    </title>
 	<meta name="generator" content="Bootply" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -41,7 +42,7 @@
 
 <body class="digitalobjectpage">
   <div id="skip">
-    <a href="#content">Skip to Main Content</a>
+    <a href="#content">{% trans %}Skip to Main Content{% endtrans %}</a>
   </div>
   <div>
     {% include "header.html" %}
@@ -51,10 +52,10 @@
       <div class="row"> <!-- Off Canvas Wrapper Row -->
         <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
           <div class="col-xs-9 breadcrumbs">
-            <a href="https://www.lib.uchicago.edu/collex/">Collections &amp; Exhibits</a> &gt;
-            <a href="https://www.lib.uchicago.edu/collex/collections/">Collections</a> &gt;
-            <a href="/">Indigenous Mesoamerican Languages Portal</a> &gt;
-            {{ title_slug }}
+            <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
+            <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
+            <a href="/">{{ trans.collection_title }}</a> &gt;
+            {{ breadcrumb|safe or title_slug}}
           </div> <!-- // Breadcrumbs -->
           <div class="col-xs-3 text-right">
             <form action="/language-change" method="POST">
