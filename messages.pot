@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-09-12 21:11-0500\n"
+"POT-Creation-Date: 2023-09-13 12:09-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: app.py:316
-msgid "Restricted"
+#: templates/base.html:45
+msgid "Skip to Main Content"
 msgstr ""
 
-#: app.py:320
-msgid "Public Domain"
+#: templates/base.html:55
+msgid "Collections & Exhibits"
 msgstr ""
 
 #: templates/home.html:9
@@ -31,5 +31,75 @@ msgstr ""
 
 #: templates/sidebar-left.html:4
 msgid "Project navigation"
+msgstr ""
+
+#: templates/sidebar-left.html:10
+msgid "About the Project"
+msgstr ""
+
+#: templates/sidebar-left.html:11
+msgid "About the Collections"
+msgstr ""
+
+#: templates/sidebar-left.html:12
+msgid "Terms of Access"
+msgstr ""
+
+#: templates/sidebar-left.html:13
+msgid "How to Deposit Materials"
+msgstr ""
+
+#: templates/sidebar-left.html:14
+msgid "Related Collections at UChicago"
+msgstr ""
+
+#: templates/sidebar-left.html:15
+msgid "Additional Resources"
+msgstr ""
+
+#: templates/sidebar-right.html:68
+msgid "Credits"
+msgstr ""
+
+#: templates/sidebar-right.html:69
+msgid ""
+"The presentation of this material is based upon work supported by the "
+"National Science Foundation under Grant No. 1953104."
+msgstr ""
+
+#: templates/sidebar-right.html:72
+msgid "Principal Investigators"
+msgstr ""
+
+#: templates/sidebar-right.html:77
+msgid "Project Manager"
+msgstr ""
+
+#: templates/sidebar-right.html:82
+msgid "Senior Personnel"
+msgstr ""
+
+#: templates/sidebar-right.html:87
+msgid "Senior Developer"
+msgstr ""
+
+#: templates/sidebar-right.html:92
+msgid "Post-doctoral Fellow"
+msgstr ""
+
+#: templates/sidebar-right.html:97
+msgid "Graduate Student Fellow"
+msgstr ""
+
+#: templates/sidebar-right.html:102
+msgid ""
+"User Experience and Digital Collections Design Intern, and Metcalf "
+"Odyssey Intern"
+msgstr ""
+
+#: templates/sidebar-right.html:107
+msgid ""
+"Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey "
+"Intern"
 msgstr ""
 

@@ -22,11 +22,15 @@ babel = Babel(app, default_locale='en', locale_selector=get_locale)
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-# To define strings in code, it has to be with lazy_gettext()
-# test_string_lazy = lazy_gettext(u'Test Lazy String Original') 
+
 @app.context_processor
-def inject_locale():
-    return dict(locale = get_locale())
+def inject_strings():
+    return dict(
+        locale = get_locale(),
+        trans = dict(
+            collection_title = lazy_gettext(u'Mesoamerican Language Collections')
+            )
+        )
 
 @app.route('/language-change', methods=["POST"])
 def change_language():
@@ -233,6 +237,35 @@ def cli_search(term, facet):
 
 # WEB
 
+access_key = {
+    'restricted': {
+        'trans': lazy_gettext(u'Restricted'),
+        'class': 'warning'
+    },
+    'public domain':  {
+        'trans': lazy_gettext(u'Public Domain'),
+        'class': 'success'
+    }
+}
+
+def get_access_label_obj(item):
+    # list of results
+        # tuple for item
+            # string for url
+            # dictionary of data
+                # list of values
+    ar = item['access_rights']
+
+    # [<string from database>, <translated string>, <bootstrap label class>]
+    if( len(ar) > 0 and ar[0].lower() in access_key):
+        return [
+            ar[0], 
+            access_key[ar[0].lower()]['trans'], 
+            access_key[ar[0].lower()]['class']
+            ]
+    else:
+        return ['emtpy','By Request','info']
+
 @app.errorhandler(400)
 def bad_request(e):
     return (render_template('400.html'), 400)
@@ -256,12 +289,13 @@ def suggest_corrections():
     item_title = request.args.get('ittt')
     rec_id = request.args.get('rcid')
     item_url = request.args.get('iurl')
+    page_title = lazy_gettext(u'Suggest Corrections')
     return render_template(
         'suggest-corrections.html',
         item_title = item_title,
         rec_id = rec_id,
         item_url = item_url,
-        title_slug = 'Suggest Corrections',
+        title_slug = page_title,
         hide_right_column = True
     )
 
@@ -311,35 +345,6 @@ def browse():
             browse_type = browse_type
         )
 
-access_key = {
-    'restricted': {
-        'trans': lazy_gettext(u'Restricted'),
-        'class': 'warning'
-    },
-    'public domain':  {
-        'trans': lazy_gettext(u'Public Domain'),
-        'class': 'success'
-    }
-}
-
-def get_access_label_obj(item):
-    # list of results
-        # tuple for item
-            # string for url
-            # dictionary of data
-                # list of values
-    ar = item['access_rights']
-
-    # [<string from database>, <translated string>, <bootstrap label class>]
-    if( len(ar) > 0 and ar[0].lower() in access_key):
-        return [
-            ar[0], 
-            access_key[ar[0].lower()]['trans'], 
-            access_key[ar[0].lower()]['class']
-            ]
-    else:
-        return ['emtpy','By Request','info']
-
 @app.route('/item/<noid>/')
 def item(noid):
     def ark_to_panopto(ark_url):
@@ -373,16 +378,20 @@ def item(noid):
     series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
     try:
-        title_stub = item_data['titles'][0]
+        title_slug = item_data['titles'][0]
     except (IndexError, KeyError):
-        title_stub = ''
-        
+        title_slug = ''
+
+    brdcrb = "<a href='"+series[0].replace('https://ark.lib.uchicago.edu/ark:61001/', '/series/')+"'>"+series[1]['titles'][0]+"</a> &gt; "
+    brdcrb += item_data['titles'][0]
+
     return render_template(
         'item.html',
         **(item_data | {'series': series,
-                        'title_slug': title_stub,
+                        'title_slug': title_slug,
                         'access_rights': get_access_label_obj(item_data),
-                        'panopto_identifier': panopto_identifier })
+                        'panopto_identifier': panopto_identifier,
+                        'breadcrumb': brdcrb})
     )
 
 @app.route('/search/')
@@ -432,15 +441,15 @@ def series(noid):
     print(json.dumps(items, indent=2))
 
     try:
-        title_stub = series_data['titles'][0]
+        title_slug = series_data['titles'][0]
     except (IndexError, KeyError):
-        title_stub = ''
-        
+        title_slug = ''
+
     return render_template(
         'series.html',
         **(series_data | {
             'items': items,
-            'title_slug': title_stub,
+            'title_slug': title_slug,
             'access_rights': get_access_label_obj(series_data)
         })
     )

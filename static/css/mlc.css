@@ -6,6 +6,9 @@ doesn't seem necessary. */
 html{
 	font-size: 14px;
 }
+pre{
+	text-wrap: wrap;
+}
 .main-content{
 	padding-top: 2rem;
 }

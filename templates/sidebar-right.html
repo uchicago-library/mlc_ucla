@@ -13,21 +13,29 @@
         </div>
       </div>
       <div class="collections browse"><!-- Browse Collection by -->
-        <span class="headline">Browse Collection by</span>
+        <span class="headline">{% trans %}Browse Collection by{% endtrans %}</span>
         <ul>
-          <li><a href="/browse/?type=language">Language</a></li>
-          <li><a href="/browse/?type=location">Location</a></li>
-          <li><a href="/browse/?type=contributor">Contributors</a></li>
-          <li><a href="/browse/?type=decade">Dates</a></li>
+          <li><a href="/browse/?type=language">
+            {% trans %}Language{% endtrans %}
+          </a></li>
+          <li><a href="/browse/?type=location">
+            {% trans %}Location{% endtrans %}
+          </a></li>
+          <li><a href="/browse/?type=contributor">
+            {% trans %}Contributors{% endtrans %}
+          </a></li>
+          <li><a href="/browse/?type=decade">
+            {% trans %}Dates{% endtrans %}
+          </a></li>
         </ul>
       </div>
       <div class="collections access"> <!-- Access -->
-        <h2>Access</h2>
-        <p><i class="fa fa-user" aria-hidden="true"></i> Logged In</p>
+        <h2>{% trans %}Access{% endtrans %}</h2>
+        <p><i class="fa fa-user" aria-hidden="true"></i> {% trans %}Logged In{% endtrans %}</p>
         <!-- <p><a href="http://dma.uchicago.edu/forms/request-research-access">Request Research Access</a></p> -->
       </div>
       <div class="collections access"> <!-- Feedback -->
-        <h2>Feedback</h2>
+        <h2>{% trans %}Feedback{% endtrans %}</h2>
         <!-- <p>Report errors, omissions, or other issues in the description of this collection.</p> -->
         {% set ts = "ittt=" ~ title_slug if title_slug else "" %}
         {% if identifier %}
@@ -40,12 +48,12 @@
           #}
         {% endif %}
         {% set ru = "iurl=" ~ request.url | urlencode if request.url else "" %}
-        <p><a href="/suggest-corrections?{{ ts }}&{{ ri }}&{{ ru }}">Suggest Corrections</a></p>
+        <p><a href="/suggest-corrections?{{ ts }}&{{ ri }}&{{ ru }}">{% trans %}Suggest Corrections{% endtrans %}</a></p>
       </div>
     </div>
     <div class="col-xs-6 col-sm-12">
       <div class="collections specialist"><!-- Subject Specialist -->
-        <h2>Subject Specialist</h2>
+        <h2>{% trans %}Subject Specialist{% endtrans %}</h2>
         <p>
           <a href="https://www.lib.uchicago.edu/about/directory/staff/david-woken/">David Woken</a><br/>
           <em>Latin American and Caribbean Studies Librarian</em><br/>
@@ -54,24 +62,47 @@
         </p>
       </div>
       <div class="collections credits"><!-- Credits -->
-        <h2>Credits</h2>
-        <p>The presentation of this material is based upon work supported by the National Science Foundation under Grant No. 1953104.</p>
+        <h2>{% trans %}Credits{% endtrans %}</h2>
+        <p>{% trans %}The presentation of this material is based upon work supported by the National Science Foundation under Grant No. 1953104.{% endtrans %}</p>
         <dl>
-          <dt>Principal Investigators</dt>
+          <dt>
+            {% trans %}Principal Investigators{% endtrans %}
+          </dt>
           <dd>John Lucy, David Woken</dd>
-          <dt>Project Manager</dt>
+
+          <dt>
+            {% trans %}Project Manager{% endtrans %}
+          </dt>
           <dd>Maria Victoria Fernandez</dd>
-          <dt>Senior Personnel</dt>
+
+          <dt>
+            {% trans %}Senior Personnel{% endtrans %}
+          </dt>
           <dd>Charles Blair, Thomas Dousa</dd>
-          <dt>Senior Developer</dt>
+
+          <dt>
+            {% trans %}Senior Developer{% endtrans %}
+          </dt>
           <dd>John Jung</dd>
-          <dt>Post-doctoral Fellow</dt>
+
+          <dt>
+            {% trans %}Post-doctoral Fellow{% endtrans %}
+          </dt>
           <dd>Carlos Javier Cisneros</dd>
-          <dt>Graduate Student Fellow</dt>
+
+          <dt>
+            {% trans %}Graduate Student Fellow{% endtrans %}
+          </dt>
           <dd>Hugo Novales Contreras</dd>
-          <dt>User Experience and Digital Collections Design Intern, and Metcalf Odyssey Intern</dt>
+
+          <dt>
+            {% trans %}User Experience and Digital Collections Design Intern, and Metcalf Odyssey Intern{% endtrans %}
+          </dt>
           <dd>Wina Aaron</dd>
-          <dt>Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern</dt>
+
+          <dt>
+            {% trans %}Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern{% endtrans %}
+          </dt>
           <dd>Phoebe Price</dd>
         </dl>
       </div>
