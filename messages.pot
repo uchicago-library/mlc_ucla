@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-09-13 14:53-0500\n"
+"POT-Creation-Date: 2023-09-15 10:16-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,8 +29,44 @@ msgstr ""
 msgid "Public Domain"
 msgstr ""
 
-#: app.py:292 templates/sidebar-right.html:51
+#: app.py:292 templates/sidebar-right.html:62
 msgid "Suggest Corrections"
+msgstr ""
+
+#: app.py:307
+msgid "Browse by Contributors"
+msgstr ""
+
+#: app.py:308
+msgid "Browse by Creator"
+msgstr ""
+
+#: app.py:309
+msgid "Browse by Date"
+msgstr ""
+
+#: app.py:310
+msgid "Browse by Decade"
+msgstr ""
+
+#: app.py:311
+msgid "Browse by Language"
+msgstr ""
+
+#: app.py:312
+msgid "Browse by Location"
+msgstr ""
+
+#: app.py:328
+msgid "Results with"
+msgstr ""
+
+#: app.py:330
+msgid "Results for search"
+msgstr ""
+
+#: app.py:420 app.py:422
+msgid "Search Results for"
 msgstr ""
 
 #: templates/base.html:45
@@ -50,11 +86,12 @@ msgid "Browse Collection by"
 msgstr ""
 
 #: templates/elements-browse-bar.html:4 templates/item.html:66
-#: templates/series.html:50 templates/sidebar-right.html:19
+#: templates/search.html:41 templates/series.html:50
+#: templates/sidebar-right.html:19
 msgid "Language"
 msgstr ""
 
-#: templates/elements-browse-bar.html:5 templates/search.html:41
+#: templates/elements-browse-bar.html:5 templates/search.html:48
 #: templates/sidebar-right.html:22
 msgid "Location"
 msgstr ""
@@ -83,7 +120,7 @@ msgstr ""
 msgid "Item Identifier"
 msgstr ""
 
-#: templates/item.html:48
+#: templates/item.html:48 templates/search.html:27
 msgid "Contributor"
 msgstr ""
 
@@ -115,6 +152,11 @@ msgstr ""
 msgid "Part of Series"
 msgstr ""
 
+#: templates/search.html:16
+#, python-format
+msgid "Found %(num)s results"
+msgstr ""
+
 #: templates/search.html:22
 msgid "Series"
 msgstr ""
@@ -123,15 +165,15 @@ msgstr ""
 msgid "Indigenous Language(s)"
 msgstr ""
 
-#: templates/search.html:48 templates/series.html:68
+#: templates/search.html:55 templates/series.html:68
 msgid "Date"
 msgstr ""
 
-#: templates/search.html:55
+#: templates/search.html:62
 msgid "Resource Type"
 msgstr ""
 
-#: templates/search.html:66
+#: templates/search.html:73
 msgid "No results found"
 msgstr ""
 
@@ -191,6 +233,14 @@ msgstr ""
 msgid "Additional Resources"
 msgstr ""
 
+#: templates/sidebar-right.html:2
+msgid "Search & Browse"
+msgstr ""
+
+#: templates/sidebar-right.html:8
+msgid "Search language, location, people, etc."
+msgstr ""
+
 #: templates/sidebar-right.html:33
 msgid "Access"
 msgstr ""
@@ -199,59 +249,59 @@ msgstr ""
 msgid "Logged In"
 msgstr ""
 
-#: templates/sidebar-right.html:38
-msgid "Feedback"
-msgstr ""
-
-#: templates/sidebar-right.html:56
+#: templates/sidebar-right.html:40
 msgid "Subject Specialist"
 msgstr ""
 
-#: templates/sidebar-right.html:59
+#: templates/sidebar-right.html:43
 msgid "Latin American and Caribbean Studies Librarian"
 msgstr ""
 
-#: templates/sidebar-right.html:65
+#: templates/sidebar-right.html:49
+msgid "Feedback"
+msgstr ""
+
+#: templates/sidebar-right.html:68
 msgid "Credits"
 msgstr ""
 
-#: templates/sidebar-right.html:66
+#: templates/sidebar-right.html:69
 msgid ""
 "The presentation of this material is based upon work supported by the "
 "National Science Foundation under Grant No. 1953104."
 msgstr ""
 
-#: templates/sidebar-right.html:69
+#: templates/sidebar-right.html:72
 msgid "Principal Investigators"
 msgstr ""
 
-#: templates/sidebar-right.html:74
+#: templates/sidebar-right.html:77
 msgid "Project Manager"
 msgstr ""
 
-#: templates/sidebar-right.html:79
+#: templates/sidebar-right.html:82
 msgid "Senior Personnel"
 msgstr ""
 
-#: templates/sidebar-right.html:84
+#: templates/sidebar-right.html:87
 msgid "Senior Developer"
 msgstr ""
 
-#: templates/sidebar-right.html:89
+#: templates/sidebar-right.html:92
 msgid "Post-doctoral Fellow"
 msgstr ""
 
-#: templates/sidebar-right.html:94
+#: templates/sidebar-right.html:97
 msgid "Graduate Student Fellow"
 msgstr ""
 
-#: templates/sidebar-right.html:99
+#: templates/sidebar-right.html:102
 msgid ""
 "User Experience and Digital Collections Design Intern, and Metcalf "
 "Odyssey Intern"
 msgstr ""
 
-#: templates/sidebar-right.html:104
+#: templates/sidebar-right.html:107
 msgid ""
 "Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey "
 "Intern"
@@ -269,8 +319,16 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+#: templates/suggest-corrections.html:31
+msgid "Enter your name"
+msgstr ""
+
 #: templates/suggest-corrections.html:34
 msgid "Email address"
+msgstr ""
+
+#: templates/suggest-corrections.html:35
+msgid "Enter your email address"
 msgstr ""
 
 #: templates/suggest-corrections.html:38
@@ -288,6 +346,10 @@ msgid ""
 "Corrections may include misspellings, incorrect or missing dates, "
 "misidentified languages, individuals, locations, pointing out outdated or"
 " harmful terminology/language, etc."
+msgstr ""
+
+#: templates/suggest-corrections.html:43
+msgid "Provide a description of the correction"
 msgstr ""
 
 #: templates/suggest-corrections.html:45

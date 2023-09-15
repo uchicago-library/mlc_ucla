@@ -66,7 +66,7 @@
         <dt>{% trans %}Language{% endtrans %}:</dt>
         <dd>
           {% for i in primary_language %}
-            <a href="/browse?type=language{{ i|urlencode }}">{{ i }}</a><br>
+            <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a><br>
           {% endfor %}
         </dd>
       {% endif %}
@@ -75,7 +75,7 @@
         <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
         <dd>
           {% for i in location %}
-            <a href="/browse?type=location{{ i|urlencode }}">{{ i }}</a><br>
+            <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a><br>
           {% endfor %}
         </dd>
       {% endif %}
