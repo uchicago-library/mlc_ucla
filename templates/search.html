@@ -13,26 +13,33 @@
 
     <section class="listing" role="main">
       {% if results %}
+        <em>{% trans num=results|length %}Found {{ num }} results{% endtrans %}</em>
         {% for result in results %}
-
           <figure>
             <figcaption>
               <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
                 <h3>
                   {% trans %}Series{% endtrans %}: {{ result.1.titles.0 }} 
-  <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+                  <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
                 </h3>
               </a>
               {% if result.1.contributor %}
-                <p><b>Contributor:</b>
+                <p><b>{% trans %}Contributor{% endtrans %}:</b>
                   {% for contributor in result.1.contributor %}
-                      <span class="search-results-facet">{{ contributor }};</span>
+                    <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="search-results-facet">{{ contributor }};</a>
                   {% endfor %}
                </p>
               {% endif %}
-              {% if result.1.language %}
+              {% if result.1.subject_language %}
                 <p><b>{% trans %}Indigenous Language(s){% endtrans %}: </b>
-                  {% for language in result.1.language %}
+                  {% for language in result.1.subject_language %}
+                    <a href="/browse/?type=language&term={{ language|urlencode }}" class="search-results-facet">{{ language }}</a>
+                  {% endfor %}
+               </p>
+              {% endif %}
+              {% if result.1.primary_language %}
+                <p><b>{% trans %}Language{% endtrans %}: </b>
+                  {% for language in result.1.primary_language %}
                     <a href="/browse/?type=language&term={{ language|urlencode }}" class="search-results-facet">{{ language }}</a>
                   {% endfor %}
                </p>
