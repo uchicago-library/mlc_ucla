@@ -981,17 +981,22 @@ class MLCDB:
                   series identifier, a series info dictionary for constructing
                   search snippets, and a rank. 
         """
-        # replace all punctuation with a single space.
-        query = re.sub(u"\p{P}+", " ", str(query))
+        # limit queries to 256 characters. (size chosen arbitrarily.)
+        query = query[:256]
+
+        # replace all non-unicode characters in the query with a single space.
+        # this should strip out punctuation, etc. 
+        query = re.sub(u"\P{L}+", " ", str(query))
 
         # replace all whitespace with a single space.
         query = ' '.join(query.split())
 
         # join all search terms with AND. 
+        # limit queries to 32 search terms. (size chosen arbitrarily.)
         match_string = []
         for q in query.split(' '):
             match_string.append(q)
-        match_string = ' AND '.join(match_string)
+        match_string = ' AND '.join(match_string[:32])
 
         subqueries = []
         for f in facets:
@@ -1026,7 +1031,13 @@ class MLCDB:
                     where series.id in ({})
                     order by series.id;
             '''.format(' intersect '.join(subqueries))
-    
+        else:
+            sql = '''
+                    select series.id, series.info
+                    from series
+                    order by series.id;
+            '''
+
         vars = []
         if query:
             vars.append(query)
