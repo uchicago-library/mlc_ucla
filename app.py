@@ -304,12 +304,12 @@ def browse():
     mlc_db = MLCDB(app.config)
 
     title_slugs = {
-        'contributor': 'Browse by Contributors',
-        'creator':     'Browse by Creator',
-        'date':        'Browse by Date',
-        'decade':      'Browse by Decade',
-        'language':    'Browse by Language',
-        'location':    'Browse by Location'
+        'contributor': lazy_gettext(u'Browse by Contributors'),
+        'creator':     lazy_gettext(u'Browse by Creator'),
+        'date':        lazy_gettext(u'Browse by Date'),
+        'decade':      lazy_gettext(u'Browse by Decade'),
+        'language':    lazy_gettext(u'Browse by Language'),
+        'location':    lazy_gettext(u'Browse by Location')
     }
 
     browse_type = request.args.get('type')
@@ -325,16 +325,23 @@ def browse():
 
     if browse_term:
         if browse_type:
-            title_slug = "Results with "+browse_type+": "+browse_term+""
+            title_slug = lazy_gettext(u'Results with')+" "+browse_type+": "+browse_term+""
         else:
-            title_slug = "Results for search: "+browse_term+""
+            title_slug = lazy_gettext(u'Results for search')+": "+browse_term+""
         results = mlc_db.get_browse_term(browse_type, browse_term)
+
+        mod_results = []
+        for item in results:
+            item_data = item[1]
+            item_data['access_rights'] = get_access_label_obj(item_data)
+            mod_results.append( (item[0], item_data ) )
+
         return render_template(
             'search.html',
             facets = [],
             query = browse_term,
             query_field = browse_type,
-            results = results,
+            results = mod_results,
             title_slug = title_slug
         )
     else:
@@ -410,9 +417,9 @@ def search():
         mod_results.append( (item[0], item_data ) )
 
     if( facets ):
-        title_slug = 'Search Results for '+facets[0]
+        title_slug = lazy_gettext(u'Search Results for')+' '+facets[0]
     else:
-        title_slug = "Search Results for '"+query+"'"
+        title_slug = lazy_gettext(u'Search Results for')+" '"+query+"'"
 
     return render_template(
         'search.html',
