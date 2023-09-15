@@ -665,7 +665,13 @@ class MLCGraph:
             prepareQuery(''' 
                 SELECT ?label
                 WHERE {
-                    ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label
+                    {
+                        ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#altLabel> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
+                    }
                 }
             '''),
             initBindings={
@@ -692,7 +698,13 @@ class MLCGraph:
             prepareQuery(''' 
                 SELECT ?label
                 WHERE {
-                    ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+                    {
+                        ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#altLabel> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
+                    }
                     FILTER langMatches(lang(?label), "EN")
                 }
             '''),
@@ -713,11 +725,33 @@ class MLCGraph:
         Returns:
             list: a list of strings, e.g., "Guatemala"
         """
-        place_names = self.get_tgn_place_name_en(i)
+        results = set()
+        for row in self.g.query(
+            prepareQuery(''' 
+                SELECT ?label
+                WHERE {
+                    ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
+                    FILTER langMatches(lang(?label), "EN")
+                }
+            '''),
+            initBindings={
+                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
+            }
+        ):
+            results.add(str(row[0]).strip())
+
+        place_names = list(results)
         if len(place_names) > 0:
-            return place_names
+            return [place_names[0]]
         else:
-            return self.get_tgn_place_names(i)
+            place_names = self.get_tgn_place_name_en(i)
+            if len(place_names) > 0:
+                return [place_names[0]]
+            else:
+                place_names = self.get_tgn_place_names(i)
+                if len(place_names) > 0:
+                    return [self.get_tgn_place_names(i)[0]]
+        return []
     
     def get_glottolog_codes(self):
         """Get all ISO639P3P Codes from the Glottolog graph.
