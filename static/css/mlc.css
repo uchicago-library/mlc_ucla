@@ -147,20 +147,34 @@ h1{
 	padding-right: .8rem;
 }
 /* =============== BROWSE */
+/* =============== and SERIES */
+
+.series-item-list-wrapper ul,
 .browse-list-wrapper ul{
 	list-style-type: none;
 	padding: 0;
 }
+
+.series-item-list-wrapper ul li,
 .browse-list-wrapper ul li{
   padding: 0;
   margin: 0 !important;
-  height: 42px;
+  height: 55px;
 }
-@media (min-width:500px) and (max-width:992px){
+@media (min-width:500px) and (max-width:600px){
+	.series-item-list-wrapper ul li,
+	.browse-list-wrapper ul li{
+  	width: 50%;
+	}
+}
+@media (min-width:600px) and (max-width:768px){
+	.series-item-list-wrapper ul li,
 	.browse-list-wrapper ul li{
   	width: 33.33%;
 	}
 }
+
+.series-item-list-wrapper ul li a,
 .browse-list-wrapper ul li a{
 	display: inline-block;
 	width: 100%;
@@ -181,6 +195,18 @@ h1{
   border: 1px solid transparent;
   border-radius: 4px;
   overflow: hidden;
+}
+.series-item-list-wrapper .fa{
+	color: black;
+}
+dl.series-metadata dt{
+	border-bottom: none;
+}
+dl.series-metadata div:not(:first-child) dt{
+	border-top: 1px dashed #ddd;
+}
+dl.series-metadata div:not(:last-child) dd{
+	border: none;
 }
 /* =============== ITEM */
 /* Title Element */

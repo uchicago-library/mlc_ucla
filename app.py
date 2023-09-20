@@ -444,8 +444,15 @@ def series(noid):
 
     series_data = mlc_db.get_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
+
     items = mlc_db.get_items_for_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
     print(json.dumps(items, indent=2))
+
+    mod_items = []
+
+    def sortItemsInSeries(item):
+        return len(item[1]['panopto_links'])*-1
+    items.sort(key=sortItemsInSeries)
 
     try:
         title_slug = series_data['titles'][0]

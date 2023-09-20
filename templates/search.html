@@ -21,6 +21,7 @@
                 <h3>
                   {% trans %}Series{% endtrans %}: {{ result.1.titles.0 }} 
                   <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+                  <span class="text-muted">ID: {{ result.1.identifier.0 }}</span>
                 </h3>
               </a>
               {% if result.1.contributor %}
