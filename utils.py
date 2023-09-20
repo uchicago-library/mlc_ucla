@@ -1003,7 +1003,7 @@ class MLCDB:
             (identifier,)
         ).fetchall():
             results.append((row[0], json.loads(row[1])))
-        return results[0]
+        return results
     
     def get_search(self, query, facets=[]):
         """

@@ -389,7 +389,8 @@ def item(noid):
     except (IndexError, KeyError):
         title_slug = ''
 
-    brdcrb = "<a href='"+series[0].replace('https://ark.lib.uchicago.edu/ark:61001/', '/series/')+"'>"+series[1]['titles'][0]+"</a> &gt; "
+    brdcrb = ""
+    # brdcrb += "<a href='"+series[0][0].replace('https://ark.lib.uchicago.edu/ark:61001/', '/series/')+"'>"+series[0][1]['titles'][0]+"</a> &gt; "
     brdcrb += item_data['titles'][0]
 
     return render_template(
