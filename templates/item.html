@@ -128,9 +128,11 @@
       {# partOfSeries #}
       <dt>{% trans %}Part of Series{% endtrans %}:</dt>
       <dd>
-          <a href="/series/{{ series.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-              {{ series.1.titles.0 }}
-          </a><br>
+        {% for serie in series %}
+          <p><a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+              {{ serie.1.titles.0 }}
+          </a></p>
+          {% endfor %}
       </dd>
     </dl>
   </div> <!-- // .main -->
