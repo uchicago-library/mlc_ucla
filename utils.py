@@ -94,6 +94,31 @@ class MLCGraph:
             results.add(row[0])
         return sorted(list(results))
 
+    def get_item_dbid(self, item_id):
+        """
+        Get the database identifier for a given item.
+
+        Parameters:
+            item_id (str): a series identifier.
+
+        Returns:
+            str: item identifier.
+        """
+        dbid = ''
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?dbid
+                WHERE {
+                    ?item_id <http://purl.org/dc/elements/1.1/identifier> ?dbid
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            dbid = row[0]
+        return dbid
+
     def get_item_info(self, item_id):
         """
         Get info for search snippets and page views for a given series.
@@ -102,7 +127,7 @@ class MLCGraph:
             item_id (str): a series identifier.
     
         Returns:
-            str: series title.
+            dict: item information.
         """
         data = {}
     
@@ -241,6 +266,8 @@ class MLCGraph:
             access_rights.add(str(row[0]))
         data['access_rights'] = list(access_rights)
 
+        data['ark'] = item_id
+
         return data
 
     def get_series_info(self, series_id):
@@ -356,6 +383,8 @@ class MLCGraph:
         data['subject_language'] = []
         for preferred_name in preferred_names:
             data['subject_language'].append(preferred_name)
+
+        data['ark'] = series_id
 
         return data
 
@@ -510,9 +539,10 @@ class MLCGraph:
     
         return browse_dict
 
-    def get_search_tokens_for_series_identifier(self, i):
+    def get_search_tokens_for_identifier(self, i):
         """
-        Get the search tokens for a given series identifier from the graph.
+        Get the search tokens for a given series or item identifier from the
+        graph.
     
         Parameters:
             i (str): a series identifier
@@ -603,6 +633,22 @@ class MLCGraph:
         # series-level dc:date
         # TODO
     
+        # replace all whitespace with single spaces and return all search tokens in
+        # a single string.
+        return ' '.join([' '.join(s.split()) for s in search_tokens])
+
+    def get_search_tokens_for_series_identifier(self, i):
+        """
+        Get the search tokens for a given series identifier from the graph.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a string that can be searched via SQLite.
+        """
+        search_tokens = []
+        
         # item-level description
         for iid in self.get_item_identifiers_for_series(i):
             r = self.g.query(
@@ -618,11 +664,86 @@ class MLCGraph:
             )
             for row in r:
                 search_tokens.append(row[0])
-    
-        # replace all whitespace with single spaces and return all search tokens in
-        # a single string.
-        return ' '.join([' '.join(s.split()) for s in search_tokens])
 
+        token_str = self.get_search_tokens_for_identifier(i)
+
+        if token_str and search_tokens:
+            token_str = token_str + \
+            ' ' + \
+            ' '.join([' '.join(s.split()) for s in search_tokens])
+
+        return token_str
+
+    def get_search_tokens_for_item_identifier(self, i):
+        """
+        Get the search tokens for a given item identifier from the graph.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a string that can be searched via SQLite.
+        """
+        search_tokens = []
+        
+        # item-level description
+        r = self.g.query(
+            prepareQuery('''
+                SELECT ?o
+                    WHERE {
+                        ?item_id <http://purl.org/dc/elements/1.1/description> ?o
+                   }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(i)
+            }
+        )
+        for row in r:
+            search_tokens.append(row[0])
+
+        token_str = self.get_search_tokens_for_identifier(i)
+
+        if token_str and search_tokens:
+            token_str = token_str + \
+            ' ' + \
+            ' '.join([' '.join(s.split()) for s in search_tokens])
+
+        return token_str
+
+    def get_date_for_series_identifier(self, i):
+        """
+        Get a single date for a given series identifier from the graph.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a four-digit year (YYYY) or a year range (YYYY/YYYY)
+        """
+        years = []
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?date
+                WHERE {
+                    ?identifier <http://purl.org/dc/terms/date> ?date
+                }
+                '''
+            ),
+            initBindings={
+                'identifier': rdflib.URIRef(i)
+            }
+        ):
+            for year in row[0].split('/'):
+                years.append(year)
+
+        if len(years) == 0:
+            return ''
+        elif len(years) == 1:
+            return years[0]
+        elif len(years) > 1:
+            years = sorted(years)
+            return '/'.join([years[0], years[-1]])
+        
     def get_tgn_identifiers(self):
         """Get all TGN identifiers from the TGN graph.
     
@@ -843,16 +964,30 @@ class MLCDB:
         # build the search table after loading data to avoid issues dumping and
         # reloading virtual tables.
         self.cur.execute('''
-            create virtual table search using fts5(
+            create virtual table item_search using fts5(
+                id,
+                text,
+                tokenize="porter unicode61"
+            );
+        ''')
+
+        self.cur.execute('''
+            create virtual table series_search using fts5(
                 id,
                 text,
                 tokenize="porter unicode61"
             );
         ''')
     
+        for row in self.cur.execute('select id, text from item;').fetchall():
+            self.cur.execute(
+                'insert into item_search(id, text) values (?, ?);',
+                row
+            )
+
         for row in self.cur.execute('select id, text from series;').fetchall():
             self.cur.execute(
-                'insert into search(id, text) values (?, ?);',
+                'insert into series_search(id, text) values (?, ?);',
                 row
             )
 
@@ -1005,20 +1140,152 @@ class MLCDB:
             results.append((row[0], json.loads(row[1])))
         return results[0]
     
-    def get_search(self, query, facets=[]):
+    def get_search(self, query, facets=[], sort_type='rank'):
         """
         Get search results.
     
         Parameters:
-            query (str):   a search string.
-            facets (list): a list of strings, where each string begins with a
-                           browse/facet type, followed by a colon, followed by
-                           the term.
+            query (str):     a search string.
+            facets (list):   a list of strings, where each string begins with a
+                             browse/facet type, followed by a colon, followed
+                             by the term.
+            sort_type (str): e.g., 'rank', 'date'
     
         Returns:
             list: a list, where each element contains a three-tuple with a
                   series identifier, a series info dictionary for constructing
                   search snippets, and a rank. 
+        """
+        assert sort_type in ('date', 'rank', 'series.id')
+
+        query = self.convert_raw_query_to_fts(query)
+
+        subqueries = []
+        for f in facets:
+            subqueries.append('''
+                select browse.id
+                from browse
+                where browse.type=?
+                and browse.term=? 
+            ''')
+
+        vars = []
+        if query:
+            vars.append(query)
+        for f in facets:
+            m = re.match('^([^:]*):(.*)$', f)
+            vars.append(m.group(1))
+            vars.append(m.group(2))
+
+        # Execute series search.
+
+        if query and facets:
+            sql = '''
+                    select series_search.id, series.info, rank
+                    from series_search
+                    inner join series on series.id = series_search.id
+                    where series_search.text match ?
+                    and series_search.id in ({})
+                    order by {};
+            '''.format(' intersect '.join(subqueries), sort_type)
+        elif query:
+            sql = '''
+                    select series_search.id, series.info, rank
+                    from series_search
+                    inner join series on series.id = series_search.id
+                    where series_search.text match ?
+                    order by {};
+            '''.format(sort_type)
+        elif facets:
+            sql = '''
+                    select series.id, series.info
+                    from series
+                    where series.id in ({})
+                    order by {}
+            '''.format(' intersect '.join(subqueries), sort_type)
+        else:
+            sql = '''
+                    select series.id, series.info
+                    from series
+                    order by {}
+            '''.format(sort_type)
+
+        series_results = []
+        for row in self.cur.execute(sql, vars).fetchall():
+            if len(row) == 2:
+                series_results.append((row[0], json.loads(row[1]), 0.0))
+            else:
+                series_results.append((row[0], json.loads(row[1]), row[2]))
+
+        # Execute item search.
+
+        if query and facets:
+            sql = '''
+                    select item_search.id, item.dbid, item.info, series_item.series_id
+                    from item_search
+                    inner join item on item.id = item_search.id
+                    inner join series_item on series_item.item_id = item_search.id
+                    where item_search.text match ?
+                    and item_search.id in ({})
+                    order by cast (item.dbid as unsigned);
+            '''.format(' intersect '.join(subqueries))
+        elif query:
+            sql = '''
+                    select item_search.id, item.dbid, item.info, series_item.series_id
+                    from item_search
+                    inner join item on item.id = item_search.id
+                    inner join series_item on series_item.item_id = item_search.id
+                    where item_search.text match ?
+                    order by cast (item.dbid as unsigned);
+            '''
+        elif facets:
+            sql = '''
+                    select item.id, item.dbid, item.info, series_item.series_id
+                    from item
+                    inner join series_item on series_item.item_id = item.id
+                    where item.id in ({})
+                    order by cast (item.dbid as unsigned);
+            '''.format(' intersect '.join(subqueries))
+        else:
+            sql = '''
+                    select item.id, item.dbid, item.info, series_item.series_id
+                    from item
+                    inner join series_item on series_item.item_id = item.id
+                    order by cast (item.dbid as unsigned);
+            '''
+
+        item_results = []
+        for row in self.cur.execute(sql, vars).fetchall():
+            item_results.append((row[0], row[1], json.loads(row[2]), row[3]))
+
+        # Build a series lookup to speed up processing.
+        series_lookup = {}
+        for s in range(len(series_results)):
+            series_lookup[series_results[s][0]] = s
+       
+        # Add an 'item_list' key, an empty list, for each series.  
+        for s in range(len(series_results)):
+            series_results[s][1]['item_list'] = []
+
+        # Add item result to appropriate series. 
+        for i in range(len(item_results)):
+            info = item_results[i][2]
+            series_id = item_results[i][3]
+            series_index = series_lookup[series_id]
+            series_results[series_index][1]['item_list'].append(info)
+                    
+        return series_results
+
+    def convert_raw_query_to_fts(self, query):
+        """
+        Convert a raw user query to a series of single words, joined by boolean
+        AND, and suitable for passing along to SQLite FTS.
+
+        Parameters:
+            query (str): a search string.
+
+        Returns:
+            str: search terms cleaned and separated by ' AND '.
         """
         # limit queries to 256 characters. (size chosen arbitrarily.)
         query = query[:256]
@@ -1037,62 +1304,8 @@ class MLCDB:
             match_string.append(q)
         match_string = ' AND '.join(match_string[:32])
 
-        subqueries = []
-        for f in facets:
-            subqueries.append('''
-                select browse.id
-                from browse
-                where browse.type=?
-                and browse.term=? 
-            ''')
+        return match_string
 
-        if query and facets:
-            sql = '''
-                    select search.id, series.info, rank
-                    from search
-                    inner join series on series.id = search.id
-                    where search.text match ?
-                    and search.id in ({})
-                    order by rank;
-            '''.format(' intersect '.join(subqueries))
-        elif query:
-            sql = '''
-                    select search.id, series.info, rank
-                    from search
-                    inner join series on series.id = search.id
-                    where search.text match ?
-                    order by rank;
-            '''.format(' intersect '.join(subqueries))
-        elif facets:
-            sql = '''
-                    select series.id, series.info
-                    from series
-                    where series.id in ({})
-                    order by series.id;
-            '''.format(' intersect '.join(subqueries))
-        else:
-            sql = '''
-                    select series.id, series.info
-                    from series
-                    order by series.id;
-            '''
-
-        vars = []
-        if query:
-            vars.append(query)
-        for f in facets:
-            m = re.match('^([^:]*):(.*)$', f)
-            vars.append(m.group(1))
-            vars.append(m.group(2))
-
-        results = []
-        for row in self.cur.execute(sql, vars).fetchall():
-            if len(row) == 2:
-                results.append((row[0], json.loads(row[1]), 0.0))
-            else:
-                results.append((row[0], json.loads(row[1]), row[2]))
-        return results
-    
     def get_series(self, identifier):
         """
         Get series metadata.
@@ -1128,7 +1341,7 @@ class MLCDB:
 
 def build_sqlite_db(cur):
     g = rdflib.Graph()
-    g.parse('meso.big.20230816.ttl', format='turtle')
+    g.parse('meso.small.20230918.ttl', format='turtle')
     g.parse('glottolog_language.ttl', format='turtle')
     g.parse('TGN.ttl')
     mlc_graph = MLCGraph(g)
@@ -1146,12 +1359,15 @@ def build_sqlite_db(cur):
     cur.execute('''
         create table item(
             id text,
-            info text
+            dbid text,
+            info text,
+            text text
         );
     ''')
     cur.execute('''
         create table series(
             id text,
+            date text,
             info text,
             text text
         );
@@ -1195,12 +1411,14 @@ def build_sqlite_db(cur):
     # load item
     for i in mlc_graph.get_item_identifiers(): 
         cur.execute('''
-            insert into item (id, info) 
-            values (?, ?);
+            insert into item (id, dbid, info, text) 
+            values (?, ?, ?, ?);
             ''',
             (
                 i,
-                json.dumps(mlc_graph.get_item_info(i))
+                mlc_graph.get_item_dbid(i),
+                json.dumps(mlc_graph.get_item_info(i)),
+                mlc_graph.get_search_tokens_for_item_identifier(i)
             )
         )
 
@@ -1209,11 +1427,13 @@ def build_sqlite_db(cur):
         cur.execute('''
             insert into series (
                 id, 
+                date,
                 info,
-                text) values (?, ?, ?);
+                text) values (?, ?, ?, ?);
             ''',
             (
                 i,
+                mlc_graph.get_date_for_series_identifier(i),
                 json.dumps(mlc_graph.get_series_info(i)),
                 mlc_graph.get_search_tokens_for_series_identifier(i)
             )

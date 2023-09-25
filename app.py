@@ -216,7 +216,7 @@ def cli_list_series(verbose):
 @click.argument('facet')
 def cli_search(term, facet):
     mlc_db = MLCDB(app.config)
-    for i in mlc_db.get_search(term, [facet]):
+    for i in mlc_db.get_search(term, [facet], 'rank'):
         print(i[0])
         print(i[2])
         sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
@@ -407,8 +407,9 @@ def search():
 
     facets = request.args.getlist('facet')
     query = request.args.get('query')
+    sort_type = request.args.get('sort', 'rank')
 
-    results = mlc_db.get_search(query, facets)
+    results = mlc_db.get_search(query, facets, sort_type)
     mod_results = []
     
     for item in results:
