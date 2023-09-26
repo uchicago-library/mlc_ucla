@@ -119,9 +119,9 @@ class MLCGraph:
             dbid = row[0]
         return dbid
 
-    def get_item_info(self, item_id):
+    def get_item_info_without_format_relationships(self, item_id):
         """
-        Get info for search snippets and page views for a given series.
+        Get info for search snippets and page views of a given item.
     
         Parameters:
             item_id (str): a series identifier.
@@ -267,6 +267,54 @@ class MLCGraph:
         data['access_rights'] = list(access_rights)
 
         data['ark'] = item_id
+
+        return data
+
+    def get_item_info(self, item_id):
+        """
+        Get info for search snippets and page views of a given item.
+    
+        Parameters:
+            item_id (str): a series identifier.
+    
+        Returns:
+            dict: item information.
+        """
+        data = self.get_item_info_without_format_relationships(item_id)
+
+        # dcterms:hasFormat
+        data['has_format'] = []
+
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?has_format_item_id
+                WHERE {
+                    ?item_id <http://purl.org/dc/terms/hasFormat> ?has_format_item_id
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            format_item_id = row[0]
+            data['has_format'].append(self.get_item_info_without_format_relationships(format_item_id))
+
+        # dcterms:isFormatOf
+        data['is_format_of'] = []
+
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?is_format_of
+                WHERE {
+                    ?item_id <http://purl.org/dc/terms/isFormatOf> ?is_format_of
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            format_item_id = row[0]
+            data['is_format_of'].append(self.get_item_info_without_format_relationships(format_item_id))
 
         return data
 
@@ -1341,7 +1389,7 @@ class MLCDB:
 
 def build_sqlite_db(cur):
     g = rdflib.Graph()
-    g.parse('meso.small.20230918.ttl', format='turtle')
+    g.parse('meso.big.20230918.ttl', format='turtle')
     g.parse('glottolog_language.ttl', format='turtle')
     g.parse('TGN.ttl')
     mlc_graph = MLCGraph(g)
