@@ -1152,12 +1152,25 @@ class MLCDB:
         if not self.con:
             self.connect()
 
-        return json.loads(
+        info = json.loads(
             self.cur.execute(
                 'select info from item where id = ?',
                 (identifier,)
             ).fetchone()[0]
         )
+
+        # load item hasFormat / isFormatOf relationships
+        for p in ('has_format', 'is_format_of'):
+            if p in info and isinstance(info[p], list):
+                for i in range(len(info[p])):
+                    url = info[p][i]
+                    for row in self.cur.execute(
+                        'select info from item where id = ?;', 
+                        (url,)
+                    ).fetchall():
+                        info[p][i] = json.loads(row[0])
+
+        return info
 
     def get_item_info(self, item_id):
         """
