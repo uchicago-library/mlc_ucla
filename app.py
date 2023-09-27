@@ -1,20 +1,15 @@
 import click, json, logging, os, re, sqlite3, sqlite_dump, sys
 from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
-from utils import MLCDB, build_sqlite_db
+from utils import MLCDB
 from flask_babel import Babel, gettext, lazy_gettext, get_locale
-import requests
-from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
 
 def get_locale():
-    if (session):
-        if( 'language' in session):
-            return session.get('language', 'en')
-        else:
-            session['language'] = 'en'
-            return session.get('language', 'en')
+    if not 'language' in session:
+        session['language'] = 'en'
+    return session.get('language', 'en')
 
 app.config.from_pyfile('local.py')
 babel = Babel(app, default_locale='en', locale_selector=get_locale)
@@ -23,27 +18,26 @@ app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+mlc_db = MLCDB(app.config)
+
 @app.context_processor
 def inject_strings():
-    return dict(
-        locale = get_locale(),
-        trans = dict(
-            collection_title = lazy_gettext(u'Mesoamerican Language Collections')
-            )
-        )
+    return {
+        'locale': get_locale(),
+        'trans': {
+            'collection_title': lazy_gettext(u'Mesoamerican Language Collections')
+        }
+    }
 
 @app.route('/language-change', methods=["POST"])
 def change_language():
-    if( 'language' in session and session['language'] == 'en'):
+    if 'language' in session and session['language'] == 'en':
         session['language'] = 'es'
     else:
         session['language'] = 'en'
     return redirect(request.referrer) 
 
 app.logger.setLevel(logging.DEBUG)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
 
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -58,12 +52,7 @@ class SetEncoder(json.JSONEncoder):
     short_help='Build or rebuild SQLite database from linked data triples.'
 )
 def cli_build_db():
-    con = sqlite3.connect(':memory:')
-    build_sqlite_db(con.cursor())
-
-    with open(app.config['DB'], 'w', encoding='utf-8') as f:
-        for line in sqlite_dump.iterdump(con):
-            f.write(line + '\n')
+    mlc_db.build_db()
 
 @app.cli.command(
     'get-browse',
@@ -71,7 +60,6 @@ def cli_build_db():
 )
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
-    mlc_db = MLCDB(app.config)
     for row in mlc_db.get_browse(browse_type):
         print('{} ({})'.format(row[0], row[1]))
 
@@ -82,7 +70,6 @@ def cli_get_browse(browse_type):
 @click.argument('browse_type')
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
-    mlc_db = MLCDB(app.config)
     for row in mlc_db.get_browse_term(browse_type, browse_term):
         print(row)
 
@@ -92,12 +79,13 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    mlc_db = MLCDB(app.config)
     i = mlc_db.get_item(item_identifier)
     print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 14 + '\n').format(
+    sys.stdout.write(('{}: {}\n' * 15 + '\n').format(
         'Panopto Links',
         ' '.join(i['panopto_links']),
+        'Panopto Identifiers',
+        ' '.join(i['panopto_identifiers']),
         'Access Rights',
         ' | '.join(i['access_rights']),
         'Item Title',
@@ -132,7 +120,6 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    mlc_db = MLCDB(app.config)
     i = mlc_db.get_series(series_identifier)
     print(series_identifier)
     sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
@@ -160,15 +147,16 @@ def cli_get_series(series_identifier):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
-    mlc_db = MLCDB(app.config)
     for i in mlc_db.get_item_list():
         print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
+            sys.stdout.write(('{}: {}\n' * 9 + '\n').format(
                 'Item Title',
                 ' '.join(i[1]['titles']),
                 'Panopto Links',
                 ' | '.join(i[1]['panopto_links']),
+                'Panopto Identifiers',
+                ' | '.join(i[1]['panopto_identifiers']),
                 'Access Rights',
                 ' | '.join(i[1]['access_rights']),
                 'Contributor',
@@ -189,7 +177,6 @@ def cli_list_items(verbose):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
-    mlc_db = MLCDB(app.config)
     for i in mlc_db.get_series_list():
         print(i[0])
         if verbose:
@@ -215,7 +202,6 @@ def cli_list_series(verbose):
 @click.argument('term')
 @click.argument('facet')
 def cli_search(term, facet):
-    mlc_db = MLCDB(app.config)
     for i in mlc_db.get_search(term, [facet], 'rank'):
         print(i[0])
         print(i[2])
@@ -301,8 +287,6 @@ def suggest_corrections():
 
 @app.route('/browse/')
 def browse():
-    mlc_db = MLCDB(app.config)
-
     title_slugs = {
         'contributor': lazy_gettext(u'Browse by Contributors'),
         'creator':     lazy_gettext(u'Browse by Creator'),
@@ -354,19 +338,6 @@ def browse():
 
 @app.route('/item/<noid>/')
 def item(noid):
-    def ark_to_panopto(ark_url):
-        req = requests.head(ark_url, allow_redirects=True)
-        percent_url = req.url
-        return parse_qs(
-            urlparse(
-                parse_qs(
-                    urlparse(percent_url).query
-                )['ReturnUrl'][0]
-            ).query
-        )["id"][0]
-
-    mlc_db = MLCDB(app.config)
-
     if not re.match('^[a-z0-9]{12}$', noid):
         app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
@@ -377,64 +348,72 @@ def item(noid):
 
     item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
-    if item_data['panopto_links']:
-        panopto_identifier = ark_to_panopto(item_data['panopto_links'][0])
+    if item_data['panopto_identifiers']:
+        panopto_identifier = item_data['panopto_identifiers'][0]
     else:
         panopto_identifier = ''
 
-    series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    series = [] 
+    for s in mlc_db.get_series_for_item(
+        'https://ark.lib.uchicago.edu/ark:61001/' + noid
+    ):
+        series.append((s, mlc_db.get_series_info(s)))
 
     try:
         title_slug = item_data['titles'][0]
     except (IndexError, KeyError):
         title_slug = ''
 
-    brdcrb = "<a href='"+series[0].replace('https://ark.lib.uchicago.edu/ark:61001/', '/series/')+"'>"+series[1]['titles'][0]+"</a> &gt; "
-    brdcrb += item_data['titles'][0]
+    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
+        series[0][0].replace(
+            'https://ark.lib.uchicago.edu/ark:61001/', 
+            ''
+        ),
+        series[0][1]['titles'][0],
+        item_data['titles'][0]
+    )
 
     return render_template(
         'item.html',
-        **(item_data | {'series': series,
+        **(item_data | {'series': series[0],
                         'title_slug': title_slug,
                         'access_rights': get_access_label_obj(item_data),
                         'panopto_identifier': panopto_identifier,
-                        'breadcrumb': brdcrb})
+                        'breadcrumb': breadcrumb})
     )
 
 @app.route('/search/')
 def search():
-    mlc_db = MLCDB(app.config)
-
     facets = request.args.getlist('facet')
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
-    results = mlc_db.get_search(query, facets, sort_type)
-    mod_results = []
-    
-    for item in results:
-        item_data = item[1]
-        item_data['access_rights'] = get_access_label_obj(item_data)
-        mod_results.append( (item[0], item_data ) )
+    db_results = mlc_db.get_search(query, facets, sort_type)
 
-    if( facets ):
-        title_slug = lazy_gettext(u'Search Results for')+' '+facets[0]
+    processed_results = []
+    for db_series in db_results:
+        series_data = mlc_db.get_series_info(db_series[0])
+        series_data['access_rights'] = get_access_label_obj(series_data)
+        processed_results.append( (db_series[0], series_data ) )
+
+    if facets:
+        title_slug = lazy_gettext(u'Search Results for') + ' ' + facets[0]
+    elif query:
+        title_slug = lazy_gettext(u'Search Results for') + ' \'' + query + '\''
     else:
-        title_slug = lazy_gettext(u'Search Results for')+" '"+query+"'"
+        title_slug = lazy_gettext(u'Search Results')
 
     return render_template(
         'search.html',
         facets = [],
         query = query,
         query_field = '',
-        results = mod_results,
+        results = processed_results,
         title_slug = title_slug
     )
     
 @app.route('/series/<noid>/')
 def series(noid):
-    mlc_db = MLCDB(app.config)
-
     if not re.match('^[a-z0-9]{12}$', noid):
         app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
@@ -445,8 +424,12 @@ def series(noid):
 
     series_data = mlc_db.get_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
 
-    items = mlc_db.get_items_for_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
-    print(json.dumps(items, indent=2))
+    items = []
+    for i in mlc_db.get_items_for_series('https://ark.lib.uchicago.edu/ark:61001/' + noid):
+        items.append((
+            i,
+            mlc_db.get_item_info(i)
+        ))
 
     try:
         title_slug = series_data['titles'][0]
@@ -461,4 +444,7 @@ def series(noid):
             'access_rights': get_access_label_obj(series_data)
         })
     )
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
 
