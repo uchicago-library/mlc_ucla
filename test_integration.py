@@ -1,6 +1,42 @@
-import click, local, os, sqlite3, sqlite_dump, unittest, utils
+import click, unittest, urllib.parse
+from app import app, cli_get_browse, cli_list_items, cli_list_series
+from click.testing import CliRunner
 
-from app import app
+
+class TestMLCCLI(unittest.TestCase):
+    def setUp(self):
+        self.runner = CliRunner()
+
+    # browse 
+    def test_browse(self):
+        for b in ('contributor', 'creator', 'date', 'decade', 'language'):
+            self.assertEqual(
+                self.runner.invoke(cli_get_browse, [b]).exit_code,
+                0
+            )
+
+    # list items
+    def test_list_item(self):
+        self.assertEqual(
+            self.runner.invoke(cli_list_items).exit_code,
+            0
+        )
+        self.assertEqual(
+            self.runner.invoke(cli_list_items, ['--verbose']).exit_code,
+            0
+        )
+
+    # list series
+    def test_list_series(self):
+        self.assertEqual(
+            self.runner.invoke(cli_list_series).exit_code,
+            0
+        )
+        self.assertEqual(
+            self.runner.invoke(cli_list_series, ['--verbose']).exit_code,
+            0
+        )
+
 
 class TestMLCSite(unittest.TestCase):
     def setUp(self):
@@ -30,225 +66,56 @@ class TestMLCSite(unittest.TestCase):
             200
         )
 
-        # search term includes special characters.
-        self.assertEqual(
-            self.client.get('/search/?query=IOUgf%29%26T+*Q%26V*%29%40%23Y+V%24*%28Y%40*%28Y%28P%40*Y%40*%28PY+*%28P%40*%28PY%40*%28+YP%28%40Y+%29%28*+%40UYP*+UY%40').status_code,
-            200
-        )
+        # search terms include special characters.
+        for q in ('IOUgf)&T *Q&V*)@#Y V$*(Y@*(Y(P@*Y@*(PY *(P@*(PY@*( YP(@Y )(* @UYP* UY@',
+                  '()&*@#$', '()', '?', '/', '`'):
+            self.assertEqual(
+                self.client.get(
+                    '/search/?query={}'.format(
+                        urllib.parse.quote_plus(q)
+                    )
+                ).status_code,
+                200
+            )
 
-        self.assertEqual(
-            self.client.get('/search/?query=%28%29%26*%40%23%24').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=%28%29').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=%3F').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=%2F').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=%60').status_code,
-            200
-        )
-
+        # a search with many tokens.
         self.assertEqual(
             self.client.get('/search/?query=a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+++++aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+++++a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+++++a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+++++a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+++++a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+++++a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+++++aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+a++++a+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+++++a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+++++a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+++++a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+++++a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+++++a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+++++aa+a+a+a+a+a+aa+a+a+a+a+a+aa+a+a+a+a+a+a').status_code,
  200
         )
 
         # representative searches from DB.
-
-        self.assertEqual(
-            self.client.get('/search/?query=vasquez').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=fernandez').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=smith').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=charles').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=penninsula').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Maya+recordings').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Maya+recordings').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=K%27iche%27').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=K%27iche%27+dialect+survey').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Zapotec').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Tlaxcala-Puebla-Central+Nahuatl').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Field+recordings').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Spoken+language').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Vocabulary').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=mopan+vocabulary').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Aluminum+discs').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Guatemala+texts').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Mam+speakers').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Chants+and+folk+songs').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Male+informant').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Honduras+music').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Man-in-nature+project').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Chiapas+Project').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Microfilm+Collection+of+Manuscripts+on+Cultural+Anthropology').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Mexican+folktales').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Huichol+chants').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Norman+McQuown').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Manuel+Andrade').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=González%2C+Raul').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Tampemoch').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Veracruz').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Chiapas').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Distrito+Federal').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Interviews+in+Belize').status_code,
-            200
-        )
+        for q in ('vasquez', 'fernandez', 'smith', 'charles', 'penninsula',
+                  'recordings', 'Maya recordings', 'K\'iche\'', 
+                  'K\'iche\' dialect survey', 'Zapotec',
+                  'Tlaxcala-Puebla-Central Nahuatl', 'Field recordings',
+                  'Spoken language', 'Vocabulary', 'mopan vocabulary',
+                  'Aluminum discs', 'Guatemala texts', 'Mam speakers', 
+                  'Chants and folk songs', 'Male informant', 
+                  'Honduras music', 'Man-in-nature project', 'Chiapas Project',
+                  'Microfilm Collection of Manuscripts on Cultural Anthropology', 
+                  'Mexican folktales', 'Huichol chants', 'Norman McQuown',
+                  'Manuel Andrade', 'González, Raul', 'Tampemoch', 'Veracruz',
+                  'Chiapas', 'Distrito Federal', 'Interviews in Belize'):
+            self.assertEqual(
+                self.client.get(
+                    '/search/?query={}'.format(
+                        urllib.parse.quote_plus(q)
+                    )
+                ).status_code,
+                200
+            )
 
         # representative searches from JL.
-
-        self.assertEqual(
-            self.client.get('/search/?query=Isthumus+Zapotec').status_code,
-            200
-        )
-
-        self.assertEqual(
-            self.client.get('/search/?query=Isthumus+Nahuatl').status_code,
-            200
-        )
+        for q in ('Isthmus Zapotec', 'Isthmus Nahuatl'):
+            self.assertEqual(
+                self.client.get(
+                    '/search/?query={}'.format(
+                        urllib.parse.quote_plus(q)
+                    )
+                ).status_code,
+                200
+            )
 
 
 if __name__=='__main__':
