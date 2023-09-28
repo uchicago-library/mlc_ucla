@@ -10,7 +10,7 @@ class TestMLCDB(unittest.TestCase):
 
     def test_list_items(self):
         self.assertEqual(
-	    sorted([i[0] for i in self.__class__.mlc_db.get_item_list()]),
+	    sorted(self.__class__.mlc_db.get_item_list()),
             [
                 'https://ark.lib.uchicago.edu/ark:61001/s1_i1',
                 'https://ark.lib.uchicago.edu/ark:61001/s1_i2',
@@ -23,7 +23,7 @@ class TestMLCDB(unittest.TestCase):
 
     def test_list_series(self):
         self.assertEqual(
-	    sorted([i[0] for i in self.__class__.mlc_db.get_series_list()]),
+	    sorted(self.__class__.mlc_db.get_series_list()),
             [
                 'https://ark.lib.uchicago.edu/ark:61001/s1',
                 'https://ark.lib.uchicago.edu/ark:61001/s2'

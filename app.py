@@ -5,20 +5,22 @@ from utils import MLCDB
 from flask_babel import Babel, gettext, lazy_gettext, get_locale
 
 app = Flask(__name__)
-
-def get_locale():
-    if not 'language' in session:
-        session['language'] = 'en'
-    return session.get('language', 'en')
-
 app.config.from_pyfile('local.py')
-babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
-app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
 mlc_db = MLCDB(app.config)
+
+# Language switching
+
+def get_locale():
+    """Language switching."""
+    if not 'language' in session:
+        session['language'] = 'en'
+    return session.get('language')
+
+babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
 @app.context_processor
 def inject_strings():
@@ -29,7 +31,7 @@ def inject_strings():
         }
     }
 
-@app.route('/language-change', methods=["POST"])
+@app.route('/language-change', methods=['POST'])
 def change_language():
     if 'language' in session and session['language'] == 'en':
         session['language'] = 'es'
@@ -37,21 +39,70 @@ def change_language():
         session['language'] = 'en'
     return redirect(request.referrer) 
 
-app.logger.setLevel(logging.DEBUG)
-
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
-
 # CLI
+
+def print_item(item_info):
+    sys.stdout.write('{}\n'.format(item_info['ark']))
+    sys.stdout.write(('{}: {}\n' * 15 + '\n').format(
+        'Panopto Links',
+        ' '.join(item_info['panopto_links']),
+        'Panopto Identifiers',
+        ' '.join(item_info['panopto_identifiers']),
+        'Access Rights',
+        ' | '.join(item_info['access_rights']),
+        'Item Title',
+        ' '.join(item_info['titles']),
+        'Item Identifier',
+        item_info['identifier'][0],
+        'Contributor',
+        ' | '.join(item_info['contributor']),
+        'Indigenous Language',
+        ' | '.join(item_info['subject_language']),
+        'Language',
+        ' | '.join(item_info['primary_language']),
+        'Location Where Indigenous Language is Spoken',
+        ' | '.join(item_info['location']),
+        'Date',
+        ' | '.join(item_info['date']),
+        'Description',
+        ' | '.join(item_info['description']),
+        'Linguistic Data Type',
+        ' | '.join(item_info['linguistic_data_type']),
+        'Discourse Type',
+        ' | '.join(item_info['discourse_type']),
+        'Item Content Type',
+        ' | '.join(item_info['content_type']),
+        'Part of Series',
+        item_info['is_part_of'][0]
+    ))
+
+def print_series(series_info):
+    sys.stdout.write('{}\n'.format(series_info['ark']))
+    sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
+        'Series Title',
+        ' '.join(series_info['titles']),
+        'Series Identifier',
+        series_info['identifier'][0],
+        'Collection',
+        '',
+        'Indigenous Language',
+        ' | '.join(series_info['subject_language']),
+        'Language',
+        ' | '.join(series_info['primary_language']),
+        'Location Where Indigenous Language is Spoken',
+        ' | '.join(series_info['location']),
+        'Date',
+        ' | '.join(series_info['date']),
+        'Description',
+        ' | '.join(series_info['description'])
+    ))
 
 @app.cli.command(
     'build-db', 
     short_help='Build or rebuild SQLite database from linked data triples.'
 )
 def cli_build_db():
+    """Build a SQLite database from linked data triples."""
     mlc_db.build_db()
 
 @app.cli.command(
@@ -60,8 +111,9 @@ def cli_build_db():
 )
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
+    """List browse terms."""
     for row in mlc_db.get_browse(browse_type):
-        print('{} ({})'.format(row[0], row[1]))
+        sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
 
 @app.cli.command(
     'get-browse-term',
@@ -71,7 +123,7 @@ def cli_get_browse(browse_type):
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
     for row in mlc_db.get_browse_term(browse_type, browse_term):
-        print(row)
+        print_series(row[1])
 
 @app.cli.command(
     'get-item',
@@ -79,40 +131,7 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    i = mlc_db.get_item(item_identifier)
-    print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 15 + '\n').format(
-        'Panopto Links',
-        ' '.join(i['panopto_links']),
-        'Panopto Identifiers',
-        ' '.join(i['panopto_identifiers']),
-        'Access Rights',
-        ' | '.join(i['access_rights']),
-        'Item Title',
-        ' '.join(i['titles']),
-        'Item Identifier',
-        i['identifier'][0],
-        'Contributor',
-        ' | '.join(i['contributor']),
-        'Indigenous Language',
-        ' | '.join(i['subject_language']),
-        'Language',
-        ' | '.join(i['primary_language']),
-        'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['location']),
-        'Date',
-        ' | '.join(i['date']),
-        'Description',
-        ' | '.join(i['description']),
-        'Linguistic Data Type',
-        ' | '.join(i['linguistic_data_type']),
-        'Discourse Type',
-        ' | '.join(i['discourse_type']),
-        'Item Content Type',
-        ' | '.join(i['content_type']),
-        'Part of Series',
-        i['is_part_of'][0]
-    ))
+    print_item(mlc_db.get_item(item_identifier))
 
 @app.cli.command(
     'get-series',
@@ -120,26 +139,7 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    i = mlc_db.get_series(series_identifier)
-    print(series_identifier)
-    sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
-        'Series Title',
-        ' '.join(i['titles']),
-        'Series Identifier',
-        i['identifier'][0],
-        'Collection',
-        '',
-        'Indigenous Language',
-        ' | '.join(i['subject_language']),
-        'Language',
-        ' | '.join(i['primary_language']),
-        'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['location']),
-        'Date',
-        ' | '.join(i['date']),
-        'Description',
-        ' | '.join(i['description'])
-    ))
+    print_series(mlc_db.get_series(series_identifier))
 
 @app.cli.command(
     'list-items',
@@ -148,28 +148,10 @@ def cli_get_series(series_identifier):
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
     for i in mlc_db.get_item_list():
-        print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 9 + '\n').format(
-                'Item Title',
-                ' '.join(i[1]['titles']),
-                'Panopto Links',
-                ' | '.join(i[1]['panopto_links']),
-                'Panopto Identifiers',
-                ' | '.join(i[1]['panopto_identifiers']),
-                'Access Rights',
-                ' | '.join(i[1]['access_rights']),
-                'Contributor',
-                ' | '.join(i[1]['contributor']),
-                'Indigenous Language',
-                ' | '.join(i[1]['subject_language']),
-                'Location',
-                ' | '.join(i[1]['location']),
-                'Date',
-                ' | '.join(i[1]['date']),
-                'Resource Type',
-                ' | '.join(i[1]['content_type'])
-            ))
+            print_item(mlc_db.get_item(i))
+        else:
+            sys.stdout.write('{}\n'.format(i))
 
 @app.cli.command(
     'list-series',
@@ -178,22 +160,10 @@ def cli_list_items(verbose):
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
     for i in mlc_db.get_series_list():
-        print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
-                'Series Title',
-                ' '.join(i[1]['titles']),
-                'Contributor',
-                ' | '.join(i[1]['contributor']),
-                'Indigenous Language',
-                ' | '.join(i[1]['subject_language']),
-                'Location',
-                ' | '.join(i[1]['location']),
-                'Date',
-                ' | '.join(i[1]['date']),
-                'Resource Type',
-                ' | '.join(i[1]['content_type'])
-            ))
+            print_series(mlc_db.get_series(i))
+        else:
+            sys.stdout.write('{}\n'.format(i))
 
 @app.cli.command(
     'search',
@@ -346,7 +316,7 @@ def item(noid):
         )
         abort(400)
 
-    item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    item_data = mlc_db.get_item(BASE + noid)
 
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
@@ -354,9 +324,7 @@ def item(noid):
         panopto_identifier = ''
 
     series = [] 
-    for s in mlc_db.get_series_for_item(
-        'https://ark.lib.uchicago.edu/ark:61001/' + noid
-    ):
+    for s in mlc_db.get_series_for_item(BASE + noid):
         series.append((s, mlc_db.get_series_info(s)))
 
     try:
@@ -365,10 +333,7 @@ def item(noid):
         title_slug = ''
 
     breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
-        series[0][0].replace(
-            'https://ark.lib.uchicago.edu/ark:61001/', 
-            ''
-        ),
+        series[0][0].replace(BASE, ''),
         series[0][1]['titles'][0],
         item_data['titles'][0]
     )
@@ -422,10 +387,10 @@ def series(noid):
         )
         abort(400)
 
-    series_data = mlc_db.get_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    series_data = mlc_db.get_series(BASE + noid)
 
     items = []
-    for i in mlc_db.get_items_for_series('https://ark.lib.uchicago.edu/ark:61001/' + noid):
+    for i in mlc_db.get_items_for_series(BASE + noid):
         items.append((
             i,
             mlc_db.get_item_info(i)
@@ -447,4 +412,3 @@ def series(noid):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
-

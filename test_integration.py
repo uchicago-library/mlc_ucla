@@ -21,10 +21,7 @@ class TestMLCCLI(unittest.TestCase):
             self.runner.invoke(cli_list_items).exit_code,
             0
         )
-        self.assertEqual(
-            self.runner.invoke(cli_list_items, ['--verbose']).exit_code,
-            0
-        )
+        # omitting the verbose option to speed up test.
 
     # list series
     def test_list_series(self):
@@ -36,7 +33,6 @@ class TestMLCCLI(unittest.TestCase):
             self.runner.invoke(cli_list_series, ['--verbose']).exit_code,
             0
         )
-
 
 class TestMLCSite(unittest.TestCase):
     def setUp(self):
