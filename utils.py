@@ -633,7 +633,7 @@ class MLCGraph:
     
         search_tokens = []
     
-        # series-level non-blank triples with no special processing
+        # non-blank triples with no special processing
         for p in (
             'http://purl.org/dc/elements/1.1/description',
             'http://purl.org/dc/elements/1.1/title',
@@ -658,7 +658,7 @@ class MLCGraph:
             for row in r:
                 search_tokens.append(str(row[0]))
     
-        # series-level edm:datasetName
+        # edm:datasetName
         r = self.g.query(
             prepareQuery('''
                 SELECT ?o
@@ -677,7 +677,7 @@ class MLCGraph:
         for row in r:
             search_tokens.append(lookup[str(row[0])])
     
-        # series-level dc:language 
+        # dc:language 
         r = self.g.query(
             prepareQuery('''
                 SELECT ?o
@@ -693,7 +693,7 @@ class MLCGraph:
             for label in self.get_glottolog_language_names(str(row[0])):
                 search_tokens.append(label)
        
-        # series-level dcterms:spatial 
+        # dcterms:spatial 
         r = self.g.query(
             prepareQuery('''
                 SELECT ?o
@@ -1195,15 +1195,15 @@ class MLCDB:
             None
     
         Returns:
-            list: a list of identifier, metadata dict tuples. 
+            list: a list of item identifiers
         """
         if not self.con:
             self.connect()
 
-        results = []
-        for row in self.cur.execute('select id, info from item;').fetchall():
-            results.append((row[0], json.loads(row[1])))
-        return results
+        item_ids = []
+        for row in self.cur.execute('select id from item;').fetchall():
+            item_ids.append(row[0])
+        return item_ids
 
     def get_items_for_series(self, identifier):
         """
@@ -1419,11 +1419,11 @@ class MLCDB:
         if query:
             # limit queries to 256 characters. (size chosen arbitrarily.)
             query = query[:256]
-    
-            # replace all non-unicode characters in the query with a single space.
-            # this should strip out punctuation, etc. 
-            query = re.sub(u"\P{L}+", " ", str(query))
-    
+
+            # replace all non-unicode letters or numbers in the query with a
+            # single space. This should strip out punctuation, etc. 
+            query = re.sub(u"[^\p{L}\p{N}]+", " ", str(query))
+
             # replace all whitespace with a single space.
             query = ' '.join(query.split())
 
@@ -1464,15 +1464,15 @@ class MLCDB:
             None
     
         Returns:
-            list: a list of identifier, metadata dict tuples. 
+            list: a list of series identifiers.
         """
         if not self.con:
             self.connect()
 
-        results = []
-        for row in self.cur.execute('select id, info from series;').fetchall():
-            results.append((row[0], json.loads(row[1])))
-        return results
+        series_ids = []
+        for row in self.cur.execute('select id from series;').fetchall():
+            series_ids.append(row[0])
+        return series_ids
 
     def build_db(self):
         """
