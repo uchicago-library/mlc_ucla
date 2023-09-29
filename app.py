@@ -367,6 +367,12 @@ def search():
     for db_series in db_results:
         series_data = mlc_db.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
+        series_data['items'] = []
+        for i in db_series[1]:
+            info = mlc_db.get_item_info(i)
+            # JEJ
+            print(json.dumps(info, indent=2))
+            series_data['items'].append(info)
         processed_results.append( (db_series[0], series_data ) )
 
     if facets:
