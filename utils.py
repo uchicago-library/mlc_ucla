@@ -669,7 +669,34 @@ class MLCGraph:
                     search_tokens.append(label)
     
         # series-level dc:date
-        # TODO
+        years = set()
+        r = self.g.query(
+            prepareQuery('''
+                SELECT ?o
+                    WHERE {
+                        ?series_id <http://purl.org/dc/terms/date> ?o
+                    }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(i)
+            }
+        )
+        for row in r:
+            date_str = str(row[0])
+            year_strs = []
+            for year_str in date_str.split('/'):
+                if year_str.isnumeric() and len(year_str) == 4:
+                    year_strs.append(int(year_str))
+            if len(year_strs) == 1:
+                years.add(str(year_strs[0]))
+            elif len(year_strs) > 1:
+                year_strs.sort()
+                y = year_strs[0]
+                while y <= year_strs[-1]: 
+                    years.add(str(y))
+                    y += 1
+        for y in sorted(list(years)):
+            search_tokens.append(y)
     
         # replace all whitespace with single spaces and return all search tokens in
         # a single string.
