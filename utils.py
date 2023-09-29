@@ -422,8 +422,12 @@ class MLCGraph:
             prepareQuery('''
                 SELECT ?has_format_item_id
                 WHERE {
-                    ?item_id <http://purl.org/dc/terms/hasFormat> ?has_format_item_id
+                    ?item_id <http://purl.org/dc/terms/hasFormat> ?has_format_item_id .
+                    ?has_format_item_id <http://purl.org/dc/elements/1.1/identifier> ?has_format_item_dbid .
+                    ?has_format_agg <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?has_format_item_id .
+                    BIND( EXISTS { ?has_format_agg <http://www.europeana.eu/schemas/edm/isShownBy> ?_ . } AS ?has_panopto )
                 }
+                ORDER BY DESC(?has_panopto) ?has_format_item_dbid
             '''),
             initBindings={
                 'item_id': rdflib.URIRef(item_id)
@@ -436,10 +440,14 @@ class MLCGraph:
 
         for row in self.g.query(
             prepareQuery('''
-                SELECT ?is_format_of
+                SELECT ?is_format_of_item_id
                 WHERE {
-                    ?item_id <http://purl.org/dc/terms/isFormatOf> ?is_format_of
+                    ?item_id <http://purl.org/dc/terms/isFormatOf> ?is_format_of_item_id .
+                    ?is_format_of_item_id <http://purl.org/dc/elements/1.1/identifier> ?is_format_of_item_dbid .
+                    ?is_format_of_agg <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?is_format_of_item_id .
+                    BIND( EXISTS { ?is_format_of_agg <http://www.europeana.eu/schemas/edm/isShownBy> ?_ . } AS ?has_panopto )
                 }
+                ORDER BY DESC(?has_panopto) ?is_format_of_item_dbid
             '''),
             initBindings={
                 'item_id': rdflib.URIRef(item_id)
