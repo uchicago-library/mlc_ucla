@@ -325,7 +325,7 @@ def item(noid):
 
     series = [] 
     for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series_info(s)))
+        series.append((s, mlc_db.get_series(s)))
 
     try:
         title_slug = item_data['titles'][0]
@@ -357,7 +357,7 @@ def search():
 
     processed_results = []
     for db_series in db_results:
-        series_data = mlc_db.get_series_info(db_series[0])
+        series_data = mlc_db.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
         processed_results.append( (db_series[0], series_data ) )
 
@@ -393,7 +393,7 @@ def series(noid):
     for i in mlc_db.get_items_for_series(BASE + noid):
         items.append((
             i,
-            mlc_db.get_item_info(i)
+            mlc_db.get_item(i)
         ))
 
     try:
