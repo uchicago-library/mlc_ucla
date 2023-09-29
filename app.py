@@ -282,7 +282,12 @@ def browse():
             title_slug = lazy_gettext(u'Results with')+" "+browse_type+": "+browse_term+""
         else:
             title_slug = lazy_gettext(u'Results for search')+": "+browse_term+""
-        results = mlc_db.get_browse_term(browse_type, browse_term)
+
+        sort_field = 'dbid'
+        if browse_type == 'decade':
+            sort_field = 'date'
+
+        results = mlc_db.get_browse_term(browse_type, browse_term, sort_field)
 
         mod_results = []
         for item in results:

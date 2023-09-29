@@ -114,7 +114,7 @@ class MLCGraph:
             )
             for browse_term, identifier in qres:
                 browse_term = regularize_string(str(browse_term))
-                for label in self.get_glottolog_language_preferred_names(
+                for label in self.get_glottolog_language_names_preferred(
                     browse_term
                 ):
                     label = regularize_string(label)
@@ -225,7 +225,7 @@ class MLCGraph:
             results.add(str(row[0]).strip())
         return list(results)
       
-    def get_glottolog_language_preferred_names(self, c):
+    def get_glottolog_language_names_preferred(self, c):
         """Get preferred language names from Glottolog.
     
         Parameters:
@@ -731,6 +731,36 @@ class MLCGraph:
             years = sorted(years)
             return '/'.join([years[0], years[-1]])
 
+    def get_series_dbid(self, i):
+        """
+        Get a single database identifier for a given series identifier.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a database identifier. 
+        """
+        dbids = []
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?dbid
+                WHERE {
+                    ?identifier <http://purl.org/dc/elements/1.1/identifier> ?dbid
+                }
+                '''
+            ),
+            initBindings={
+                'identifier': rdflib.URIRef(i)
+            }
+        ):
+            dbids.append(str(row[0]))
+
+        if len(dbids) == 0:
+            return ''
+        else:
+            return dbids[0]
+
     def get_series_identifiers(self):
         """
         Get all series identifiers from the graph.
@@ -1035,7 +1065,7 @@ class MLCGraph:
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
+            for preferred_name in self.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -1064,7 +1094,7 @@ class MLCGraph:
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_preferred_names(
+            for preferred_name in self.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -1272,6 +1302,7 @@ class MLCDB:
         cur.execute('''
             create virtual table series using fts5(
                 id,
+                dbid,
                 date,
                 info,
                 text
@@ -1327,12 +1358,14 @@ class MLCDB:
             cur.execute('''
                 insert into series (
                     id, 
+                    dbid,
                     date,
                     info,
-                    text) values (?, ?, ?, ?);
+                    text) values (?, ?, ?, ?, ?);
                 ''',
                 (
                     i,
+                    mlc_graph.get_series_dbid(i),
                     mlc_graph.get_series_date(i),
                     json.dumps(mlc_graph.get_series_info(i)),
                     mlc_graph.get_search_tokens_for_series_identifier(i)
@@ -1429,13 +1462,14 @@ class MLCDB:
             key=lambda i: re.sub(u'\P{L}+', '', i[0]).lower()
         )
 
-    def get_browse_term(self, browse_type, browse_term):
+    def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
         """
         Get a list of series for a specific browse term.
 
         Parameters:
             browse_type (str): type of browse term.
             browse_term (str): browse term.
+            sort_field (str):  database field to sort on.
 
         Returns:
 	    list: a list of browse results. This should contain all the
@@ -1450,6 +1484,11 @@ class MLCDB:
             'location'
         )
 
+        assert sort_field in (
+            'dbid',
+            'date'
+        )
+
         if not self.con:
             self.connect()
 
@@ -1461,8 +1500,8 @@ class MLCDB:
                 inner join series on series.id = browse.id
                 where type=?
                 and term=?
-                order by browse.id
-            ''',
+                order by series.{}
+            '''.format(sort_field),
             (browse_type, browse_term)
         ).fetchall():
             results.append((row[0], json.loads(row[1]), row[2]))
