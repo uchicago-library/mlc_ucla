@@ -114,7 +114,7 @@ class MLCGraph:
             )
             for browse_term, identifier in qres:
                 browse_term = regularize_string(str(browse_term))
-                for label in self.get_glottolog_language_names_preferred(
+                for label in self.get_glottolog_language_preferred_names(
                     browse_term
                 ):
                     label = regularize_string(label)
@@ -139,7 +139,7 @@ class MLCGraph:
             for browse_terms, identifier in qres:
                 for browse_term in browse_terms.split():
                     browse_term = regularize_string(browse_term)
-                    for label in self.get_tgn_place_name_preferred(
+                    for label in self.get_tgn_place_names_preferred(
                         browse_term
                     ):
                         label = regularize_string(label)
@@ -225,7 +225,7 @@ class MLCGraph:
             results.add(str(row[0]).strip())
         return list(results)
       
-    def get_glottolog_language_names_preferred(self, c):
+    def get_glottolog_language_preferred_names(self, c):
         """Get preferred language names from Glottolog.
     
         Parameters:
@@ -274,55 +274,6 @@ class MLCGraph:
         ):
             dbid = row[0]
         return dbid
-
-    def get_item_identifiers(self):
-        """
-        Get all item identifiers from the graph.
-    
-        Parameters:
-            None
-    
-        Returns:
-            list: item identifiers. 
-        """
-        qres = self.g.query('''
-            SELECT ?item_id
-            WHERE {
-                ?_ <http://purl.org/dc/terms/hasPart> ?item_id
-            }
-        ''')
-    
-        results = set()
-        for row in qres:
-            results.add(str(row[0]))
-        return sorted(list(results))
-
-    def get_item_identifiers_for_series(self, i):
-        """
-        Get the item identifiers for a given series.
-      
-        Parameters:
-            i (str): a series identifier.
-    
-        Returns:
-            list: a list of item identifiers.
-        """
-        r = self.g.query(
-            prepareQuery('''
-                SELECT ?item_id
-                    WHERE {
-                        ?series_id <http://purl.org/dc/terms/hasPart> ?item_id
-                   }
-            '''),
-            initBindings={
-                'series_id': rdflib.URIRef(i)
-            }
-        )
-    
-        results = set()
-        for row in r:
-            results.add(str(row[0]))
-        return sorted(list(results))
 
     def get_item_info(self, item_id):
         """
@@ -375,7 +326,7 @@ class MLCGraph:
 
         data['location'] = []
         for i in tgn_identifiers:
-            for preferred_name in self.get_tgn_place_name_preferred(
+            for preferred_name in self.get_tgn_place_names_preferred(
                 i
             ):
                 data['location'].append(preferred_name)
@@ -526,43 +477,56 @@ class MLCGraph:
 
         return data
 
-    def get_item_search_tokens(self, i):
+    def get_item_identifiers(self):
         """
-        Get the search tokens for a given item identifier from the graph.
+        Get all item identifiers from the graph.
     
         Parameters:
-            i (str): a series identifier
+            None
     
         Returns:
-            str: a string that can be searched via SQLite.
+            list: item identifiers. 
         """
-        search_tokens = []
-        
-        # item-level description
+        qres = self.g.query('''
+            SELECT ?item_id
+            WHERE {
+                ?_ <http://purl.org/dc/terms/hasPart> ?item_id
+            }
+        ''')
+    
+        results = set()
+        for row in qres:
+            results.add(str(row[0]))
+        return sorted(list(results))
+
+    def get_item_identifiers_for_series(self, i):
+        """
+        Get the item identifiers for a given series.
+      
+        Parameters:
+            i (str): a series identifier.
+    
+        Returns:
+            list: a list of item identifiers.
+        """
         r = self.g.query(
             prepareQuery('''
-                SELECT ?o
+                SELECT ?item_id
                     WHERE {
-                        ?item_id <http://purl.org/dc/elements/1.1/description> ?o
+                        ?series_id <http://purl.org/dc/terms/hasPart> ?item_id
                    }
             '''),
             initBindings={
-                'item_id': rdflib.URIRef(i)
+                'series_id': rdflib.URIRef(i)
             }
         )
+    
+        results = set()
         for row in r:
-            search_tokens.append(row[0])
+            results.add(str(row[0]))
+        return sorted(list(results))
 
-        token_str = self.get_search_tokens(i)
-
-        if token_str and search_tokens:
-            token_str = token_str + \
-            ' ' + \
-            ' '.join([' '.join(s.split()) for s in search_tokens])
-
-        return token_str
-
-    def get_search_tokens(self, i):
+    def get_search_tokens_for_identifier(self, i):
         """
         Get the search tokens for a given series or item identifier from the
         graph.
@@ -659,6 +623,79 @@ class MLCGraph:
         # replace all whitespace with single spaces and return all search tokens in
         # a single string.
         return ' '.join([' '.join(s.split()) for s in search_tokens])
+
+    def get_search_tokens_for_series_identifier(self, i):
+        """
+        Get the search tokens for a given series identifier from the graph.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a string that can be searched via SQLite.
+        """
+        search_tokens = []
+        
+        # item-level description
+        for iid in self.get_item_identifiers_for_series(i):
+            r = self.g.query(
+                prepareQuery('''
+                    SELECT ?o
+                        WHERE {
+                            ?item_id <http://purl.org/dc/elements/1.1/description> ?o
+                       }
+                '''),
+                initBindings={
+                    'item_id': rdflib.URIRef(iid)
+                }
+            )
+            for row in r:
+                search_tokens.append(row[0])
+
+        token_str = self.get_search_tokens_for_identifier(i)
+
+        if token_str and search_tokens:
+            token_str = token_str + \
+            ' ' + \
+            ' '.join([' '.join(s.split()) for s in search_tokens])
+
+        return token_str
+
+    def get_search_tokens_for_item_identifier(self, i):
+        """
+        Get the search tokens for a given item identifier from the graph.
+    
+        Parameters:
+            i (str): a series identifier
+    
+        Returns:
+            str: a string that can be searched via SQLite.
+        """
+        search_tokens = []
+        
+        # item-level description
+        r = self.g.query(
+            prepareQuery('''
+                SELECT ?o
+                    WHERE {
+                        ?item_id <http://purl.org/dc/elements/1.1/description> ?o
+                   }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(i)
+            }
+        )
+        for row in r:
+            search_tokens.append(row[0])
+
+        token_str = self.get_search_tokens_for_identifier(i)
+
+        if token_str and search_tokens:
+            token_str = token_str + \
+            ' ' + \
+            ' '.join([' '.join(s.split()) for s in search_tokens])
+
+        return token_str
 
     def get_series_date(self, i):
         """
@@ -873,30 +910,172 @@ class MLCGraph:
         """
         search_tokens = []
         
-        # item-level description
-        for iid in self.get_item_identifiers_for_series(i):
-            r = self.g.query(
+    def get_series_identifiers(self):
+        """
+        Get all series identifiers from the graph.
+    
+        Parameters:
+            None
+    
+        Returns:
+            list: series identifiers. 
+        """
+        qres = self.g.query('''
+            SELECT ?series_id
+            WHERE {
+                ?series_id <http://purl.org/dc/terms/hasPart> ?_
+            }
+        ''')
+    
+        results = set()
+        for row in qres:
+            results.add(str(row[0]))
+        return sorted(list(results))
+
+    def get_series_identifiers_for_item(self, i):
+        """
+        Get the series identifiers for a given item.
+      
+        Parameters:
+            i (str): an item identifier.
+    
+        Returns:
+            list: a list of series identifiers.
+        """
+        r = self.g.query(
+            prepareQuery('''
+                SELECT ?series_id
+                    WHERE {
+                        ?series_id <http://purl.org/dc/terms/hasPart> ?item_id
+                   }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(i)
+            }
+        )
+    
+        results = set()
+        for row in r:
+            results.add(str(row[0]))
+        return sorted(list(results))
+
+    def get_series_info(self, series_id):
+        """
+        Get info for search snippets and page views for a given series.
+    
+        Parameters:
+            series_id (str): a series identifier.
+    
+        Returns:
+            str: series title.
+        """
+        data = {}
+    
+        # edm:datasetName translate "DMA" to "Digital Media Archive"
+        # language (indigenous and interview)
+    
+        for label, p in {
+            'content_type':      'http://id.loc.gov/ontologies/bibframe/content',
+            'creator':           'http://purl.org/dc/terms/creator',
+            'description':       'http://purl.org/dc/elements/1.1/description',
+            'identifier':        'http://purl.org/dc/elements/1.1/identifier',
+            'titles':            'http://purl.org/dc/elements/1.1/title',
+            'access_rights':     'http://purl.org/dc/terms/accessRights',
+            'alternative_title': 'http://purl.org/dc/terms/alternative',
+            'contributor':       'http://purl.org/dc/terms/contributor',
+            'date':              'http://purl.org/dc/terms/date',
+            'location':          'http://purl.org/dc/terms/spatial'
+        }.items():
+            values = set()
+            for row in self.g.query(
                 prepareQuery('''
-                    SELECT ?o
-                        WHERE {
-                            ?item_id <http://purl.org/dc/elements/1.1/description> ?o
-                       }
+                    SELECT ?value
+                    WHERE {
+                        ?series_id ?p ?value
+                    }
                 '''),
                 initBindings={
-                    'item_id': rdflib.URIRef(iid)
+                    'p': rdflib.URIRef(p),
+                    'series_id': rdflib.URIRef(series_id)
                 }
-            )
-            for row in r:
-                search_tokens.append(row[0])
+            ):
+                values.add(' '.join(row[0].split()))
+            data[label] = sorted(list(values))
 
-        token_str = self.get_search_tokens(i)
+        # convert TGN identifiers to preferred names.
+        tgn_identifiers = set()
+        for i in data['location']:
+            for j in i.split():
+                tgn_identifiers.add(j)
 
-        if token_str and search_tokens:
-            token_str = token_str + \
-            ' ' + \
-            ' '.join([' '.join(s.split()) for s in search_tokens])
+        data['location'] = []
+        for i in tgn_identifiers:
+            for preferred_name in self.get_tgn_place_names_preferred(
+                i
+            ):
+                data['location'].append(preferred_name)
 
-        return token_str
+        # primary_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Primary'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['primary_language'] = []
+        for preferred_name in preferred_names:
+            data['primary_language'].append(preferred_name)
+
+        # subject_language
+        codes = set()
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?code
+                WHERE {
+                    ?series_id <http://lib.uchicago.edu/language> ?l .
+                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
+                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
+                    FILTER (?role IN ('Both', 'Subject'))
+                }
+            '''),
+            initBindings={
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            codes.add(row[0])
+
+        preferred_names = set()
+        for c in codes:
+            for preferred_name in self.get_glottolog_language_preferred_names(
+                c
+            ):
+                preferred_names.add(preferred_name)
+
+        data['subject_language'] = []
+        for preferred_name in preferred_names:
+            data['subject_language'].append(preferred_name)
+
+        data['ark'] = series_id
+
+        return data
 
     def get_tgn_identifiers(self):
         """Get all TGN identifiers from the TGN graph.
@@ -926,7 +1105,37 @@ class MLCGraph:
             results.add(str(row[0]).replace('http://vocab.getty.edu/tgn/', ''))
         return list(results)
     
-    def get_tgn_place_name_en(self, i):
+    def get_tgn_place_names(self, i):
+        """Get all place names from TGN for a given identifier. 
+     
+        Parameters:
+            i (str): TGN identifier, e.g., '7005493'
+    
+        Returns:
+            list: a list of place names as unicode strings.
+        """
+        results = set()
+        for row in self.g.query(
+            prepareQuery(''' 
+                SELECT ?label
+                WHERE {
+                    {
+                        ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#altLabel> ?label .
+                    } UNION {
+                        ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
+                    }
+                }
+            '''),
+            initBindings={
+                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
+            }
+        ):
+            results.add(str(row[0]))
+        return list(results)
+    
+    def get_tgn_place_names_en(self, i):
         """Get a list of English-language place names from TGN.
     
         Parameters:
@@ -960,7 +1169,7 @@ class MLCGraph:
             results.add(str(row[0]).strip())
         return list(results)
     
-    def get_tgn_place_name_preferred(self, i):
+    def get_tgn_place_names_preferred(self, i):
         """Get English-language place names if we can, otherwise get a list of all
            place names.
     
@@ -989,7 +1198,7 @@ class MLCGraph:
         if len(place_names) > 0:
             return [place_names[0]]
         else:
-            place_names = self.get_tgn_place_name_en(i)
+            place_names = self.get_tgn_place_names_en(i)
             if len(place_names) > 0:
                 return [place_names[0]]
             else:
@@ -997,36 +1206,6 @@ class MLCGraph:
                 if len(place_names) > 0:
                     return [self.get_tgn_place_names(i)[0]]
         return []
-
-    def get_tgn_place_names(self, i):
-        """Get all place names from TGN for a given identifier. 
-     
-        Parameters:
-            i (str): TGN identifier, e.g., '7005493'
-    
-        Returns:
-            list: a list of place names as unicode strings.
-        """
-        results = set()
-        for row in self.g.query(
-            prepareQuery(''' 
-                SELECT ?label
-                WHERE {
-                    {
-                        ?tgn <http://www.w3.org/2000/01/rdf-schema#label> ?label .
-                    } UNION {
-                        ?tgn <http://www.w3.org/2004/02/skos/core#altLabel> ?label .
-                    } UNION {
-                        ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
-                    }
-                }
-            '''),
-            initBindings={
-                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
-            }
-        ):
-            results.add(str(row[0]))
-        return list(results)
     
 
 class MLCDB:
@@ -1085,9 +1264,7 @@ class MLCDB:
             create virtual table item using fts5(
                 id,
                 dbid,
-                has_panopto_link,
                 info,
-                medium,
                 text,
                 series_ids
             );
@@ -1133,16 +1310,14 @@ class MLCDB:
         # load item
         for i in mlc_graph.get_item_identifiers(): 
             cur.execute('''
-                insert into item (id, dbid, has_panopto_link, info, medium, text, series_ids) 
-                values (?, ?, ?, ?, ?, ?, ?);
+                insert into item (id, dbid, info, text, series_ids) 
+                values (?, ?, ?, ?, ?);
                 ''',
                 (
                     i,
                     mlc_graph.get_item_dbid(i),
-                    '0',
                     json.dumps(mlc_graph.get_item_info(i)),
-                    '',
-                    mlc_graph.get_item_search_tokens(i),
+                    mlc_graph.get_search_tokens_for_item_identifier(i),
                     '|'.join(item_series_lookup[i])
                 )
             )
@@ -1160,7 +1335,7 @@ class MLCDB:
                     i,
                     mlc_graph.get_series_date(i),
                     json.dumps(mlc_graph.get_series_info(i)),
-                    mlc_graph.get_series_search_tokens(i)
+                    mlc_graph.get_search_tokens_for_series_identifier(i)
                 )
             )
     
