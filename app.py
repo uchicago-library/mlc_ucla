@@ -323,6 +323,9 @@ def item(noid):
 
     item_data = mlc_db.get_item(BASE + noid)
 
+    # JEJ
+    print(json.dumps(item_data, indent=2)) 
+
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
     else:

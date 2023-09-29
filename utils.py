@@ -275,6 +275,32 @@ class MLCGraph:
             dbid = row[0]
         return dbid
 
+    def get_item_has_panopto_link(self, item_id):
+        """
+        Return whether an item has a Panopto link or not.
+
+        Parameters:
+            item_id (str): a series identifier.
+
+        Returns:
+            bool
+        """
+        has_panopto_link = '0'
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?url
+                WHERE {
+                    ?aggregation <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?item_id .
+                    ?aggregation <http://www.europeana.eu/schemas/edm/isShownBy> ?url
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            has_panopto_link = '1'
+        return has_panopto_link
+
     def get_item_info(self, item_id):
         """
         Get info for search snippets and page views of a given item.
@@ -525,6 +551,31 @@ class MLCGraph:
         for row in r:
             results.add(str(row[0]))
         return sorted(list(results))
+
+    def get_item_medium(self, item_id):
+        """
+        Get the medium for a given item.
+
+        Parameters:
+            item_id (str): a series identifier.
+
+        Returns:
+            str: medium
+        """
+        medium = ''
+        for row in self.g.query(
+            prepareQuery('''
+                SELECT ?medium
+                WHERE {
+                    ?item_id <http://purl.org/dc/terms/medium> ?medium
+                }
+            '''),
+            initBindings={
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            medium = str(row[0])
+        return medium
 
     def get_search_tokens_for_identifier(self, i):
         """
@@ -1294,7 +1345,9 @@ class MLCDB:
             create virtual table item using fts5(
                 id,
                 dbid,
+                has_panopto_link,
                 info,
+                medium,
                 text,
                 series_ids
             );
@@ -1341,13 +1394,15 @@ class MLCDB:
         # load item
         for i in mlc_graph.get_item_identifiers(): 
             cur.execute('''
-                insert into item (id, dbid, info, text, series_ids) 
-                values (?, ?, ?, ?, ?);
+                insert into item (id, dbid, has_panopto_link, info, medium, text, series_ids) 
+                values (?, ?, ?, ?, ?, ?, ?);
                 ''',
                 (
                     i,
                     mlc_graph.get_item_dbid(i),
+                    mlc_graph.get_item_has_panopto_link(i),
                     json.dumps(mlc_graph.get_item_info(i)),
+                    json.dumps(mlc_graph.get_item_medium(i)),
                     mlc_graph.get_search_tokens_for_item_identifier(i),
                     '|'.join(item_series_lookup[i])
                 )
