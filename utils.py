@@ -1,78 +1,85 @@
-import json, os, rdflib, requests, requests_cache, sqlite3, sys, timeit, urllib.parse
-from docopt import docopt
+import json
+import os
+import sqlite3
+import urllib.parse
+import rdflib
+import requests
+import requests_cache
 from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
 
 requests_cache.install_cache('requests_cache')
 
-def regularize_string(s):
-    """Regularize a string for browses by trimming excess whitespace, 
+
+def regularize_string(_):
+    """Regularize a string for browses by trimming excess whitespace,
        converting all whitespace to a single space, etc.
-  
-       Parameters: s(str) - a string to regularize.
- 
+
+       Parameters: _(str) - a string to regularize.
+
        Returns:
-           str: 
+           str:
     """
-    return ' '.join(s.split())
+    return ' '.join(_.split())
+
 
 class MLCGraph:
-    def __init__(self, g):
+    def __init__(self, graph):
         """
         Parameters:
             g (rdflib.Graph): a graph containing triples for the project.
         """
-        self.g = g
+        self.graph = graph
 
     def get_browse_terms(self, browse_type, sort_key='label'):
         """
         Get a dictionary of browse terms, along with the items for each term. It's
         currently not documented whether a browse should return series nodes, item
-        nodes, or both - so this includes both. 
-    
+        nodes, or both - so this includes both.
+
         Paramters:
             browse_type (str): e.g., 'contributor', 'creator', 'date',
                 'decade', 'language', 'location'
             sort_key (str): e.g., 'count', 'label'
-    
+
         Returns:
             dict: a Python dictionary, where the key is the browse term and the
-            value is a list of identifiers. 
-    
+            value is a list of identifiers.
+
         Notes:
             The date browse converts all dates into decades and is range-aware-
             so an item with the date "1933/1955" will appear in "1930s", "1940s",
             and "1950s".
-    
+
             When I try to match our dc:language to Glottolog's lexvo:iso639P3PCode,
             I run into trouble in Python's rdflib because Glottolog's data has an
             explicit datatype of xsd:string() and ours doesn't have an explicit
             datatype. Making both match manually solves the problem. We may be able
-            to solve this in MarkLogic by casting the variable. 
-    
-            Here I solved the problem by manually editing the glottolog triples 
-            so they match ours. 
-    
-            I would like to get TGN data as triples. 
-    
+            to solve this in MarkLogic by casting the variable.
+
+            Here I solved the problem by manually editing the glottolog triples
+            so they match ours.
+
+            I would like to get TGN data as triples.
+
             Go to http://vocab.getty.edu/sparql.
         """
         browse_types = {
             'contributor': 'http://purl.org/dc/terms/contributor',
-            'creator':     'http://purl.org/dc/terms/creator',
-            'date':        'http://purl.org/dc/terms/date',
-            'decade':      'http://purl.org/dc/terms/date',
-            'language':    'http://purl.org/dc/elements/1.1/language',
-            'location':    'http://purl.org/dc/terms/spatial'
+            'creator': 'http://purl.org/dc/terms/creator',
+            'date': 'http://purl.org/dc/terms/date',
+            'decade': 'http://purl.org/dc/terms/date',
+            'language': 'http://purl.org/dc/elements/1.1/language',
+            'location': 'http://purl.org/dc/terms/spatial'
         }
         assert browse_type in browse_types
-    
+
         browse_dict = {}
         if browse_type == 'decade':
-            qres = self.g.query(
+            qres = self.graph.query(
                 prepareQuery('''
-                    SELECT ?date_str ?identifier 
+                    SELECT ?date_str ?identifier
                     WHERE {{
                         ?identifier ?browse_type ?date_str .
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
@@ -91,18 +98,18 @@ class MLCGraph:
                 if len(dates) == 1:
                     dates.append(dates[0])
                 if len(dates) > 2:
-                    dates = dates[:2] 
+                    dates = dates[:2]
                 d = dates[0]
                 while d <= dates[1]:
                     decade = str(d)[:3] + '0s'
-                    if not decade in browse_dict:
+                    if decade not in browse_dict:
                         browse_dict[decade] = set()
                     browse_dict[decade].add(str(identifier))
                     d += 1
         elif browse_type == 'language':
-            qres = self.g.query(
+            qres = self.graph.query(
                 prepareQuery('''
-                    SELECT ?browse_term ?identifier 
+                    SELECT ?browse_term ?identifier
                     WHERE {
                         ?identifier ?browse_type ?browse_term .
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
@@ -120,13 +127,13 @@ class MLCGraph:
                     label = regularize_string(label)
                     if not label:
                         continue
-                    if not label in browse_dict:
+                    if label not in browse_dict:
                         browse_dict[label] = set()
                     browse_dict[label].add(regularize_string(str(identifier)))
         elif browse_type == 'location':
-            qres = self.g.query(
+            qres = self.graph.query(
                 prepareQuery('''
-                    SELECT ?browse_term ?identifier 
+                    SELECT ?browse_term ?identifier
                     WHERE {
                         ?identifier ?browse_type ?browse_term .
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
@@ -145,13 +152,14 @@ class MLCGraph:
                         label = regularize_string(label)
                         if not label:
                             continue
-                        if not label in browse_dict:
+                        if label not in browse_dict:
                             browse_dict[label] = set()
-                        browse_dict[label].add(regularize_string(str(identifier)))
+                        browse_dict[label].add(
+                            regularize_string(str(identifier)))
         else:
-            qres = self.g.query(
+            qres = self.graph.query(
                 prepareQuery('''
-                    SELECT ?browse_term ?identifier 
+                    SELECT ?browse_term ?identifier
                     WHERE {
                         ?identifier ?browse_type ?browse_term .
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
@@ -166,27 +174,27 @@ class MLCGraph:
                     label = regularize_string(label)
                     if not label:
                         continue
-                    if not label in browse_dict:
+                    if label not in browse_dict:
                         browse_dict[label] = set()
                     browse_dict[label].add(regularize_string(str(identifier)))
-    
+
         # convert identifiers set to a list.
         for k in browse_dict.keys():
             browse_dict[k] = sorted(list(browse_dict[k]))
-    
+
         return browse_dict
 
     def get_glottolog_codes(self):
         """Get all ISO639P3P Codes from the Glottolog graph.
-    
+
         Parameters:
             (none)
-    
+
         Returns:
-            list: all identifiers. 
+            list: all identifiers.
         """
         results = set()
-        for row in self.g.query('''
+        for row in self.graph.query('''
             SELECT ?code
             WHERE {
                 ?_ <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code
@@ -194,18 +202,18 @@ class MLCGraph:
         '''):
             results.add(str(row[0]))
         return results
-    
+
     def get_glottolog_language_names(self, c):
-        """Get all language names from Glottolog for a given identifier. 
-     
+        """Get all language names from Glottolog for a given identifier.
+
         Parameters:
             c (str): ISO 639P3P code, e.g., "eng"
-    
+
         Returns:
             list: a list of language names as unicode strings.
         """
         results = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?label
                 WHERE {
@@ -215,7 +223,7 @@ class MLCGraph:
                     } UNION {
                         ?identifier <http://www.w3.org/2004/02/skos/core#prefLabel> ?label
                     }
-                    
+
                 }
             '''),
             initBindings={
@@ -224,18 +232,18 @@ class MLCGraph:
         ):
             results.add(str(row[0]).strip())
         return list(results)
-      
+
     def get_glottolog_language_names_preferred(self, c):
         """Get preferred language names from Glottolog.
-    
+
         Parameters:
             c (str): ISO 639P3P code, e.g., "eng"
-    
+
         Returns:
             list: a list of language names, e.g., "English"
         """
         results = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?label
                 WHERE {
@@ -261,7 +269,7 @@ class MLCGraph:
             str: item identifier.
         """
         dbid = ''
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?dbid
                 WHERE {
@@ -286,7 +294,7 @@ class MLCGraph:
             bool
         """
         has_panopto_link = '0'
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?url
                 WHERE {
@@ -304,32 +312,32 @@ class MLCGraph:
     def get_item_info(self, item_id):
         """
         Get info for search snippets and page views of a given item.
-    
+
         Parameters:
             item_id (str): a series identifier.
-    
+
         Returns:
             dict: item information.
         """
         data = {}
-    
+
         for label, p in {
-            'content_type':         'http://id.loc.gov/ontologies/bibframe/content',
+            'content_type': 'http://id.loc.gov/ontologies/bibframe/content',
             'linguistic_data_type': 'http://lib.uchicago.edu/dma/olacLinguisticDataType',
-            'creator':              'http://purl.org/dc/terms/creator',
-            'description':          'http://purl.org/dc/elements/1.1/description',
-            'identifier':           'http://purl.org/dc/elements/1.1/identifier',
-            'medium':               'http://purl.org/dc/terms/medium',
-            'titles':               'http://purl.org/dc/elements/1.1/title',
-            'alternative_title':    'http://purl.org/dc/terms/alternative',
-            'contributor':          'http://purl.org/dc/terms/contributor',
-            'date':                 'http://purl.org/dc/terms/date',
-            'is_part_of':           'http://purl.org/dc/terms/isPartOf',
-            'location':             'http://purl.org/dc/terms/spatial',
-            'discourse_type':       'http://www.language−archives.org/OLAC/metadata.htmldiscourseType'
+            'creator': 'http://purl.org/dc/terms/creator',
+            'description': 'http://purl.org/dc/elements/1.1/description',
+            'identifier': 'http://purl.org/dc/elements/1.1/identifier',
+            'medium': 'http://purl.org/dc/terms/medium',
+            'titles': 'http://purl.org/dc/elements/1.1/title',
+            'alternative_title': 'http://purl.org/dc/terms/alternative',
+            'contributor': 'http://purl.org/dc/terms/contributor',
+            'date': 'http://purl.org/dc/terms/date',
+            'is_part_of': 'http://purl.org/dc/terms/isPartOf',
+            'location': 'http://purl.org/dc/terms/spatial',
+            'discourse_type': 'http://www.language−archives.org/OLAC/metadata.htmldiscourseType'
         }.items():
             values = set()
-            for row in self.g.query(
+            for row in self.graph.query(
                 prepareQuery('''
                     SELECT ?value
                     WHERE {
@@ -356,10 +364,10 @@ class MLCGraph:
                 i
             ):
                 data['location'].append(preferred_name)
-   
+
         # primary_language
         codes = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?code
                 WHERE {
@@ -388,7 +396,7 @@ class MLCGraph:
 
         # subject_language
         codes = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?code
                 WHERE {
@@ -418,7 +426,7 @@ class MLCGraph:
         # has_format
         data['has_format'] = {}
 
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?has_format_item_id ?has_format_medium
                 WHERE {
@@ -436,14 +444,14 @@ class MLCGraph:
         ):
             format_id = str(row[0])
             medium = str(row[1])
-            if not medium in data['has_format']:
+            if medium not in data['has_format']:
                 data['has_format'][medium] = []
             data['has_format'][medium].append(row[0])
 
         # is_format_of
         data['is_format_of'] = {}
 
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?is_format_of_item_id ?is_format_of_medium
                 WHERE {
@@ -461,13 +469,13 @@ class MLCGraph:
         ):
             format_id = str(row[0])
             medium = str(row[1])
-            if not medium in data['is_format_of']:
+            if medium not in data['is_format_of']:
                 data['is_format_of'][medium] = []
             data['is_format_of'][medium].append(row[0])
 
         # panopto links
         panopto_links = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?panopto_link
                 WHERE {
@@ -497,12 +505,14 @@ class MLCGraph:
                 panopto_identifiers.add(identifier)
             except requests.exceptions.ConnectionError:
                 data['panopto_links'].remove(panopto_link)
-                print('unable to retrieve panopto identifier from ' + panopto_link)
+                print(
+                    'unable to retrieve panopto identifier from ' +
+                    panopto_link)
         data['panopto_identifiers'] = list(panopto_identifiers)
 
         # access rights
         access_rights = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?access_rights
                 WHERE {
@@ -524,20 +534,20 @@ class MLCGraph:
     def get_item_identifiers(self):
         """
         Get all item identifiers from the graph.
-    
+
         Parameters:
             None
-    
+
         Returns:
-            list: item identifiers. 
+            list: item identifiers.
         """
-        qres = self.g.query('''
+        qres = self.graph.query('''
             SELECT ?item_id
             WHERE {
                 ?_ <http://purl.org/dc/terms/hasPart> ?item_id
             }
         ''')
-    
+
         results = set()
         for row in qres:
             results.add(str(row[0]))
@@ -546,14 +556,14 @@ class MLCGraph:
     def get_item_identifiers_for_series(self, i):
         """
         Get the item identifiers for a given series.
-      
+
         Parameters:
             i (str): a series identifier.
-    
+
         Returns:
             list: a list of item identifiers.
         """
-        r = self.g.query(
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?item_id
                     WHERE {
@@ -564,7 +574,7 @@ class MLCGraph:
                 'series_id': rdflib.URIRef(i)
             }
         )
-    
+
         results = set()
         for row in r:
             results.add(str(row[0]))
@@ -581,7 +591,7 @@ class MLCGraph:
             str: medium
         """
         medium = ''
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?medium
                 WHERE {
@@ -599,16 +609,16 @@ class MLCGraph:
         """
         Get the search tokens for a given series or item identifier from the
         graph.
-    
+
         Parameters:
             i (str): a series identifier
-    
+
         Returns:
             str: a string that can be searched via SQLite.
         """
-    
+
         search_tokens = []
-    
+
         # non-blank triples with no special processing
         for p in (
             'http://purl.org/dc/elements/1.1/description',
@@ -619,7 +629,7 @@ class MLCGraph:
             'http://www.language−archives.org/OLAC/metadata.htmldiscourseType',
             'http://lib.uchicago.edu/dma/contentType'
         ):
-            r = self.g.query(
+            r = self.graph.query(
                 prepareQuery('''
                     SELECT ?o
                         WHERE {
@@ -633,9 +643,9 @@ class MLCGraph:
             )
             for row in r:
                 search_tokens.append(str(row[0]))
-    
+
         # edm:datasetName
-        r = self.g.query(
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?o
                     WHERE {
@@ -652,9 +662,9 @@ class MLCGraph:
         }
         for row in r:
             search_tokens.append(lookup[str(row[0])])
-    
-        # dc:language 
-        r = self.g.query(
+
+        # dc:language
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?o
                     WHERE {
@@ -668,9 +678,9 @@ class MLCGraph:
         for row in r:
             for label in self.get_glottolog_language_names(str(row[0])):
                 search_tokens.append(label)
-       
-        # dcterms:spatial 
-        r = self.g.query(
+
+        # dcterms:spatial
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?o
                     WHERE {
@@ -685,10 +695,10 @@ class MLCGraph:
             for tgn_identifier in str(row[0]).split():
                 for label in self.get_tgn_place_names(tgn_identifier):
                     search_tokens.append(label)
-    
+
         # series-level dc:date
         years = set()
-        r = self.g.query(
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?o
                     WHERE {
@@ -710,12 +720,12 @@ class MLCGraph:
             elif len(year_strs) > 1:
                 year_strs.sort()
                 y = year_strs[0]
-                while y <= year_strs[-1]: 
+                while y <= year_strs[-1]:
                     years.add(str(y))
                     y += 1
         for y in sorted(list(years)):
             search_tokens.append(y)
-    
+
         # replace all whitespace with single spaces and return all search tokens in
         # a single string.
         return ' '.join([' '.join(s.split()) for s in search_tokens])
@@ -723,18 +733,18 @@ class MLCGraph:
     def get_search_tokens_for_series_identifier(self, i):
         """
         Get the search tokens for a given series identifier from the graph.
-    
+
         Parameters:
             i (str): a series identifier
-    
+
         Returns:
             str: a string that can be searched via SQLite.
         """
         search_tokens = []
-        
+
         # item-level description
         for iid in self.get_item_identifiers_for_series(i):
-            r = self.g.query(
+            r = self.graph.query(
                 prepareQuery('''
                     SELECT ?o
                         WHERE {
@@ -752,25 +762,25 @@ class MLCGraph:
 
         if token_str and search_tokens:
             token_str = token_str + \
-            ' ' + \
-            ' '.join([' '.join(s.split()) for s in search_tokens])
+                ' ' + \
+                ' '.join([' '.join(s.split()) for s in search_tokens])
 
         return token_str
 
     def get_search_tokens_for_item_identifier(self, i):
         """
         Get the search tokens for a given item identifier from the graph.
-    
+
         Parameters:
             i (str): a series identifier
-    
+
         Returns:
             str: a string that can be searched via SQLite.
         """
         search_tokens = []
-        
+
         # item-level description
-        r = self.g.query(
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?o
                     WHERE {
@@ -788,30 +798,30 @@ class MLCGraph:
 
         if token_str and search_tokens:
             token_str = token_str + \
-            ' ' + \
-            ' '.join([' '.join(s.split()) for s in search_tokens])
+                ' ' + \
+                ' '.join([' '.join(s.split()) for s in search_tokens])
 
         return token_str
 
     def get_series_date(self, i):
         """
         Get a single date for a given series identifier from the graph.
-    
+
         Parameters:
             i (str): a series identifier
-    
+
         Returns:
             str: a four-digit year (YYYY) or a year range (YYYY/YYYY)
         """
         years = []
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?date
                 WHERE {
                     ?identifier <http://purl.org/dc/terms/date> ?date
                 }
                 '''
-            ),
+                         ),
             initBindings={
                 'identifier': rdflib.URIRef(i)
             }
@@ -821,31 +831,32 @@ class MLCGraph:
 
         if len(years) == 0:
             return ''
-        elif len(years) == 1:
+
+        if len(years) == 1:
             return years[0]
-        elif len(years) > 1:
-            years = sorted(years)
-            return '/'.join([years[0], years[-1]])
+
+        years = sorted(years)
+        return '/'.join([years[0], years[-1]])
 
     def get_series_dbid(self, i):
         """
         Get a single database identifier for a given series identifier.
-    
+
         Parameters:
             i (str): a series identifier
-    
+
         Returns:
-            str: a database identifier. 
+            str: a database identifier.
         """
         dbids = []
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?dbid
                 WHERE {
                     ?identifier <http://purl.org/dc/elements/1.1/identifier> ?dbid
                 }
                 '''
-            ),
+                         ),
             initBindings={
                 'identifier': rdflib.URIRef(i)
             }
@@ -854,26 +865,25 @@ class MLCGraph:
 
         if len(dbids) == 0:
             return ''
-        else:
-            return dbids[0]
+        return dbids[0]
 
     def get_series_identifiers(self):
         """
         Get all series identifiers from the graph.
-    
+
         Parameters:
             None
-    
+
         Returns:
-            list: series identifiers. 
+            list: series identifiers.
         """
-        qres = self.g.query('''
+        qres = self.graph.query('''
             SELECT ?series_id
             WHERE {
                 ?series_id <http://purl.org/dc/terms/hasPart> ?_
             }
         ''')
-    
+
         results = set()
         for row in qres:
             results.add(str(row[0]))
@@ -882,14 +892,14 @@ class MLCGraph:
     def get_series_identifiers_for_item(self, i):
         """
         Get the series identifiers for a given item.
-      
+
         Parameters:
             i (str): an item identifier.
-    
+
         Returns:
             list: a list of series identifiers.
         """
-        r = self.g.query(
+        r = self.graph.query(
             prepareQuery('''
                 SELECT ?series_id
                     WHERE {
@@ -900,7 +910,7 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(i)
             }
         )
-    
+
         results = set()
         for row in r:
             results.add(str(row[0]))
@@ -909,211 +919,32 @@ class MLCGraph:
     def get_series_info(self, series_id):
         """
         Get info for search snippets and page views for a given series.
-    
+
         Parameters:
             series_id (str): a series identifier.
-    
+
         Returns:
             str: series title.
         """
         data = {}
-    
+
         # edm:datasetName translate "DMA" to "Digital Media Archive"
         # language (indigenous and interview)
-    
+
         for label, p in {
-            'content_type':      'http://id.loc.gov/ontologies/bibframe/content',
-            'creator':           'http://purl.org/dc/terms/creator',
-            'description':       'http://purl.org/dc/elements/1.1/description',
-            'identifier':        'http://purl.org/dc/elements/1.1/identifier',
-            'titles':            'http://purl.org/dc/elements/1.1/title',
-            'access_rights':     'http://purl.org/dc/terms/accessRights',
+            'content_type': 'http://id.loc.gov/ontologies/bibframe/content',
+            'creator': 'http://purl.org/dc/terms/creator',
+            'description': 'http://purl.org/dc/elements/1.1/description',
+            'identifier': 'http://purl.org/dc/elements/1.1/identifier',
+            'titles': 'http://purl.org/dc/elements/1.1/title',
+            'access_rights': 'http://purl.org/dc/terms/accessRights',
             'alternative_title': 'http://purl.org/dc/terms/alternative',
-            'contributor':       'http://purl.org/dc/terms/contributor',
-            'date':              'http://purl.org/dc/terms/date',
-            'location':          'http://purl.org/dc/terms/spatial'
+            'contributor': 'http://purl.org/dc/terms/contributor',
+            'date': 'http://purl.org/dc/terms/date',
+            'location': 'http://purl.org/dc/terms/spatial'
         }.items():
             values = set()
-            for row in self.g.query(
-                prepareQuery('''
-                    SELECT ?value
-                    WHERE {
-                        ?series_id ?p ?value
-                    }
-                '''),
-                initBindings={
-                    'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(series_id)
-                }
-            ):
-                values.add(' '.join(row[0].split()))
-            data[label] = sorted(list(values))
-
-        # convert TGN identifiers to preferred names.
-        tgn_identifiers = set()
-        for i in data['location']:
-            for j in i.split():
-                tgn_identifiers.add(j)
-
-        data['location'] = []
-        for i in tgn_identifiers:
-            for preferred_name in self.get_tgn_place_name_preferred(
-                i
-            ):
-                data['location'].append(preferred_name)
-
-        # primary_language
-        codes = set()
-        for row in self.g.query(
-            prepareQuery('''
-                SELECT ?code
-                WHERE {
-                    ?series_id <http://lib.uchicago.edu/language> ?l .
-                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
-                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
-                    FILTER (?role IN ('Both', 'Primary'))
-                }
-            '''),
-            initBindings={
-                'series_id': rdflib.URIRef(series_id)
-            }
-        ):
-            codes.add(row[0])
-
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['primary_language'] = []
-        for preferred_name in preferred_names:
-            data['primary_language'].append(preferred_name)
-
-        # subject_language
-        codes = set()
-        for row in self.g.query(
-            prepareQuery('''
-                SELECT ?code
-                WHERE {
-                    ?series_id <http://lib.uchicago.edu/language> ?l .
-                    ?l <http://lib.uchicago.edu/icu/languageRole> ?role .
-                    ?l <https://www.iso.org/standard/39534.htmliso639P3PCode> ?code .
-                    FILTER (?role IN ('Both', 'Subject'))
-                }
-            '''),
-            initBindings={
-                'series_id': rdflib.URIRef(series_id)
-            }
-        ):
-            codes.add(row[0])
-
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['subject_language'] = []
-        for preferred_name in preferred_names:
-            data['subject_language'].append(preferred_name)
-
-        data['ark'] = series_id
-
-        return data
-
-    def get_series_search_tokens(self, i):
-        """
-        Get the search tokens for a given series identifier from the graph.
-    
-        Parameters:
-            i (str): a series identifier
-    
-        Returns:
-            str: a string that can be searched via SQLite.
-        """
-        search_tokens = []
-        
-    def get_series_identifiers(self):
-        """
-        Get all series identifiers from the graph.
-    
-        Parameters:
-            None
-    
-        Returns:
-            list: series identifiers. 
-        """
-        qres = self.g.query('''
-            SELECT ?series_id
-            WHERE {
-                ?series_id <http://purl.org/dc/terms/hasPart> ?_
-            }
-        ''')
-    
-        results = set()
-        for row in qres:
-            results.add(str(row[0]))
-        return sorted(list(results))
-
-    def get_series_identifiers_for_item(self, i):
-        """
-        Get the series identifiers for a given item.
-      
-        Parameters:
-            i (str): an item identifier.
-    
-        Returns:
-            list: a list of series identifiers.
-        """
-        r = self.g.query(
-            prepareQuery('''
-                SELECT ?series_id
-                    WHERE {
-                        ?series_id <http://purl.org/dc/terms/hasPart> ?item_id
-                   }
-            '''),
-            initBindings={
-                'item_id': rdflib.URIRef(i)
-            }
-        )
-    
-        results = set()
-        for row in r:
-            results.add(str(row[0]))
-        return sorted(list(results))
-
-    def get_series_info(self, series_id):
-        """
-        Get info for search snippets and page views for a given series.
-    
-        Parameters:
-            series_id (str): a series identifier.
-    
-        Returns:
-            str: series title.
-        """
-        data = {}
-    
-        # edm:datasetName translate "DMA" to "Digital Media Archive"
-        # language (indigenous and interview)
-    
-        for label, p in {
-            'content_type':      'http://id.loc.gov/ontologies/bibframe/content',
-            'creator':           'http://purl.org/dc/terms/creator',
-            'description':       'http://purl.org/dc/elements/1.1/description',
-            'identifier':        'http://purl.org/dc/elements/1.1/identifier',
-            'titles':            'http://purl.org/dc/elements/1.1/title',
-            'access_rights':     'http://purl.org/dc/terms/accessRights',
-            'alternative_title': 'http://purl.org/dc/terms/alternative',
-            'contributor':       'http://purl.org/dc/terms/contributor',
-            'date':              'http://purl.org/dc/terms/date',
-            'location':          'http://purl.org/dc/terms/spatial'
-        }.items():
-            values = set()
-            for row in self.g.query(
+            for row in self.graph.query(
                 prepareQuery('''
                     SELECT ?value
                     WHERE {
@@ -1143,7 +974,7 @@ class MLCGraph:
 
         # primary_language
         codes = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?code
                 WHERE {
@@ -1172,7 +1003,7 @@ class MLCGraph:
 
         # subject_language
         codes = set()
-        for row in self.g.query(
+        for row in self.graph.query(
             prepareQuery('''
                 SELECT ?code
                 WHERE {
@@ -1205,18 +1036,18 @@ class MLCGraph:
 
     def get_tgn_identifiers(self):
         """Get all TGN identifiers from the TGN graph.
-    
+
         Parameters:
             (None)
-    
+
         Returns:
-            list: all identifiers. 
-    
+            list: all identifiers.
+
         Notes:
-            There are only 157 identifiers in the data as of August, 2023. 
+            There are only 157 identifiers in the data as of August, 2023.
         """
         results = set()
-        for row in self.g.query('''
+        for row in self.graph.query('''
             SELECT ?identifier
             WHERE {
                 ?identifier <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .
@@ -1230,19 +1061,19 @@ class MLCGraph:
         '''):
             results.add(str(row[0]).replace('http://vocab.getty.edu/tgn/', ''))
         return list(results)
-    
+
     def get_tgn_place_names(self, i):
-        """Get all place names from TGN for a given identifier. 
-     
+        """Get all place names from TGN for a given identifier.
+
         Parameters:
             i (str): TGN identifier, e.g., '7005493'
-    
+
         Returns:
             list: a list of place names as unicode strings.
         """
         results = set()
-        for row in self.g.query(
-            prepareQuery(''' 
+        for row in self.graph.query(
+            prepareQuery('''
                 SELECT ?label
                 WHERE {
                     {
@@ -1260,22 +1091,22 @@ class MLCGraph:
         ):
             results.add(str(row[0]))
         return list(results)
-    
+
     def get_tgn_place_names_en(self, i):
         """Get a list of English-language place names from TGN.
-    
+
         Parameters:
             i (str): TGN identifier, e.g., '7005493'
-    
+
         Returns:
             list: a list of strings, e.g., "Guatemala"
-    
+
         Notes:
             This data is spotty- English-language names are not always available.
         """
         results = set()
-        for row in self.g.query(
-            prepareQuery(''' 
+        for row in self.graph.query(
+            prepareQuery('''
                 SELECT ?label
                 WHERE {
                     {
@@ -1294,20 +1125,20 @@ class MLCGraph:
         ):
             results.add(str(row[0]).strip())
         return list(results)
-    
+
     def get_tgn_place_names_preferred(self, i):
         """Get English-language place names if we can, otherwise get a list of all
            place names.
-    
+
         Parameters:
             i (str): TGN identifier, e.g., '7005493'
-    
+
         Returns:
             list: a list of strings, e.g., "Guatemala"
         """
         results = set()
-        for row in self.g.query(
-            prepareQuery(''' 
+        for row in self.graph.query(
+            prepareQuery('''
                 SELECT ?label
                 WHERE {
                     ?tgn <http://www.w3.org/2004/02/skos/core#prefLabel> ?label .
@@ -1321,18 +1152,20 @@ class MLCGraph:
             results.add(str(row[0]).strip())
 
         place_names = list(results)
+
         if len(place_names) > 0:
             return [place_names[0]]
-        else:
-            place_names = self.get_tgn_place_names_en(i)
-            if len(place_names) > 0:
-                return [place_names[0]]
-            else:
-                place_names = self.get_tgn_place_names(i)
-                if len(place_names) > 0:
-                    return [self.get_tgn_place_names(i)[0]]
+
+        place_names = self.get_tgn_place_names_en(i)
+        if len(place_names) > 0:
+            return [place_names[0]]
+
+        place_names = self.get_tgn_place_names(i)
+        if len(place_names) > 0:
+            return [self.get_tgn_place_names(i)[0]]
+
         return []
-    
+
 
 class MLCDB:
     def __init__(self, config):
@@ -1351,34 +1184,35 @@ class MLCDB:
     def build_db(self):
         """
         Build SQLite database.
-    
+
         Parameters:
             None
         """
         if os.path.exists(self.config['DB']):
             os.remove(self.config['DB'])
-     
+
         con = sqlite3.connect(self.config['DB'])
         cur = con.cursor()
-    
+
         g = rdflib.Graph()
         g.parse(self.config['MESO_TRIPLES'], format='turtle')
         g.parse(self.config['GLOTTO_TRIPLES'], format='turtle')
         g.parse(self.config['TGN_TRIPLES'])
-    
+
         mlc_graph = MLCGraph(g)
 
         # build an item to series lookup
         item_series_lookup = {}
         for item_id in mlc_graph.get_item_identifiers():
-            if not item_id in item_series_lookup:
+            if item_id not in item_series_lookup:
                 item_series_lookup[item_id] = []
-            for series_id in mlc_graph.get_series_identifiers_for_item(item_id): 
+            for series_id in mlc_graph.get_series_identifiers_for_item(
+                    item_id):
                 item_series_lookup[item_id].append(series_id)
 
         # build tables
         cur.execute('begin')
-    
+
         cur.execute('''
             create table browse(
                 type text,
@@ -1407,18 +1241,18 @@ class MLCDB:
             );
         ''')
         cur.execute('commit')
-    
+
         # load data
         cur.execute('begin')
-    
+
         # load browses
         for browse_type, sort_key in {
             'contributor': 'count',
-            'creator':     'count',
-            'date':        'label',
-            'decade':      'label',
-            'language':    'count',
-            'location':    'count'
+            'creator': 'count',
+            'date': 'label',
+            'decade': 'label',
+            'language': 'count',
+            'location': 'count'
         }.items():
             for browse_term, identifiers in mlc_graph.get_browse_terms(
                 browse_type,
@@ -1429,49 +1263,50 @@ class MLCDB:
                         insert into browse (type, term, id)
                         values (?, ?, ?);
                         ''',
-                        (
-                            browse_type,
-                            browse_term,
-                            identifier
-                        )
-                    )
-    
+                                (
+                                    browse_type,
+                                    browse_term,
+                                    identifier
+                                )
+                                )
+
         # load item
-        for i in mlc_graph.get_item_identifiers(): 
+        for i in mlc_graph.get_item_identifiers():
             cur.execute('''
-                insert into item (id, dbid, has_panopto_link, info, medium, text, series_ids) 
+                insert into item (id, dbid, has_panopto_link, info, medium, text, series_ids)
                 values (?, ?, ?, ?, ?, ?, ?);
                 ''',
-                (
-                    i,
-                    mlc_graph.get_item_dbid(i),
-                    mlc_graph.get_item_has_panopto_link(i),
-                    json.dumps(mlc_graph.get_item_info(i)),
-                    json.dumps(mlc_graph.get_item_medium(i)),
-                    mlc_graph.get_search_tokens_for_item_identifier(i),
-                    '|'.join(item_series_lookup[i])
-                )
-            )
-    
-        # load series 
-        for i in mlc_graph.get_series_identifiers(): 
+                        (
+                            i,
+                            mlc_graph.get_item_dbid(i),
+                            mlc_graph.get_item_has_panopto_link(i),
+                            json.dumps(mlc_graph.get_item_info(i)),
+                            json.dumps(mlc_graph.get_item_medium(i)),
+                            mlc_graph.get_search_tokens_for_item_identifier(i),
+                            '|'.join(item_series_lookup[i])
+                        )
+                        )
+
+        # load series
+        for i in mlc_graph.get_series_identifiers():
             cur.execute('''
                 insert into series (
-                    id, 
+                    id,
                     dbid,
                     date,
                     info,
                     text) values (?, ?, ?, ?, ?);
                 ''',
-                (
-                    i,
-                    mlc_graph.get_series_dbid(i),
-                    mlc_graph.get_series_date(i),
-                    json.dumps(mlc_graph.get_series_info(i)),
-                    mlc_graph.get_search_tokens_for_series_identifier(i)
-                )
-            )
-    
+                        (
+                            i,
+                            mlc_graph.get_series_dbid(i),
+                            mlc_graph.get_series_date(i),
+                            json.dumps(mlc_graph.get_series_info(i)),
+                            mlc_graph.get_search_tokens_for_series_identifier(
+                                i)
+                        )
+                        )
+
         cur.execute('commit')
 
     def connect(self):
@@ -1509,13 +1344,13 @@ class MLCDB:
             query = query[:256]
 
             # replace all non-unicode letters or numbers in the query with a
-            # single space. This should strip out punctuation, etc. 
-            query = re.sub(u"[^\p{L}\p{N}]+", " ", str(query))
+            # single space. This should strip out punctuation, etc.
+            query = re.sub("[^\\p{L}\\p{N}]+", " ", str(query))
 
             # replace all whitespace with a single space.
             query = ' '.join(query.split())
 
-        # join all search terms with AND. 
+        # join all search terms with AND.
         # limit queries to 32 search terms. (size chosen arbitrarily.)
         match_string = []
         for q in query.split(' '):
@@ -1527,25 +1362,25 @@ class MLCDB:
     def get_browse(self, browse_type):
         """
         Get browse.
-    
+
         Parameters:
-            browse_type (str): type of browse terms to retrieve. 
-    
+            browse_type (str): type of browse terms to retrieve.
+
         Returns:
             list: a list of browse terms.
         """
         assert browse_type in (
-            'contributor', 
+            'contributor',
             'creator',
-            'date', 
-            'decade', 
+            'date',
+            'decade',
             'language',
             'location'
         )
 
         if not self.con:
             self.connect()
-   
+
         # sort browse results on case-insensitive characters only, stripping
         # out things like leading quotation marks. Because SQLite doesn't let
         # us strip out things like punctuation for sorting we do that after
@@ -1557,9 +1392,9 @@ class MLCDB:
                 where type=?
                 group by term
                 ''',
-                (browse_type,)
-            ).fetchall(),
-            key=lambda i: re.sub(u'\P{L}+', '', i[0]).lower()
+                             (browse_type,)
+                             ).fetchall(),
+            key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
         )
 
     def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
@@ -1572,14 +1407,14 @@ class MLCDB:
             sort_field (str):  database field to sort on.
 
         Returns:
-	    list: a list of browse results. This should contain all the
+            list: a list of browse results. This should contain all the
             information that search results contain.
         """
         assert browse_type in (
-            'contributor', 
+            'contributor',
             'creator',
-            'date', 
-            'decade', 
+            'date',
+            'decade',
             'language',
             'location'
         )
@@ -1610,10 +1445,10 @@ class MLCDB:
     def get_item(self, identifier):
         """
         Get item metadata.
-    
+
         Parameters:
             identifier (str): item identifier.
-    
+
         Returns:
             dict: a metadata dictionary.
         """
@@ -1633,7 +1468,7 @@ class MLCDB:
                 for i in range(len(info[p])):
                     url = info[p][i]
                     for row in self.cur.execute(
-                        'select info from item where id = ?;', 
+                        'select info from item where id = ?;',
                         (url,)
                     ).fetchall():
                         info[p][i] = json.loads(row[0])
@@ -1643,10 +1478,10 @@ class MLCDB:
     def get_item_info(self, item_id):
         """
         Get info dict for an item.
-    
+
         Parameters:
-            item_id (str): item identifier. 
-    
+            item_id (str): item identifier.
+
         Returns:
             dict: a dictionary of item information.
         """
@@ -1658,10 +1493,10 @@ class MLCDB:
     def get_item_list(self):
         """
         Get all item identifiers.
-    
+
         Parameters:
             None
-    
+
         Returns:
             list: a list of item identifiers
         """
@@ -1676,38 +1511,38 @@ class MLCDB:
     def get_items_for_series(self, identifier):
         """
         Get items for a series.
-    
+
         Parameters:
-            identifier (str): series identifier. 
-    
+            identifier (str): series identifier.
+
         Returns:
             list: a list of series identifiers.
         """
         if not self.con:
             self.connect()
 
-        results = []   
+        results = []
         for row in self.cur.execute('''
             select id
-            from item 
+            from item
             where series_ids like ?
             ''',
-            ('%' + identifier + '%',)
-        ).fetchall():
+                                    ('%' + identifier + '%',)
+                                    ).fetchall():
             results.append(str(row[0]))
         return results
 
     def get_search(self, query, facets=[], sort_type='rank'):
         """
         Get search results.
-    
+
         Parameters:
             query (str):     a search string.
             facets (list):   a list of strings, where each string begins with a
                              browse/facet type, followed by a colon, followed
                              by the term.
             sort_type (str): e.g., 'rank', 'date'
-    
+
         Returns:
             list: a list, where each element contains a three-tuple with a
                   series identifier, a list of item identifiers with hits in
@@ -1722,21 +1557,21 @@ class MLCDB:
             query = self.convert_raw_query_to_fts(query)
 
         subqueries = []
-        for f in facets:
+        for _ in facets:
             subqueries.append('''
                 select id
                 from browse
                 where type=?
-                and term=? 
+                and term=?
             ''')
 
         vars = []
         if query:
             vars.append(query)
-        for f in facets:
-            m = re.match('^([^:]*):(.*)$', f)
-            vars.append(m.group(1))
-            vars.append(m.group(2))
+        for facet in facets:
+            match = re.match('^([^:]*):(.*)$', facet)
+            vars.append(match.group(1))
+            vars.append(match.group(2))
 
         # Execute series search.
 
@@ -1822,7 +1657,7 @@ class MLCDB:
             for series_id in series_ids:
                 series_lookup[series_id] = s
 
-        # Add item result to appropriate series. 
+        # Add item result to appropriate series.
         for i in range(len(item_results)):
             item_id = item_results[i][0]
             series_ids = item_results[i][1]
@@ -1830,16 +1665,16 @@ class MLCDB:
                 if series_id in series_lookup:
                     series_index = series_lookup[series_id]
                     series_results[series_index][1].append(item_id)
-                    
+
         return series_results
 
     def get_series(self, identifier):
         """
         Get series metadata.
-    
+
         Parameters:
             identifier (str): a series identifier.
-    
+
         Returns:
             dict: a metadata dictionary.
         """
@@ -1856,24 +1691,24 @@ class MLCDB:
     def get_series_for_item(self, identifier):
         """
         Get series for item.
-    
+
         Parameters:
-            identifier (str): item identifier. 
-    
+            identifier (str): item identifier.
+
         Returns:
             list: a list of series identifiers.
         """
         if not self.con:
             self.connect()
 
-        results = []   
+        results = []
         for row in self.cur.execute('''
             select series_ids
-            from item 
+            from item
             where id = ?
             ''',
-            (identifier,)
-        ).fetchall():
+                                    (identifier,)
+                                    ).fetchall():
             for series_id in row[0].split('|'):
                 results.append(series_id)
         return results
@@ -1881,10 +1716,10 @@ class MLCDB:
     def get_series_info(self, series_id):
         """
         Get info dict for a series.
-    
+
         Parameters:
-            series_id (str): item identifier. 
-    
+            series_id (str): item identifier.
+
         Returns:
             dict: a dictionary of item information.
         """
@@ -1896,10 +1731,10 @@ class MLCDB:
     def get_series_list(self):
         """
         Get all series identifiers.
-    
+
         Parameters:
             None
-    
+
         Returns:
             list: a list of series identifiers.
         """
