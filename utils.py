@@ -32,7 +32,7 @@ class MLCGraph:
         """
         self.graph = graph
 
-    def get_browse_terms(self, browse_type, sort_key='label'):
+    def get_browse_terms(self, browse_type):
         """
         Get a dictionary of browse terms, along with the items for each term. It's
         currently not documented whether a browse should return series nodes, item
@@ -41,7 +41,6 @@ class MLCGraph:
         Paramters:
             browse_type (str): e.g., 'contributor', 'creator', 'date',
                 'decade', 'language', 'location'
-            sort_key (str): e.g., 'count', 'label'
 
         Returns:
             dict: a Python dictionary, where the key is the browse term and the
@@ -91,21 +90,21 @@ class MLCGraph:
             )
             for date_str, identifier in qres:
                 dates = []
-                for s in date_str.split('/'):
-                    m = re.search('([0-9]{4})', s)
-                    if m:
-                        dates.append(int(m.group(0)))
+                for year in date_str.split('/'):
+                    match = re.search('([0-9]{4})', year)
+                    if match:
+                        dates.append(int(match.group(0)))
                 if len(dates) == 1:
                     dates.append(dates[0])
                 if len(dates) > 2:
                     dates = dates[:2]
-                d = dates[0]
-                while d <= dates[1]:
-                    decade = str(d)[:3] + '0s'
+                year = dates[0]
+                while year <= dates[1]:
+                    decade = str(year)[:3] + '0s'
                     if decade not in browse_dict:
                         browse_dict[decade] = set()
                     browse_dict[decade].add(str(identifier))
-                    d += 1
+                    year += 1
         elif browse_type == 'language':
             qres = self.graph.query(
                 prepareQuery('''
@@ -1246,17 +1245,16 @@ class MLCDB:
         cur.execute('begin')
 
         # load browses
-        for browse_type, sort_key in {
-            'contributor': 'count',
-            'creator': 'count',
-            'date': 'label',
-            'decade': 'label',
-            'language': 'count',
-            'location': 'count'
-        }.items():
+        for browse_type in (
+            'contributor',
+            'creator',
+            'date',
+            'decade',
+            'language',
+            'location'
+        ):
             for browse_term, identifiers in mlc_graph.get_browse_terms(
-                browse_type,
-                sort_key
+                browse_type
             ).items():
                 for identifier in identifiers:
                     cur.execute('''
