@@ -416,13 +416,14 @@ class MLCGraph:
             data['subject_language'].append(preferred_name)
 
         # has_format
-        data['has_format'] = []
+        data['has_format'] = {}
 
         for row in self.g.query(
             prepareQuery('''
-                SELECT ?has_format_item_id
+                SELECT ?has_format_item_id ?has_format_medium
                 WHERE {
                     ?item_id <http://purl.org/dc/terms/hasFormat> ?has_format_item_id .
+                    ?has_format_item_id <http://purl.org/dc/terms/medium> ?has_format_medium .
                     ?has_format_item_id <http://purl.org/dc/elements/1.1/identifier> ?has_format_item_dbid .
                     ?has_format_agg <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?has_format_item_id .
                     BIND( EXISTS { ?has_format_agg <http://www.europeana.eu/schemas/edm/isShownBy> ?_ . } AS ?has_panopto )
@@ -433,16 +434,21 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            data['has_format'].append(row[0])
+            format_id = str(row[0])
+            medium = str(row[1])
+            if not medium in data['has_format']:
+                data['has_format'][medium] = []
+            data['has_format'][medium].append(row[0])
 
         # is_format_of
-        data['is_format_of'] = []
+        data['is_format_of'] = {}
 
         for row in self.g.query(
             prepareQuery('''
-                SELECT ?is_format_of_item_id
+                SELECT ?is_format_of_item_id ?is_format_of_medium
                 WHERE {
                     ?item_id <http://purl.org/dc/terms/isFormatOf> ?is_format_of_item_id .
+                    ?is_format_of_item_id <http://purl.org/dc/terms/medium> ?is_format_of_medium .
                     ?is_format_of_item_id <http://purl.org/dc/elements/1.1/identifier> ?is_format_of_item_dbid .
                     ?is_format_of_agg <http://www.europeana.eu/schemas/edm/aggregatedCHO> ?is_format_of_item_id .
                     BIND( EXISTS { ?is_format_of_agg <http://www.europeana.eu/schemas/edm/isShownBy> ?_ . } AS ?has_panopto )
@@ -453,7 +459,11 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            data['is_format_of'].append(row[0])
+            format_id = str(row[0])
+            medium = str(row[1])
+            if not medium in data['is_format_of']:
+                data['is_format_of'][medium] = []
+            data['is_format_of'][medium].append(row[0])
 
         # panopto links
         panopto_links = set()

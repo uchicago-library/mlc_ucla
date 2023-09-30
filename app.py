@@ -323,6 +323,11 @@ def item(noid):
 
     item_data = mlc_db.get_item(BASE + noid)
 
+    for p in ('has_format', 'is_format_of'):
+        for k in item_data[p].keys():
+            for i in range(len(item_data[p][k])):
+                item_data[p][k][i] = mlc_db.get_item(item_data[p][k][i])
+
     # JEJ
     print(json.dumps(item_data, indent=2)) 
 
