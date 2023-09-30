@@ -79,5 +79,14 @@ class TestMLCDB(unittest.TestCase):
             ]
         )
 
+    def test_convert_raw_query_to_fts(self):
+        for s, expected_output in (
+            ('zapo1437', 'zapo1437'),
+        ):
+            self.assertEqual(
+                self.__class__.mlc_db.convert_raw_query_to_fts(s),
+                expected_output
+            )
+
 if __name__=='__main__':
     unittest.main()
