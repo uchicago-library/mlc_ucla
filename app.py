@@ -368,7 +368,7 @@ def item(noid):
 
     series = []
     for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series(s)))
+        series.append((s, mlc_db.get_series_info(s)))
 
     try:
         title_slug = item_data['titles'][0]
@@ -383,7 +383,7 @@ def item(noid):
 
     return render_template(
         'item.html',
-        **(item_data | {'series': series[0],
+        **(item_data | {'series': series,
                         'title_slug': title_slug,
                         'access_rights': get_access_label_obj(item_data),
                         'panopto_identifier': panopto_identifier,
