@@ -461,19 +461,19 @@ class MLCGraph:
                 PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
-                SELECT ?has_format_item_id ?has_format_medium
+                SELECT ?format_item_id ?format_medium
                 WHERE {
-                    ?item_id dcterms:hasFormat ?has_format_item_id .
-                    ?has_format_item_id dcterms:medium ?has_format_medium .
-                    ?has_format_item_id dc:identifier ?has_format_item_dbid .
-                    ?has_format_agg edm:aggregatedCHO ?has_format_item_id .
+                    ?item_id dcterms:hasFormat ?format_item_id .
+                    ?format_item_id dcterms:medium ?format_medium .
+                    ?format_item_id dc:identifier ?format_dbid .
+                    ?format_agg edm:aggregatedCHO ?format_item_id .
                     BIND( EXISTS {
-                        ?has_format_agg edm:isShownBy ?_ .
+                        ?format_agg edm:isShownBy ?_ .
                     }
                     AS ?has_panopto
                     )
                 }
-                ORDER BY DESC(?has_panopto) ?has_format_item_dbid
+                ORDER BY DESC(?has_panopto) ?format_dbid
             '''),
             initBindings={
                 'item_id': rdflib.URIRef(item_id)
@@ -1567,14 +1567,15 @@ class MLCDB:
 
         # load item hasFormat / isFormatOf relationships
         for p in ('has_format', 'is_format_of'):
-            if p in info and isinstance(info[p], list):
-                for i in range(len(info[p])):
-                    url = info[p][i]
-                    for row in self.cur.execute(
-                        'select info from item where id = ?;',
-                        (url,)
-                    ).fetchall():
-                        info[p][i] = json.loads(row[0])
+            if p in info:
+                for m in info[p].keys():
+                    for i in range(len(info[p][m])):
+                        url = info[p][m][i]
+                        for row in self.cur.execute(
+                            'select info from item where id = ?;',
+                            (url,)
+                        ).fetchall():
+                            info[p][m][i] = json.loads(row[0])
 
         return info
 
