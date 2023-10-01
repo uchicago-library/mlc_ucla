@@ -134,6 +134,31 @@
           </a></p>
           {% endfor %}
       </dd>
+
+      {% if has_format %}
+        <dt>{% trans %}Has Format{% endtrans %}:</dt>
+        <dd>
+          {% for medium, items in has_format.items() %}
+            <p>{{ medium }}</p>
+            {% for i in items %}
+              <a href="/item/{{ i.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ i.titles.0 }}</a><br>
+            {% endfor %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if is_format_of %}
+        <dt>{% trans %}Is Format Of{% endtrans %}:</dt>
+        <dd>
+          {% for medium, items in is_format_of.items() %}
+            <p>{{ medium }}</p>
+            {% for i in items %}
+              <a href="/item/{{ i.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ i.titles.0 }}</a><br>
+            {% endfor %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
     </dl>
   </div> <!-- // .main -->
 {% endblock %}

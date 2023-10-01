@@ -5,4 +5,7 @@ regex
 sqlite_dump
 flask_babel
 flask_session
+requests
+requests_cache
+sqlite_dump
 translate-toolkit

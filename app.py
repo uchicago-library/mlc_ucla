@@ -1,79 +1,138 @@
-import click, json, logging, os, re, sqlite3, sqlite_dump, sys
+import click
+import json
+import logging
+import os
+import re
+import sqlite3
+import sqlite_dump
+import sys
 from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
-from utils import MLCDB, build_sqlite_db
+from utils import MLCDB
 from flask_babel import Babel, gettext, lazy_gettext, get_locale
-import requests
-from urllib.parse import parse_qs, urlparse
 
 app = Flask(__name__)
+app.config.from_pyfile('local.py')
+
+Session(app)
+
+BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
+mlc_db = MLCDB(app.config)
+
+
+# Language switching
 
 def get_locale():
-    if (session):
-        if( 'language' in session):
-            return session.get('language', 'en')
-        else:
-            session['language'] = 'en'
-            return session.get('language', 'en')
+    """Language switching."""
+    if 'language' not in session:
+        session['language'] = 'en'
+    return session.get('language')
 
-app.config.from_pyfile('local.py')
+
 babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
-app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
 
 @app.context_processor
 def inject_strings():
-    return dict(
-        locale = get_locale(),
-        trans = dict(
-            collection_title = lazy_gettext(u'Mesoamerican Language Collections')
+    return {
+        'locale': get_locale(),
+        'trans': {
+            'collection_title': lazy_gettext(
+                'Mesoamerican Language Collections'
             )
-        )
+        }
+    }
 
-@app.route('/language-change', methods=["POST"])
+
+@app.route('/language-change', methods=['POST'])
 def change_language():
-    if( 'language' in session and session['language'] == 'en'):
+    if 'language' in session and session['language'] == 'en':
         session['language'] = 'es'
     else:
         session['language'] = 'en'
-    return redirect(request.referrer) 
+    return redirect(request.referrer)
 
-app.logger.setLevel(logging.DEBUG)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
-
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
 
 # CLI
 
+def print_item(item_info):
+    sys.stdout.write('{}\n'.format(item_info['ark']))
+    sys.stdout.write(('{}: {}\n' * 15 + '\n').format(
+        'Panopto Links',
+        ' '.join(item_info['panopto_links']),
+        'Panopto Identifiers',
+        ' '.join(item_info['panopto_identifiers']),
+        'Access Rights',
+        ' | '.join(item_info['access_rights']),
+        'Item Title',
+        ' '.join(item_info['titles']),
+        'Item Identifier',
+        item_info['identifier'][0],
+        'Contributor',
+        ' | '.join(item_info['contributor']),
+        'Indigenous Language',
+        ' | '.join(item_info['subject_language']),
+        'Language',
+        ' | '.join(item_info['primary_language']),
+        'Location Where Indigenous Language is Spoken',
+        ' | '.join(item_info['location']),
+        'Date',
+        ' | '.join(item_info['date']),
+        'Description',
+        ' | '.join(item_info['description']),
+        'Linguistic Data Type',
+        ' | '.join(item_info['linguistic_data_type']),
+        'Discourse Type',
+        ' | '.join(item_info['discourse_type']),
+        'Item Content Type',
+        ' | '.join(item_info['content_type']),
+        'Part of Series',
+        item_info['is_part_of'][0]
+    ))
+
+
+def print_series(series_info):
+    sys.stdout.write('{}\n'.format(series_info['ark']))
+    sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
+        'Series Title',
+        ' '.join(series_info['titles']),
+        'Series Identifier',
+        series_info['identifier'][0],
+        'Collection',
+        '',
+        'Indigenous Language',
+        ' | '.join(series_info['subject_language']),
+        'Language',
+        ' | '.join(series_info['primary_language']),
+        'Location Where Indigenous Language is Spoken',
+        ' | '.join(series_info['location']),
+        'Date',
+        ' | '.join(series_info['date']),
+        'Description',
+        ' | '.join(series_info['description'])
+    ))
+
+
 @app.cli.command(
-    'build-db', 
+    'build-db',
     short_help='Build or rebuild SQLite database from linked data triples.'
 )
 def cli_build_db():
-    con = sqlite3.connect(':memory:')
-    build_sqlite_db(con.cursor())
+    """Build a SQLite database from linked data triples."""
+    mlc_db.build_db()
 
-    with open(app.config['DB'], 'w', encoding='utf-8') as f:
-        for line in sqlite_dump.iterdump(con):
-            f.write(line + '\n')
 
 @app.cli.command(
     'get-browse',
-    short_help='Get a contributor, creator, date, decade, language or location browse.'
+    short_help='Get a contributor, creator, date, decade, language or ' +
+               'location browse.'
 )
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
-    mlc_db = MLCDB(app.config)
+    """List browse terms."""
     for row in mlc_db.get_browse(browse_type):
-        print('{} ({})'.format(row[0], row[1]))
+        sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
+
 
 @app.cli.command(
     'get-browse-term',
@@ -82,9 +141,9 @@ def cli_get_browse(browse_type):
 @click.argument('browse_type')
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
-    mlc_db = MLCDB(app.config)
     for row in mlc_db.get_browse_term(browse_type, browse_term):
-        print(row)
+        print_series(row[1])
+
 
 @app.cli.command(
     'get-item',
@@ -92,39 +151,8 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    mlc_db = MLCDB(app.config)
-    i = mlc_db.get_item(item_identifier)
-    print(item_identifier)
-    sys.stdout.write(('{}: {}\n' * 14 + '\n').format(
-        'Panopto Links',
-        ' '.join(i['panopto_links']),
-        'Access Rights',
-        ' | '.join(i['access_rights']),
-        'Item Title',
-        ' '.join(i['titles']),
-        'Item Identifier',
-        i['identifier'][0],
-        'Contributor',
-        ' | '.join(i['contributor']),
-        'Indigenous Language',
-        ' | '.join(i['subject_language']),
-        'Language',
-        ' | '.join(i['primary_language']),
-        'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['location']),
-        'Date',
-        ' | '.join(i['date']),
-        'Description',
-        ' | '.join(i['description']),
-        'Linguistic Data Type',
-        ' | '.join(i['linguistic_data_type']),
-        'Discourse Type',
-        ' | '.join(i['discourse_type']),
-        'Item Content Type',
-        ' | '.join(i['content_type']),
-        'Part of Series',
-        i['is_part_of'][0]
-    ))
+    print_item(mlc_db.get_item(item_identifier))
+
 
 @app.cli.command(
     'get-series',
@@ -132,27 +160,8 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    mlc_db = MLCDB(app.config)
-    i = mlc_db.get_series(series_identifier)
-    print(series_identifier)
-    sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
-        'Series Title',
-        ' '.join(i['titles']),
-        'Series Identifier',
-        i['identifier'][0],
-        'Collection',
-        '',
-        'Indigenous Language',
-        ' | '.join(i['subject_language']),
-        'Language',
-        ' | '.join(i['primary_language']),
-        'Location Where Indigenous Language is Spoken',
-        ' | '.join(i['location']),
-        'Date',
-        ' | '.join(i['date']),
-        'Description',
-        ' | '.join(i['description'])
-    ))
+    print_series(mlc_db.get_series(series_identifier))
+
 
 @app.cli.command(
     'list-items',
@@ -160,28 +169,12 @@ def cli_get_series(series_identifier):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
-    mlc_db = MLCDB(app.config)
     for i in mlc_db.get_item_list():
-        print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
-                'Item Title',
-                ' '.join(i[1]['titles']),
-                'Panopto Links',
-                ' | '.join(i[1]['panopto_links']),
-                'Access Rights',
-                ' | '.join(i[1]['access_rights']),
-                'Contributor',
-                ' | '.join(i[1]['contributor']),
-                'Indigenous Language',
-                ' | '.join(i[1]['subject_language']),
-                'Location',
-                ' | '.join(i[1]['location']),
-                'Date',
-                ' | '.join(i[1]['date']),
-                'Resource Type',
-                ' | '.join(i[1]['content_type'])
-            ))
+            print_item(mlc_db.get_item(i))
+        else:
+            sys.stdout.write('{}\n'.format(i))
+
 
 @app.cli.command(
     'list-series',
@@ -189,24 +182,12 @@ def cli_list_items(verbose):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
-    mlc_db = MLCDB(app.config)
     for i in mlc_db.get_series_list():
-        print(i[0])
         if verbose:
-            sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
-                'Series Title',
-                ' '.join(i[1]['titles']),
-                'Contributor',
-                ' | '.join(i[1]['contributor']),
-                'Indigenous Language',
-                ' | '.join(i[1]['subject_language']),
-                'Location',
-                ' | '.join(i[1]['location']),
-                'Date',
-                ' | '.join(i[1]['date']),
-                'Resource Type',
-                ' | '.join(i[1]['content_type'])
-            ))
+            print_series(mlc_db.get_series(i))
+        else:
+            sys.stdout.write('{}\n'.format(i))
+
 
 @app.cli.command(
     'search',
@@ -215,8 +196,7 @@ def cli_list_series(verbose):
 @click.argument('term')
 @click.argument('facet')
 def cli_search(term, facet):
-    mlc_db = MLCDB(app.config)
-    for i in mlc_db.get_search(term, [facet]):
+    for i in mlc_db.get_search(term, [facet], 'rank'):
         print(i[0])
         print(i[2])
         sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
@@ -235,6 +215,7 @@ def cli_search(term, facet):
         ))
         print('')
 
+
 # WEB
 
 access_key = {
@@ -248,41 +229,47 @@ access_key = {
     }
 }
 
+
 def get_access_label_obj(item):
     # list of results
-        # tuple for item
-            # string for url
-            # dictionary of data
-                # list of values
+    #   tuple for item
+    #     string for url
+    #       dictionary of data
+    #         list of values
     ar = item['access_rights']
 
     # [<string from database>, <translated string>, <bootstrap label class>]
-    if( len(ar) > 0 and ar[0].lower() in access_key):
+    if len(ar) > 0 and ar[0].lower() in access_key:
         return [
-            ar[0], 
-            access_key[ar[0].lower()]['trans'], 
+            ar[0],
+            access_key[ar[0].lower()]['trans'],
             access_key[ar[0].lower()]['class']
             ]
     else:
-        return ['emtpy','By Request','info']
+        return ['emtpy', 'By Request', 'info']
+
 
 @app.errorhandler(400)
 def bad_request(e):
     return (render_template('400.html'), 400)
 
+
 @app.errorhandler(404)
 def not_found(e):
     return (render_template('404.html'), 404)
 
+
 @app.errorhandler(500)
 def bad_request(e):
     return (render_template('500.html'), 500)
+
 
 @app.route('/')
 def home():
     return render_template(
         'home.html'
     )
+
 
 @app.route('/suggest-corrections/')
 def suggest_corrections():
@@ -292,17 +279,16 @@ def suggest_corrections():
     page_title = lazy_gettext(u'Suggest Corrections')
     return render_template(
         'suggest-corrections.html',
-        item_title = item_title,
-        rec_id = rec_id,
-        item_url = item_url,
-        title_slug = page_title,
-        hide_right_column = True
+        item_title=item_title,
+        rec_id=rec_id,
+        item_url=item_url,
+        title_slug=page_title,
+        hide_right_column=True
     )
+
 
 @app.route('/browse/')
 def browse():
-    mlc_db = MLCDB(app.config)
-
     title_slugs = {
         'contributor': lazy_gettext(u'Browse by Contributors'),
         'creator':     lazy_gettext(u'Browse by Creator'),
@@ -313,7 +299,7 @@ def browse():
     }
 
     browse_type = request.args.get('type')
-    if not browse_type in title_slugs.keys():
+    if browse_type not in title_slugs.keys():
         app.logger.debug(
             'in {}(), type parameter not a key in browses dict.'.format(
                 sys._getframe().f_code.co_name
@@ -325,48 +311,43 @@ def browse():
 
     if browse_term:
         if browse_type:
-            title_slug = lazy_gettext(u'Results with')+" "+browse_type+": "+browse_term+""
+            title_slug = lazy_gettext('Results with') + \
+                         ' ' + browse_type + ': ' + browse_term
         else:
-            title_slug = lazy_gettext(u'Results for search')+": "+browse_term+""
-        results = mlc_db.get_browse_term(browse_type, browse_term)
+            title_slug = lazy_gettext('Results for search') + \
+                         ': ' + browse_term
+
+        sort_field = 'dbid'
+        if browse_type == 'decade':
+            sort_field = 'date'
+
+        results = mlc_db.get_browse_term(browse_type, browse_term, sort_field)
 
         mod_results = []
         for item in results:
             item_data = item[1]
             item_data['access_rights'] = get_access_label_obj(item_data)
-            mod_results.append( (item[0], item_data ) )
+            mod_results.append((item[0], item_data))
 
         return render_template(
             'search.html',
-            facets = [],
-            query = browse_term,
-            query_field = browse_type,
-            results = mod_results,
-            title_slug = title_slug
+            facets=[],
+            query=browse_term,
+            query_field=browse_type,
+            results=mod_results,
+            title_slug=title_slug
         )
     else:
         return render_template(
             'browse.html',
-            title_slug = title_slugs[browse_type],
-            browse_terms = mlc_db.get_browse(browse_type),
-            browse_type = browse_type
+            title_slug=title_slugs[browse_type],
+            browse_terms=mlc_db.get_browse(browse_type),
+            browse_type=browse_type
         )
+
 
 @app.route('/item/<noid>/')
 def item(noid):
-    def ark_to_panopto(ark_url):
-        req = requests.head(ark_url, allow_redirects=True)
-        percent_url = req.url
-        return parse_qs(
-            urlparse(
-                parse_qs(
-                    urlparse(percent_url).query
-                )['ReturnUrl'][0]
-            ).query
-        )["id"][0]
-
-    mlc_db = MLCDB(app.config)
-
     if not re.match('^[a-z0-9]{12}$', noid):
         app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
@@ -375,66 +356,80 @@ def item(noid):
         )
         abort(400)
 
-    item_data = mlc_db.get_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    item_data = mlc_db.get_item(BASE + noid)
 
-    if item_data['panopto_links']:
-        panopto_identifier = ark_to_panopto(item_data['panopto_links'][0])
+    # JEJ
+    print(json.dumps(item_data, indent=2))
+
+    if item_data['panopto_identifiers']:
+        panopto_identifier = item_data['panopto_identifiers'][0]
     else:
         panopto_identifier = ''
 
-    series = mlc_db.get_series_for_item('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    series = []
+    for s in mlc_db.get_series_for_item(BASE + noid):
+        series.append((s, mlc_db.get_series(s)))
 
     try:
         title_slug = item_data['titles'][0]
     except (IndexError, KeyError):
         title_slug = ''
 
-    brdcrb = ""
-    # brdcrb += "<a href='"+series[0][0].replace('https://ark.lib.uchicago.edu/ark:61001/', '/series/')+"'>"+series[0][1]['titles'][0]+"</a> &gt; "
-    brdcrb += item_data['titles'][0]
+    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
+        series[0][0].replace(BASE, ''),
+        series[0][1]['titles'][0],
+        item_data['titles'][0]
+    )
 
     return render_template(
         'item.html',
-        **(item_data | {'series': series,
+        **(item_data | {'series': series[0],
                         'title_slug': title_slug,
                         'access_rights': get_access_label_obj(item_data),
                         'panopto_identifier': panopto_identifier,
-                        'breadcrumb': brdcrb})
+                        'breadcrumb': breadcrumb})
     )
+
 
 @app.route('/search/')
 def search():
-    mlc_db = MLCDB(app.config)
-
     facets = request.args.getlist('facet')
     query = request.args.get('query')
+    sort_type = request.args.get('sort', 'rank')
 
-    results = mlc_db.get_search(query, facets)
-    mod_results = []
-    
-    for item in results:
-        item_data = item[1]
-        item_data['access_rights'] = get_access_label_obj(item_data)
-        mod_results.append( (item[0], item_data ) )
+    db_results = mlc_db.get_search(query, facets, sort_type)
 
-    if( facets ):
-        title_slug = lazy_gettext(u'Search Results for')+' '+facets[0]
+    processed_results = []
+    for db_series in db_results:
+        series_data = mlc_db.get_series(db_series[0])
+        series_data['access_rights'] = get_access_label_obj(series_data)
+        series_data['items'] = []
+        for i in db_series[1]:
+            info = mlc_db.get_item_info(i)
+            # JEJ
+            print(json.dumps(info, indent=2))
+            series_data['items'].append(info)
+        processed_results.append((db_series[0], series_data))
+
+    if facets:
+        title_slug = lazy_gettext(u'Search Results for') + ' ' + facets[0]
+    elif query:
+        title_slug = lazy_gettext(u'Search Results for') + ' \'' + query + '\''
     else:
-        title_slug = lazy_gettext(u'Search Results for')+" '"+query+"'"
+        title_slug = lazy_gettext(u'Search Results')
 
     return render_template(
         'search.html',
-        facets = [],
-        query = query,
-        query_field = '',
-        results = mod_results,
-        title_slug = title_slug
+        facets=[],
+        query=query,
+        query_field='',
+        results=processed_results,
+        title_slug=title_slug
     )
-    
+
+
 @app.route('/series/<noid>/')
 def series(noid):
-    mlc_db = MLCDB(app.config)
-
     if not re.match('^[a-z0-9]{12}$', noid):
         app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
@@ -443,10 +438,14 @@ def series(noid):
         )
         abort(400)
 
-    series_data = mlc_db.get_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
+    series_data = mlc_db.get_series(BASE + noid)
 
-    items = mlc_db.get_items_for_series('https://ark.lib.uchicago.edu/ark:61001/' + noid)
-    print(json.dumps(items, indent=2))
+    items = []
+    for i in mlc_db.get_items_for_series(BASE + noid):
+        items.append((
+            i,
+            mlc_db.get_item(i)
+        ))
 
     try:
         title_slug = series_data['titles'][0]
@@ -462,3 +461,6 @@ def series(noid):
         })
     )
 
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
