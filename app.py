@@ -1,4 +1,11 @@
-import click, json, logging, os, re, sqlite3, sqlite_dump, sys
+import click
+import json
+import logging
+import os
+import re
+import sqlite3
+import sqlite_dump
+import sys
 from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
 from utils import MLCDB
@@ -12,24 +19,30 @@ Session(app)
 BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
 mlc_db = MLCDB(app.config)
 
+
 # Language switching
 
 def get_locale():
     """Language switching."""
-    if not 'language' in session:
+    if 'language' not in session:
         session['language'] = 'en'
     return session.get('language')
 
+
 babel = Babel(app, default_locale='en', locale_selector=get_locale)
+
 
 @app.context_processor
 def inject_strings():
     return {
         'locale': get_locale(),
         'trans': {
-            'collection_title': lazy_gettext(u'Mesoamerican Language Collections')
+            'collection_title': lazy_gettext(
+                'Mesoamerican Language Collections'
+            )
         }
     }
+
 
 @app.route('/language-change', methods=['POST'])
 def change_language():
@@ -37,7 +50,8 @@ def change_language():
         session['language'] = 'es'
     else:
         session['language'] = 'en'
-    return redirect(request.referrer) 
+    return redirect(request.referrer)
+
 
 # CLI
 
@@ -76,6 +90,7 @@ def print_item(item_info):
         item_info['is_part_of'][0]
     ))
 
+
 def print_series(series_info):
     sys.stdout.write('{}\n'.format(series_info['ark']))
     sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
@@ -97,23 +112,27 @@ def print_series(series_info):
         ' | '.join(series_info['description'])
     ))
 
+
 @app.cli.command(
-    'build-db', 
+    'build-db',
     short_help='Build or rebuild SQLite database from linked data triples.'
 )
 def cli_build_db():
     """Build a SQLite database from linked data triples."""
     mlc_db.build_db()
 
+
 @app.cli.command(
     'get-browse',
-    short_help='Get a contributor, creator, date, decade, language or location browse.'
+    short_help='Get a contributor, creator, date, decade, language or ' +
+               'location browse.'
 )
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
     """List browse terms."""
     for row in mlc_db.get_browse(browse_type):
         sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
+
 
 @app.cli.command(
     'get-browse-term',
@@ -125,6 +144,7 @@ def cli_get_browse_term(browse_type, browse_term):
     for row in mlc_db.get_browse_term(browse_type, browse_term):
         print_series(row[1])
 
+
 @app.cli.command(
     'get-item',
     short_help='Get item info for an item identifier.'
@@ -133,6 +153,7 @@ def cli_get_browse_term(browse_type, browse_term):
 def cli_get_item(item_identifier):
     print_item(mlc_db.get_item(item_identifier))
 
+
 @app.cli.command(
     'get-series',
     short_help='Get series info for a series identifier.'
@@ -140,6 +161,7 @@ def cli_get_item(item_identifier):
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
     print_series(mlc_db.get_series(series_identifier))
+
 
 @app.cli.command(
     'list-items',
@@ -153,6 +175,7 @@ def cli_list_items(verbose):
         else:
             sys.stdout.write('{}\n'.format(i))
 
+
 @app.cli.command(
     'list-series',
     short_help='List series objects.'
@@ -164,6 +187,7 @@ def cli_list_series(verbose):
             print_series(mlc_db.get_series(i))
         else:
             sys.stdout.write('{}\n'.format(i))
+
 
 @app.cli.command(
     'search',
@@ -191,6 +215,7 @@ def cli_search(term, facet):
         ))
         print('')
 
+
 # WEB
 
 access_key = {
@@ -204,41 +229,47 @@ access_key = {
     }
 }
 
+
 def get_access_label_obj(item):
     # list of results
-        # tuple for item
-            # string for url
-            # dictionary of data
-                # list of values
+    #   tuple for item
+    #     string for url
+    #       dictionary of data
+    #         list of values
     ar = item['access_rights']
 
     # [<string from database>, <translated string>, <bootstrap label class>]
-    if( len(ar) > 0 and ar[0].lower() in access_key):
+    if len(ar) > 0 and ar[0].lower() in access_key:
         return [
-            ar[0], 
-            access_key[ar[0].lower()]['trans'], 
+            ar[0],
+            access_key[ar[0].lower()]['trans'],
             access_key[ar[0].lower()]['class']
             ]
     else:
-        return ['emtpy','By Request','info']
+        return ['emtpy', 'By Request', 'info']
+
 
 @app.errorhandler(400)
 def bad_request(e):
     return (render_template('400.html'), 400)
 
+
 @app.errorhandler(404)
 def not_found(e):
     return (render_template('404.html'), 404)
 
+
 @app.errorhandler(500)
 def bad_request(e):
     return (render_template('500.html'), 500)
+
 
 @app.route('/')
 def home():
     return render_template(
         'home.html'
     )
+
 
 @app.route('/suggest-corrections/')
 def suggest_corrections():
@@ -248,12 +279,13 @@ def suggest_corrections():
     page_title = lazy_gettext(u'Suggest Corrections')
     return render_template(
         'suggest-corrections.html',
-        item_title = item_title,
-        rec_id = rec_id,
-        item_url = item_url,
-        title_slug = page_title,
-        hide_right_column = True
+        item_title=item_title,
+        rec_id=rec_id,
+        item_url=item_url,
+        title_slug=page_title,
+        hide_right_column=True
     )
+
 
 @app.route('/browse/')
 def browse():
@@ -267,7 +299,7 @@ def browse():
     }
 
     browse_type = request.args.get('type')
-    if not browse_type in title_slugs.keys():
+    if browse_type not in title_slugs.keys():
         app.logger.debug(
             'in {}(), type parameter not a key in browses dict.'.format(
                 sys._getframe().f_code.co_name
@@ -279,9 +311,11 @@ def browse():
 
     if browse_term:
         if browse_type:
-            title_slug = lazy_gettext(u'Results with')+" "+browse_type+": "+browse_term+""
+            title_slug = lazy_gettext('Results with') + \
+                         ' ' + browse_type + ': ' + browse_term
         else:
-            title_slug = lazy_gettext(u'Results for search')+": "+browse_term+""
+            title_slug = lazy_gettext('Results for search') + \
+                         ': ' + browse_term
 
         sort_field = 'dbid'
         if browse_type == 'decade':
@@ -293,23 +327,24 @@ def browse():
         for item in results:
             item_data = item[1]
             item_data['access_rights'] = get_access_label_obj(item_data)
-            mod_results.append( (item[0], item_data ) )
+            mod_results.append((item[0], item_data))
 
         return render_template(
             'search.html',
-            facets = [],
-            query = browse_term,
-            query_field = browse_type,
-            results = mod_results,
-            title_slug = title_slug
+            facets=[],
+            query=browse_term,
+            query_field=browse_type,
+            results=mod_results,
+            title_slug=title_slug
         )
     else:
         return render_template(
             'browse.html',
-            title_slug = title_slugs[browse_type],
-            browse_terms = mlc_db.get_browse(browse_type),
-            browse_type = browse_type
+            title_slug=title_slugs[browse_type],
+            browse_terms=mlc_db.get_browse(browse_type),
+            browse_type=browse_type
         )
+
 
 @app.route('/item/<noid>/')
 def item(noid):
@@ -329,14 +364,14 @@ def item(noid):
                 item_data[p][k][i] = mlc_db.get_item(item_data[p][k][i])
 
     # JEJ
-    print(json.dumps(item_data, indent=2)) 
+    print(json.dumps(item_data, indent=2))
 
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
     else:
         panopto_identifier = ''
 
-    series = [] 
+    series = []
     for s in mlc_db.get_series_for_item(BASE + noid):
         series.append((s, mlc_db.get_series(s)))
 
@@ -360,6 +395,7 @@ def item(noid):
                         'breadcrumb': breadcrumb})
     )
 
+
 @app.route('/search/')
 def search():
     facets = request.args.getlist('facet')
@@ -378,7 +414,7 @@ def search():
             # JEJ
             print(json.dumps(info, indent=2))
             series_data['items'].append(info)
-        processed_results.append( (db_series[0], series_data ) )
+        processed_results.append((db_series[0], series_data))
 
     if facets:
         title_slug = lazy_gettext(u'Search Results for') + ' ' + facets[0]
@@ -389,13 +425,14 @@ def search():
 
     return render_template(
         'search.html',
-        facets = [],
-        query = query,
-        query_field = '',
-        results = processed_results,
-        title_slug = title_slug
+        facets=[],
+        query=query,
+        query_field='',
+        results=processed_results,
+        title_slug=title_slug
     )
-    
+
+
 @app.route('/series/<noid>/')
 def series(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
@@ -428,6 +465,7 @@ def series(noid):
             'access_rights': get_access_label_obj(series_data)
         })
     )
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
