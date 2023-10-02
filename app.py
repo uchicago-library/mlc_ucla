@@ -44,15 +44,6 @@ def inject_strings():
     }
 
 
-@app.route('/language-change', methods=['POST'])
-def change_language():
-    if 'language' in session and session['language'] == 'en':
-        session['language'] = 'es'
-    else:
-        session['language'] = 'en'
-    return redirect(request.referrer)
-
-
 # CLI
 
 def print_item(item_info):
@@ -248,6 +239,13 @@ def get_access_label_obj(item):
     else:
         return ['emtpy', 'By Request', 'info']
 
+@app.route('/language-change', methods=['POST'])
+def change_language():
+    if 'language' in session and session['language'] == 'en':
+        session['language'] = 'es'
+    else:
+        session['language'] = 'en'
+    return redirect(request.referrer)
 
 @app.errorhandler(400)
 def bad_request(e):
