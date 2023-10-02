@@ -63,6 +63,28 @@ h1{
 	float: unset;
 }
 
+.mlc-banner{
+	/*background: url('/static/img/banner.wp2');*/
+	background: url('/static/img/banner.jpg');
+	background-size: cover;
+  background-position: center;
+  min-height: 80px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: .5rem;
+}
+.mlc-banner p{
+  color: white;
+  font-weight: 600;
+  font-size: 1.3rem;
+  background: #800000;
+  background: #800000d0;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
 /* ======= UTILS */
 .mb-1{
 	margin-bottom: 1rem;
@@ -147,6 +169,19 @@ h1{
 	padding-right: .8rem;
 }
 /* =============== BROWSE */
+.browse-bar .btn{	
+	background-color: #645E5E;
+}
+.browse-bar .btn:active,
+.browse-bar .btn:hover,
+.browse-bar .btn:focus{	
+	color: #fff;
+	background-color: #7b7474;
+}
+.browse-bar .btn:not(:last-child){	
+	margin-right: .5rem;
+}
+
 .browse-list-wrapper ul{
 	list-style-type: none;
 	padding: 0;
