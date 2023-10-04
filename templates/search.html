@@ -23,13 +23,12 @@
         <h3>
         {% trans %}Series{% endtrans %}: {{ result.1.titles.0 }} 
         <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
-        ({{ result.1.sub_items|length }})
         </h3>
         </a>
         {# ITEMS #}
         {% if result.1.sub_items|length > 0 %}
           <div class="well well-sm series-items-list">
-          <b> {% trans num=result.1.sub_items|length %} Found in {{ num }} items: {% endtrans %}  </b>
+          <b> {% trans num=result.1.sub_items|length %} Found in {{ num }} item(s): {% endtrans %}  </b>
           <ul class="no-style-list">
           {% for item in result.1.sub_items|sort(reverse=true, attribute='panopto_links,has_format.length') %}
             <li>
