@@ -70,6 +70,12 @@ h1{
 .mb-2{
 	margin-bottom: 2rem;
 }
+.mr-1{
+	margin-right: 1rem;
+}
+.pr-1{
+	padding-right: 1rem;
+}
 
 /* ======= SIDEBAR LEFT */
 
@@ -166,6 +172,22 @@ ul.no-style-list{
 	margin: 0;
 }
 
+.series-metadata .sr-link-in-row{
+	color: inherit;
+}
+.series-metadata dl{
+	display: flex;
+  flex-wrap: wrap;
+}
+.series-metadata dt{
+	color: #777;/* same as .text-muted */
+	padding: 0;
+}
+.series-metadata dd{
+	border: none;
+	padding-bottom:0;
+}
+
 /* ITEMS */
 .items-listing{
 	margin: 0;
@@ -199,7 +221,7 @@ ul.no-style-list{
   vertical-align: top;*/
 }
 
-.sr-link-in-series{
+.sr-link-in-row:not(:last-child){
 	padding-right: .8rem;
 }
 /* =============== BROWSE */

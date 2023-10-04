@@ -230,13 +230,13 @@ access_key = {
 }
 
 def sortListOfItems(item):
-    if ( isinstance(item, tuple) ):
+    if isinstance(item, tuple):
         item = item[1]
     # Give priority to items with a panopto link, and then items with a 'has_format'
     # return len(item[1]['panopto_links']) * 10 + len(item[1]['has_format'])
-    if( 'panopto_links' in item and len(item['panopto_links']) ):
+    if 'panopto_links' in item and len(item['panopto_links']):
             return 0
-    elif( 'has_format' in item and len(item['has_format']) ):
+    elif 'has_format' in item and len(item['has_format']):
         return 1
     else:
         return 2
@@ -400,7 +400,6 @@ def item(noid):
                         'panopto_identifier': panopto_identifier,
                         'breadcrumb': breadcrumb})
     )
-
 
 @app.route('/search/')
 def search():
