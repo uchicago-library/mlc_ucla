@@ -220,8 +220,8 @@ def cli_search(term, facet):
 
 access_key = {
     'restricted': {
-        'trans': lazy_gettext(u'Restricted'),
-        'class': 'warning'
+        'trans': '',
+        'class': ''
     },
     'public domain':  {
         'trans': lazy_gettext(u'Public Domain'),
@@ -234,8 +234,8 @@ def get_access_label_obj(item):
     # list of results
     #   tuple for item
     #     string for url
-    #       dictionary of data
-    #         list of values
+    #     dictionary of data
+    #       list of values
     ar = item['access_rights']
 
     # [<string from database>, <translated string>, <bootstrap label class>]
@@ -403,12 +403,13 @@ def search():
     for db_series in db_results:
         series_data = mlc_db.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
-        series_data['items'] = []
+
+        series_data['sub_items'] = []
         for i in db_series[1]:
             info = mlc_db.get_item_info(i)
             # JEJ
             print(json.dumps(info, indent=2))
-            series_data['items'].append(info)
+            series_data['sub_items'].append(info)
         processed_results.append((db_series[0], series_data))
 
     if facets:
