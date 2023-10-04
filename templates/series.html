@@ -85,8 +85,48 @@
     </dl>
 
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for i in items %}
-        {{ i.1.identifier.0 }} <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ i.1.titles.0 }}</a><br>
+    <ul class="no-style-list items-listing">
+    {% for i in items|sort(attribute='1.panopto_links.length') %}
+      {% set item = i.1 %}
+      <li>
+        {% if item.panopto_links|length > 0 %}
+          <i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i>
+        {% else %}
+          <i class="item-icon fa fa-circle" aria-hidden="true"></i>
+        {% endif %}
+        <p>
+        <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
+        {% for title in item.titles %}
+          {{ title }}
+        {% endfor %}
+        <span class="text-muted">{{ item.identifier.0 }}</span> 
+        </a>
+        {# {{ item.subject_language }} #}
+        {% for lan in item.subject_language %}
+          {{ lan }},
+        {% endfor %}
+        <br>
+        {% for medium in item.medium %}
+          {{ medium }}
+        {% endfor %}
+        {# This can be interesting, but hasn't been evaluated yet. #}
+        {% if item.has_format|length > 0 %}
+          <i class="fa fa-caret-right" aria-hidden="true"></i>
+          (
+          {# {{ item.has_format }} = #}
+          {% for format, links in item.has_format.items() %}
+            {% for link in links %}
+              <a class="sr-link-in-series" href="/item/{{ link|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ format }}
+              </a> 
+            {% endfor %}
+          {% endfor %}
+          )
+        {% endif %}
+        </p>
+        {# {{ item.identifier.0 }} 
+        <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ item.titles.0 }}</a><br> #}
+      </li>
     {% endfor %}
+    </ul>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

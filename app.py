@@ -229,6 +229,17 @@ access_key = {
     }
 }
 
+def sortListOfItems(item):
+    if ( isinstance(item, tuple) ):
+        item = item[1]
+    # Give priority to items with a panopto link, and then items with a 'has_format'
+    # return len(item[1]['panopto_links']) * 10 + len(item[1]['has_format'])
+    if( 'panopto_links' in item and len(item['panopto_links']) ):
+            return 0
+    elif( 'has_format' in item and len(item['has_format']) ):
+        return 1
+    else:
+        return 2
 
 def get_access_label_obj(item):
     # list of results
@@ -410,6 +421,7 @@ def search():
             # JEJ
             print(json.dumps(info, indent=2))
             series_data['sub_items'].append(info)
+        series_data['sub_items'].sort(key=sortListOfItems)
         processed_results.append((db_series[0], series_data))
 
     if facets:
@@ -447,6 +459,7 @@ def series(noid):
             i,
             mlc_db.get_item(i)
         ))
+    items.sort(key=sortListOfItems)
 
     try:
         title_slug = series_data['titles'][0]

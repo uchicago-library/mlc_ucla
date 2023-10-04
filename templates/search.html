@@ -8,7 +8,7 @@
   <div class="page-title">
   <h1>{{ title_slug }}</h1>
   {% if results %}
-    <em>{% trans num=results|length %}Found {{ num }} results{% endtrans %}</em>
+    <em>{% trans num=results|length %}Search found in {{ num }} serie(s){% endtrans %}</em>
   {% endif %}
   </div><!-- // search-results -->
 
@@ -27,10 +27,10 @@
         </a>
         {# ITEMS #}
         {% if result.1.sub_items|length > 0 %}
-          <div class="well well-sm series-items-list">
+          <div class="well well-sm items-listing">
           <b> {% trans num=result.1.sub_items|length %} Found in {{ num }} item(s): {% endtrans %}  </b>
           <ul class="no-style-list">
-          {% for item in result.1.sub_items|sort(reverse=true, attribute='panopto_links,has_format.length') %}
+          {% for item in result.1.sub_items %}
             <li>
             {% if item.panopto_links|length > 0 %}
               <i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i>
