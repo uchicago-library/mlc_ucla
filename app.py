@@ -33,8 +33,18 @@ babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
 
 @app.context_processor
-def inject_strings():
+def inject_variables():
+    # ---------------------------------------------> TO REMOVE !!!
+    # request.environ["REMOTE_USER"] = "23235"
+    re = None
+    cnetid = None
+    if request.environ:
+        re = request.environ
+        if 'REMOTE_USER' in request.environ: 
+            cnetid = request.environ["REMOTE_USER"]
+
     return {
+        'cnet_id' : cnetid,
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
@@ -220,7 +230,6 @@ access_key = {
     }
 }
 
-
 def get_access_label_obj(item):
     # list of results
     #   tuple for item
@@ -239,6 +248,18 @@ def get_access_label_obj(item):
     else:
         return ['emtpy', 'By Request', 'info']
 
+@app.errorhandler(400)
+def bad_request(e):
+    return (render_template('400.html'), 400)
+
+@app.errorhandler(404)
+def not_found(e):
+    return (render_template('404.html'), 404)
+
+@app.errorhandler(500)
+def bad_request(e):
+    return (render_template('500.html'), 500)
+
 @app.route('/language-change', methods=['POST'])
 def change_language():
     if 'language' in session and session['language'] == 'en':
@@ -247,43 +268,11 @@ def change_language():
         session['language'] = 'en'
     return redirect(request.referrer)
 
-@app.errorhandler(400)
-def bad_request(e):
-    return (render_template('400.html'), 400)
-
-
-@app.errorhandler(404)
-def not_found(e):
-    return (render_template('404.html'), 404)
-
-
-@app.errorhandler(500)
-def bad_request(e):
-    return (render_template('500.html'), 500)
-
-
 @app.route('/')
 def home():
     return render_template(
         'home.html'
     )
-
-
-@app.route('/suggest-corrections/')
-def suggest_corrections():
-    item_title = request.args.get('ittt')
-    rec_id = request.args.get('rcid')
-    item_url = request.args.get('iurl')
-    page_title = lazy_gettext(u'Suggest Corrections')
-    return render_template(
-        'suggest-corrections.html',
-        item_title=item_title,
-        rec_id=rec_id,
-        item_url=item_url,
-        title_slug=page_title,
-        hide_right_column=True
-    )
-
 
 @app.route('/browse/')
 def browse():
@@ -343,52 +332,6 @@ def browse():
             browse_type=browse_type
         )
 
-
-@app.route('/item/<noid>/')
-def item(noid):
-    if not re.match('^[a-z0-9]{12}$', noid):
-        app.logger.debug(
-            'in {}(), user-supplied noid appears invalid.'.format(
-                sys._getframe().f_code.co_name
-            )
-        )
-        abort(400)
-
-    item_data = mlc_db.get_item(BASE + noid)
-
-    # JEJ
-    print(json.dumps(item_data, indent=2))
-
-    if item_data['panopto_identifiers']:
-        panopto_identifier = item_data['panopto_identifiers'][0]
-    else:
-        panopto_identifier = ''
-
-    series = []
-    for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series_info(s)))
-
-    try:
-        title_slug = item_data['titles'][0]
-    except (IndexError, KeyError):
-        title_slug = ''
-
-    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
-        series[0][0].replace(BASE, ''),
-        series[0][1]['titles'][0],
-        item_data['titles'][0]
-    )
-
-    return render_template(
-        'item.html',
-        **(item_data | {'series': series,
-                        'title_slug': title_slug,
-                        'access_rights': get_access_label_obj(item_data),
-                        'panopto_identifier': panopto_identifier,
-                        'breadcrumb': breadcrumb})
-    )
-
-
 @app.route('/search/')
 def search():
     facets = request.args.getlist('facet')
@@ -425,7 +368,6 @@ def search():
         title_slug=title_slug
     )
 
-
 @app.route('/series/<noid>/')
 def series(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
@@ -455,10 +397,79 @@ def series(noid):
         **(series_data | {
             'items': items,
             'title_slug': title_slug,
+            'is_restricted': series_data['access_rights'][0].lower() == 'restricted',
+            'series_id': series_data['identifier'][0],
             'access_rights': get_access_label_obj(series_data)
         })
     )
 
+@app.route('/item/<noid>/')
+def item(noid):
+    if not re.match('^[a-z0-9]{12}$', noid):
+        app.logger.debug(
+            'in {}(), user-supplied noid appears invalid.'.format(
+                sys._getframe().f_code.co_name
+            )
+        )
+        abort(400)
+
+    item_data = mlc_db.get_item(BASE + noid)
+
+    # JEJ
+    print(json.dumps(item_data, indent=2))
+
+    if item_data['panopto_identifiers']:
+        panopto_identifier = item_data['panopto_identifiers'][0]
+    else:
+        panopto_identifier = ''
+
+    series = []
+    for s in mlc_db.get_series_for_item(BASE + noid):
+        series.append((s, mlc_db.get_series_info(s)))
+
+    series_id = []
+    for s in series:
+        series_id.append(s[1]['identifier'][0])
+
+    try:
+        title_slug = item_data['titles'][0]
+    except (IndexError, KeyError):
+        title_slug = ''
+
+    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
+        series[0][0].replace(BASE, ''),
+        series[0][1]['titles'][0],
+        item_data['titles'][0]
+    )
+
+    return render_template(
+        'item.html',
+        **(item_data | {'series': series,
+            'title_slug': title_slug,
+            'item_data': item_data,
+            'access_rights': get_access_label_obj(item_data),
+            'is_restricted': item_data['access_rights'][0].lower() == 'restricted',
+            'series_id': ','.join(series_id),
+            'panopto_identifier': panopto_identifier,
+            'breadcrumb': breadcrumb})
+    )
+    
+@app.route('/request-account')
+def request_account():
+    return render_template(
+        'request-account.html'
+    )
+
+@app.route('/suggest-corrections/')
+def suggest_corrections():
+    return render_template(
+        'suggest-corrections.html',
+        item_title = request.args.get('ittt'),
+        rec_id = request.args.get('rcid'),
+        item_url = request.args.get('iurl'),
+        title_slug = lazy_gettext(u'Suggest Corrections'),
+        hide_right_column = True
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

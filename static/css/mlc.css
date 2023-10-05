@@ -148,6 +148,9 @@ h1{
 .sidebar.sidebar-right h3{
 	font-size: 1.1rem;
 }
+.sidebar.sidebar-right ul li:not(:last-child){
+	margin-bottom: .3rem;
+}
 .sidebar.sidebar-right dl{
 	display: block;
 }
@@ -258,6 +261,7 @@ h1{
 	dl dd{
 		flex-basis: 70%;
 	}
+}
 
 
 /* =============== Suggestions */

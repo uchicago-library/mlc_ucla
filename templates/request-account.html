@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="suggest-corrections-main" id="content" role="main">
+  <div class="title-wrapper">
+    <h1>{% trans %}Request Account for Access{% endtrans %}</h1>
+  </div>
+        <p>{% trans %}
+          Small paragraph briefly explaining that a user can request a temporary account to access restricted content, that it is done case-by-case, and what to expect after they fill in the form.
+        {% endtrans %}</p>
+  <form id="suggestCorrections" class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
+    <div class="row">
+      <div class="col-xs-12">
+        <input type="hidden" name="rcpt" value="vitor">
+        {# <input type="hidden" name="whom" value="MLC website"> #}
+        <input type="hidden" name="from" value="MLC website">
+        {# <input type="hidden" name="vrfy" value="trivial"> #}
+        <input type="hidden" name="subject" value="Request for an Account for MLC">
+        <div class="form-group">
+          <label for="name">{% trans %}Name{% endtrans %}*</label>
+          <input type="text" class="form-control" id="name" name="Name" placeholder="{% trans %}Enter your name{% endtrans %}" required>
+        </div>
+        <div class="form-group">
+          <label for="email">{% trans %}Email address{% endtrans %}*</label>
+          <input type="email" class="form-control" id="Email" name="email" placeholder="{% trans %}Enter your email address{% endtrans %}" required>
+        </div>
+        <div class="form-group">
+          <label for="birthday">{% trans %}Birthday{% endtrans %}*</label>
+          <input type="date" class="form-control" id="birthday" name="Birthday" value="2005-01-01" required>
+        </div>
+        <div class="form-group">
+          <label for="projectDescription">{% trans %}Please describe your research project{% endtrans %}</label>
+          <textarea class="form-control" rows="3" id="projectDescription" name="Project Description" value="{% trans %}Provide a description of your project.{% endtrans %}"></textarea>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" required> {% trans %}I agree to the terms stated in the{% endtrans %} <a href="https://www.lib.uchicago.edu/scrc/visiting/policies-governing-use-archives-manuscripts-and-special-collections/">{% trans %}policy{% endtrans %}</a>.
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
