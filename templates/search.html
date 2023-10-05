@@ -1,44 +1,5 @@
 {% extends "base.html" %}
 
-{% set language_to_code = {
-"Mam": "mam",
-"Spanish": "spa",
-"K'iche'": "quc",
-"Tzotzil": "tzo",
-"Tzeltal": "tzh",
-"Yucatec Maya": "yua",
-"English": "eng",
-"Q'anjob'al": "kjb",
-"Tlaxcala-Puebla-Central Nahuatl": "nhn",
-"Ng\u00e4bere": "gym",
-"Huastec": "hus",
-"Classical Nahuatl": "nci",
-"Highland Totonac": "tos",
-"Purepecha": "tsz",
-"Buglere": "sab",
-"Central Guerrero Nahuatl": "ngu",
-"Akateko": "knj",
-"Popti'": "jac",
-"Chuj": "cac",
-"Kekch\u00ed": "kek",
-"Aguacateco": "agu",
-"Zapotec": "zap",
-"Ixcatec": "ixc",
-"Ixil": "ixl",
-"Mezquital Otomi": "ote",
-"Chol": "ctu",
-"Tojolabal": "toj",
-"Central Huasteca Nahuatl": "nch",
-"Poqomchi'": "poh",
-"Poqomam": "poc",
-"Pipil": "ppl",
-"Mop\u00e1n Maya": "mop",
-"Huichol": "hch",
-"German": "deu",
-"Mocho": "mhc",
-"Garifuna": "cab",
-"Huautla Mazatec": "mau"
-} %}
 
 {% block content %}
   <div class="search-results-page" id="content" role="main">
@@ -63,6 +24,67 @@
       {% trans %}Series{% endtrans %}: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }} </a>
       <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
       </h3>
+      {# METADATA #}
+      <div class="series-metadata">
+        <dl>
+        {% if result.1.contributor %}
+          <dt>{% trans %}Contributor{% endtrans %}:</dt>
+          <dd>
+          {% if result.1.contributor|length > 3 %}
+            {% for contributor in result.1.contributor[:3] %}
+              <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+            {% endfor %}
+            (+{{ result.1.contributor|length -3 }})
+          {% else %}
+            {% for contributor in result.1.contributor %}
+              <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+            {% endfor %}
+          {% endif %}
+          </dd>
+        {% endif %}
+        {% if result.1.subject_language %}
+          <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
+          <dd>
+          {% for language in result.1.subject_language %}
+            <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
+          {% endfor %}
+          </dd>
+        {% endif %}
+        {% if result.1.primary_language %}
+          <dt>{% trans %}Language{% endtrans %}: </dt>
+          <dd>
+          {% for language in result.1.primary_language %}
+            <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
+          {% endfor %}
+          </dd>
+        {% endif %}
+        {% if result.1.location %}
+          <dt>{% trans %}Location{% endtrans %}:</dt>
+          <dd>
+          {% for location in result.1.location %}
+            <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
+          {% endfor %}
+          </dd>
+        {% endif %}
+        {% if result.1.date %}
+          <dt>{% trans %}Date{% endtrans %}:</dt>
+          <dd>
+          {% for date in result.1.date %}
+            <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
+          {% endfor %}
+          </dd>
+          </dl>
+        {% endif %}
+        {% if result.1.content_type %}
+          <dt>{% trans %}Resource Type{% endtrans %}:</dt>
+          <dd>
+          {% for content_type in result.1.content_type %}
+            <span>{{ content_type }}</span>
+          {% endfor %}
+          </dd>
+        {% endif %}
+        </dl>
+      </div>
 
       {# ITEMS #}
       {% if result.1.sub_items|length > 0 %}
@@ -70,104 +92,16 @@
         <b class="text-muted"> {% trans num=result.1.sub_items|length %} Found in {{ num }} item(s): {% endtrans %}  </b>
         <div class="row">
         <ul class="no-style-list">
-        {% for item in result.1.sub_items %}
-          <li class="col-xs-12 col-md-6 col-lg-4">
-          <div class="item-card">
-          <div class="item-card-title-row">
-          <a href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-          {% for title in item.titles %}
-            {{ title }}
-          {% endfor %}
-          </a>
-          {% if item.panopto_links|length > 0 %}
-            <i title="item has digital content" class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i>
-          {% endif %}
-          </div>
-          <div class="item-card-content-row">
-          <p>
-          {% for medium in item.medium %}
-            {{ medium }}
-          {% endfor %}
-          </p>
-          {% if item.has_format|length > 0 %}
-            <i title="item is converted to these formats" class="fa fa-plus" aria-hidden="true"></i>
-          {% endif %}
-          </div>
-          <div class="item-card-content-row">
-          <p title="subject language">{% for lan in item.subject_language %}
-          {{ language_to_code[lan]|upper }}{{ ", " if not loop.last else "" }}
-          {% endfor %}</p>
-          <span class="text-muted">{{ item.identifier.0 }}</span>
-          </div>
-          </div>
-          </li>
-
+        {% for item_o in result.1.sub_items %}
+          {%  with %}
+            {%  set item = item_o %}
+            {%  include 'component-item-in-list.html' %}
+          {%  endwith %}
         {% endfor %}
         </ul>
         </div>
         </div>
       {% endif %}
-      {# METADATA #}
-      <div class="series-metadata">
-      <dl>
-      {% if result.1.contributor %}
-        <dt>{% trans %}Contributor{% endtrans %}:</dt>
-        <dd>
-        {% if result.1.contributor|length > 3 %}
-          {% for contributor in result.1.contributor[:3] %}
-            <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
-          {% endfor %}
-          (+{{ result.1.contributor|length -3 }})
-        {% else %}
-          {% for contributor in result.1.contributor %}
-            <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
-          {% endfor %}
-        {% endif %}
-        </dd>
-      {% endif %}
-      {% if result.1.subject_language %}
-        <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
-        <dd>
-        {% for language in result.1.subject_language %}
-          <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
-        {% endfor %}
-        </dd>
-      {% endif %}
-      {% if result.1.primary_language %}
-        <dt>{% trans %}Language{% endtrans %}: </dt>
-        <dd>
-        {% for language in result.1.primary_language %}
-          <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
-        {% endfor %}
-        </dd>
-      {% endif %}
-      {% if result.1.location %}
-        <dt>{% trans %}Location{% endtrans %}:</dt>
-        <dd>
-        {% for location in result.1.location %}
-          <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
-        {% endfor %}
-        </dd>
-      {% endif %}
-      {% if result.1.date %}
-        <dt>{% trans %}Date{% endtrans %}:</dt>
-        <dd>
-        {% for date in result.1.date %}
-          <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
-        {% endfor %}
-        </dd>
-        </dl>
-      {% endif %}
-      {% if result.1.content_type %}
-        <dt>{% trans %}Resource Type{% endtrans %}:</dt>
-        <dd>
-        {% for content_type in result.1.content_type %}
-          <span>{{ content_type }}</span>
-        {% endfor %}
-        </dd>
-      {% endif %}
-      </dl>
-      </div>
       </li>
     {% endfor %}
     </ul>

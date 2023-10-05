@@ -89,87 +89,13 @@
       <div class="row">
         <ul class="no-style-list">
         {% for i in items %}
-          {% set item = i.1 %}
-          <li class="col-xs-12 col-md-6 col-lg-4">
-            <div class="item-card">
-              <div class="item-card-title-row">
-                <a href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-                {% for title in item.titles %}
-                  {{ title }}
-                {% endfor %}
-                </a>
-                {% if item.panopto_links|length > 0 %}
-                  <i title="item has digital content" class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i>
-                {% endif %}
-              </div>
-              <div class="item-card-content-row">
-                <p>
-                  {% for medium in item.medium %}
-                    {{ medium }}
-                  {% endfor %}
-                </p>
-                {% if item.has_format|length > 0 %}
-                  <i title="item is converted to these formats" class="fa fa-plus" aria-hidden="true"></i>
-                {% endif %}
-              </div>
-              <div class="item-card-content-row">
-                <p title="subject language">{% for lan in item.subject_language %}
-                {{ lan }}{{ ", " if not loop.last else "" }}
-                {% endfor %}</p>
-                <span class="text-muted">{{ item.identifier.0 }}</span>
-              </div>
-            </div>
-          </li>
-
+          {%  with %}
+            {%  set item = i.1 %}
+            {%  include 'component-item-in-list.html' %}
+          {%  endwith %}
         {% endfor %}
         </ul>
       </div>
     </div>
-
-
-
-    <ul class="no-style-list items-listing">
-    {% for i in items|sort(attribute='1.panopto_links.length') %}
-      {% set item = i.1 %}
-      <li>
-        {% if item.panopto_links|length > 0 %}
-          <i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i>
-        {% else %}
-          <i class="item-icon fa fa-circle" aria-hidden="true"></i>
-        {% endif %}
-        <p>
-        <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-        {% for title in item.titles %}
-          {{ title }}
-        {% endfor %}
-        <span class="text-muted">{{ item.identifier.0 }}</span> 
-        </a>
-        {# {{ item.subject_language }} #}
-        {% for lan in item.subject_language %}
-          {{ lan }},
-        {% endfor %}
-        <br>
-        {% for medium in item.medium %}
-          {{ medium }}
-        {% endfor %}
-        {# This can be interesting, but hasn't been evaluated yet. #}
-        {% if item.has_format|length > 0 %}
-          <i class="fa fa-caret-right" aria-hidden="true"></i>
-          (
-          {# {{ item.has_format }} = #}
-          {% for format, links in item.has_format.items() %}
-            {% for link in links %}
-              <a class="sr-link-in-series" href="/item/{{ link|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ format }}
-              </a> 
-            {% endfor %}
-          {% endfor %}
-          )
-        {% endif %}
-        </p>
-        {# {{ item.identifier.0 }} 
-        <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ item.titles.0 }}</a><br> #}
-      </li>
-    {% endfor %}
-    </ul>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}
