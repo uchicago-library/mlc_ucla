@@ -222,14 +222,14 @@ ul.no-style-list{
 }
 .series-metadata dt{
 	border-top: none;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px dashed #ddd;
 	color: #777;/* same as .text-muted */
 	padding: 0;
 	max-width: 180px;
 }
 .series-metadata dd{
 	border-top: none;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px dashed #ddd;
 	padding: 0 0 0 .5rem;
 }
 
