@@ -408,7 +408,7 @@ def series(noid):
         grouped_items[medium].append(i[1])
 
     try:
-        title_slug = series_data['titles'][0]
+        title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
 

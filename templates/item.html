@@ -5,8 +5,8 @@
     <div class="title-wrapper">
       <h1>
         {{ title_slug }}
-        <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
       </h1>
+      <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </div>
     {% if panopto_identifier %}
       <div>
@@ -120,6 +120,15 @@
         <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
         <dd>
           {% for i in content_type %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if medium %}
+        <dt>{% trans %}Media Type{% endtrans %}:</dt>
+        <dd>
+          {% for i in medium %}
             {{ i }}<br>
           {% endfor %}
         </dd>

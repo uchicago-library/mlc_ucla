@@ -20,10 +20,12 @@
       <li class="search-result">
       {# SERIES #}
 
-      <h3>
-      {% trans %}Series{% endtrans %}: <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }} </a>
-      <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
-      </h3>
+      <div class="search-results-series-title">
+        <span class="series-result-series-label">{% trans %}Series{% endtrans %}: </span>
+        <h3><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">{{ result.1.titles.0 }} </a><span class="text-muted-extra"> {{ result.1.identifier.0 }}</span></h3>
+        <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+
+      </div>
       {# METADATA #}
       <div class="series-metadata">
         <dl>

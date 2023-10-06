@@ -2,10 +2,14 @@
 
 {% block content %}
   <div class="" id="content" role="main">
-    <h1>
-      <strong>{% trans %}Series Title{% endtrans %}:</strong> {% for i in titles %}{{ i }} {% endfor %}
+    <div class="title-wrapper">
+      <h1>
+        <strong>{% trans %}Series Title{% endtrans %}:</strong> {{ title_slug }}
+        <span class="text-muted-extra"> {{ identifier.0 }}</span>
+      </h1>
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
-    </h1>
+    </div>
+
     <dl>
       {% if alternative_title %}
         <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
