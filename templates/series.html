@@ -2,10 +2,14 @@
 
 {% block content %}
   <div class="" id="content" role="main">
-    <h1>
-      <strong>{% trans %}Series Title{% endtrans %}:</strong> {% for i in titles %}{{ i }} {% endfor %}
+    <div class="title-wrapper">
+      <h1>
+        <strong>{% trans %}Series Title{% endtrans %}:</strong> {{ title_slug }}
+        <span class="text-muted-extra"> {{ identifier.0 }}</span>
+      </h1>
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
-    </h1>
+    </div>
+
     <dl>
       {% if alternative_title %}
         <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
@@ -85,8 +89,35 @@
     </dl>
 
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for i in items %}
-        {{ i.1.identifier.0 }} <a href="/item/{{ i.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">{{ i.1.titles.0 }}</a><br>
+    {% for medium, item_list in grouped_items.items() %}
+      <h3>{{ medium }}</h3>
+      <div class="items-listing">
+        <div class="row">
+          <ul class="no-style-list">
+          {% for item in item_list %}
+            {%  with %}
+              {%  include 'component-item-in-list.html' %}
+            {%  endwith %}
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
     {% endfor %}
+
+    {# <pre>{{ grouped_items }}</pre>
+
+    <h2>{% trans %}Items in the Series{% endtrans %}</h2>
+    <div class="items-listing">
+      <div class="row">
+        <ul class="no-style-list">
+        {% for i in items %}
+          {%  with %}
+            {%  set item = i.1 %}
+            {%  include 'component-item-in-list.html' %}
+          {%  endwith %}
+        {% endfor %}
+        </ul>
+      </div>
+    </div> #}
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

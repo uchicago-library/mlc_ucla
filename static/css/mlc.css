@@ -92,6 +92,12 @@ h1{
 .mb-2{
 	margin-bottom: 2rem;
 }
+.mr-1{
+	margin-right: 1rem;
+}
+.pr-1{
+	padding-right: 1rem;
+}
 
 /* ======= SIDEBAR LEFT */
 
@@ -127,9 +133,9 @@ h1{
 		display: block !important;
 	}
 }
-#content{
-	padding-left: 3rem;
-}
+/*#content{
+	padding-left: 2rem;
+}*/
 
 /* ======= SIDEBAR RIGHT */
 .sidebar.sidebar-right{
@@ -147,6 +153,9 @@ h1{
 }
 .sidebar.sidebar-right h3{
 	font-size: 1.1rem;
+}
+.sidebar.sidebar-right ul li:not(:last-child){
+	margin-bottom: .3rem;
 }
 .sidebar.sidebar-right dl{
 	display: block;
@@ -182,10 +191,132 @@ h1{
 	margin-right: .5rem;
 }
 
-.browse-list-wrapper ul{
+.browse-list-wrapper ul,  
+ul.no-style-list{
 	list-style-type: none;
 	padding: 0;
 }
+
+.search-results-page .page-title {
+	padding: 0;
+	border: none;
+	margin-bottom: 2rem;
+}
+.search-results-page .page-title h1{
+	margin: 0;
+}
+.search-results-page ul li.search-result{
+	margin-bottom: 2rem;
+}
+.search-results-page ul li.search-result .search-results-series-title{
+	display: flex;
+	align-items: flex-start;
+}
+.search-results-page ul li.search-result .search-results-series-title>*:not(:last-child){
+	margin-right: 0.5rem
+}
+.search-results-page ul li.search-result .search-results-series-title .series-result-series-label{
+	font-size: 1.1em;
+  color: #525252;
+  font-weight: 600;
+  line-height: 1.4em;
+}
+.search-results-page ul li.search-result .search-results-series-title h3{
+	flex-grow: 1;
+	margin-top: 0;
+}
+.search-results-page ul li.search-result p{
+	margin: 0;
+}
+
+.series-metadata .sr-link-in-row{
+	color: inherit;
+}
+.series-metadata dl{
+	display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.series-metadata dt{
+	border-top: none;
+	border-bottom: 1px dashed #ddd;
+	color: #777;/* same as .text-muted */
+	padding: 0;
+	max-width: 180px;
+}
+.series-metadata dd{
+	border-top: none;
+	border-bottom: 1px dashed #ddd;
+	padding: 0 0 0 .5rem;
+}
+
+/* ITEMS */
+.items-listing{
+	margin: 0;
+}
+.items-listing .item-card{
+	display: block;
+	margin-bottom: .3rem;
+	margin-bottom: .5rem;
+	border: 1px solid #eee;
+	border-radius: .5rem;
+	padding: .3rem .5rem;
+	background: white;
+}
+.items-listing .item-card span:not(.item-card-title){
+	color: black;
+	text-decoration: none !important;
+}
+.text-muted-extra{
+	color: #949494 !important;
+}
+.items-listing .item-card span.item-card-title{
+	max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 5px;
+  padding-right: 3px;
+}
+.items-listing .item-card:active span.item-card-title,
+.items-listing .item-card:focus span.item-card-title,
+.items-listing .item-card:hover span.item-card-title{
+	text-decoration: underline;
+}
+.items-listing .item-card:active,
+.items-listing .item-card:focus,
+.items-listing .item-card:hover{
+	box-shadow: 1px 2px 4px #d9d9d9;
+	text-decoration: none !important;
+}
+.items-listing .item-card .item-card-title-row,
+.items-listing .item-card .item-card-content-row{
+	display: flex;
+}
+.items-listing .item-card .item-card-content-row{
+	align-items: flex-end;
+}
+.items-listing .item-card .item-card-title-row>*:first-child,
+.items-listing .item-card .item-card-content-row>*:first-child {
+  flex-grow: 1;
+}
+.items-listing .item-card .item-card-content-row p{
+  margin: 0;
+}
+.items-listing .item-card .item-card-title-row .item-icon{
+  top: .3rem;
+  position: relative;
+}
+@media (min-width:500px) and (max-width:992px){
+	.items-listing li{
+  	width: 50%;
+	}
+}
+
+.sr-link-in-row:not(:last-child){
+	padding-right: .8rem;
+}
+/* =============== BROWSE */
 .browse-list-wrapper ul li{
   padding: 0;
   margin: 0 !important;
@@ -225,16 +356,22 @@ h1{
   * the default title styling needs to be changed
   */
 .title-wrapper {
-	position: relative;
+	display: flex;
+	align-items: flex-start;
+	border-bottom: 1px solid #D6D6CE;
+	margin-bottom: 2rem;
 }
 .title-wrapper h1{
-	padding-right: 150px;
+	/*padding-right: 150px;*/
+	border: none;
+	flex-grow: 1;
+	margin: 0;
 }
-.title-wrapper .badge{
+/*.title-wrapper .badge{
 	position: absolute;
 	top: 0;
 	right: 0;
-}
+}*/
 
 /* Panopto */
 .panopto-iframe{
@@ -258,6 +395,7 @@ h1{
 	dl dd{
 		flex-basis: 70%;
 	}
+}
 
 
 /* =============== Suggestions */

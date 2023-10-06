@@ -1,4 +1,9 @@
-__pycache__
 __pycache__/
 local.py
 db.sql
+*.sql
+*.ttl
+*.py[cod]
+*.sqlite
+flask_session/
+*.pyc
