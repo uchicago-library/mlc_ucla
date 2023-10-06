@@ -33,8 +33,13 @@ babel = Babel(app, default_locale='en', locale_selector=get_locale)
 
 
 @app.context_processor
-def inject_strings():
+def inject_dict():
+    cnetid = None
+    if request.environ:
+        if 'REMOTE_USER' in request.environ: 
+            cnetid = request.environ["REMOTE_USER"]
     return {
+        'cnet_id' : cnetid,
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
@@ -209,6 +214,7 @@ def cli_search(term, facet):
 
 # WEB
 
+# removed restricted label due to issue https://github.com/uchicago-library/ucla/issues/84
 access_key = {
     'restricted': {
         'trans': '',
@@ -239,8 +245,6 @@ def get_access_label_obj(item):
     #     dictionary of data
     #       list of values
     ar = item['access_rights']
-
-    # [<string from database>, <translated string>, <bootstrap label class>]
     if len(ar) > 0 and ar[0].lower() in access_key:
         return [
             ar[0],
@@ -278,23 +282,6 @@ def home():
     return render_template(
         'home.html'
     )
-
-
-@app.route('/suggest-corrections/')
-def suggest_corrections():
-    item_title = request.args.get('ittt')
-    rec_id = request.args.get('rcid')
-    item_url = request.args.get('iurl')
-    page_title = lazy_gettext(u'Suggest Corrections')
-    return render_template(
-        'suggest-corrections.html',
-        item_title=item_title,
-        rec_id=rec_id,
-        item_url=item_url,
-        title_slug=page_title,
-        hide_right_column=True
-    )
-
 
 @app.route('/browse/')
 def browse():
@@ -353,51 +340,6 @@ def browse():
             browse_terms=mlc_db.get_browse(browse_type),
             browse_type=browse_type
         )
-
-
-@app.route('/item/<noid>/')
-def item(noid):
-    if not re.match('^[a-z0-9]{12}$', noid):
-        app.logger.debug(
-            'in {}(), user-supplied noid appears invalid.'.format(
-                sys._getframe().f_code.co_name
-            )
-        )
-        abort(400)
-
-    item_data = mlc_db.get_item(BASE + noid)
-
-    # JEJ
-    print(json.dumps(item_data, indent=2))
-
-    if item_data['panopto_identifiers']:
-        panopto_identifier = item_data['panopto_identifiers'][0]
-    else:
-        panopto_identifier = ''
-
-    series = []
-    for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series_info(s)))
-
-    try:
-        title_slug = item_data['titles'][0]
-    except (IndexError, KeyError):
-        title_slug = ''
-
-    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
-        series[0][0].replace(BASE, ''),
-        series[0][1]['titles'][0],
-        item_data['titles'][0]
-    )
-    
-    return render_template(
-        'item.html',
-        **(item_data | {'series': series,
-            'title_slug': title_slug,
-            'access_rights': get_access_label_obj(item_data),
-            'panopto_identifier': panopto_identifier,
-            'breadcrumb': breadcrumb})
-    )
 
 @app.route('/search/')
 def search():
@@ -479,6 +421,72 @@ def series(noid):
         })
     )
 
+@app.route('/item/<noid>/')
+def item(noid):
+    if not re.match('^[a-z0-9]{12}$', noid):
+        app.logger.debug(
+            'in {}(), user-supplied noid appears invalid.'.format(
+                sys._getframe().f_code.co_name
+            )
+        )
+        abort(400)
+
+    item_data = mlc_db.get_item(BASE + noid)
+
+    # JEJ
+    print(json.dumps(item_data, indent=2))
+
+    if item_data['panopto_identifiers']:
+        panopto_identifier = item_data['panopto_identifiers'][0]
+    else:
+        panopto_identifier = ''
+
+    series = []
+    for s in mlc_db.get_series_for_item(BASE + noid):
+        series.append((s, mlc_db.get_series_info(s)))
+
+    series_id = []
+    for s in series:
+        series_id.append(s[1]['identifier'][0])
+
+    try:
+        title_slug = item_data['titles'][0]
+    except (IndexError, KeyError):
+        title_slug = ''
+
+    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
+        series[0][0].replace(BASE, ''),
+        series[0][1]['titles'][0],
+        item_data['titles'][0]
+    )
+    
+    return render_template(
+        'item.html',
+        **(item_data | {'series': series,
+            'title_slug': title_slug,
+            'access_rights': get_access_label_obj(item_data),
+            'is_restricted': item_data['access_rights'][0].lower() == 'restricted',
+            'series_id': ','.join(series_id),
+            'panopto_identifier': panopto_identifier,
+            'breadcrumb': breadcrumb})
+    )
+
+@app.route('/request-account')
+def request_account():
+    return render_template(
+        'request-account.html'
+    )
+
+@app.route('/suggest-corrections/')
+def suggest_corrections():
+    return render_template(
+        'suggest-corrections.html',
+        item_title = request.args.get('ittt'),
+        rec_id = request.args.get('rcid'),
+        item_url = request.args.get('iurl'),
+        title_slug = lazy_gettext(u'Suggest Corrections'),
+        hide_right_column = True
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
