@@ -31,9 +31,44 @@
       </div>
       <div class="collections access"> <!-- Access -->
         <h2>{% trans %}Access{% endtrans %}</h2>
-        <p><i class="fa fa-user" aria-hidden="true"></i> {% trans %}Logged In{% endtrans %}</p>
-        <p><a href="/access-terms">Terms of Access</a></p>
-        <!-- <p><a href="http://dma.uchicago.edu/forms/request-research-access">Request Research Access</a></p> -->
+        <ul>
+          {% if not cnet_id %}
+            <li>
+              <a href="http://www.lib.uchicago.edu/myaccount"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
+            </li>
+            <li>
+              <a href="/request-account">{% trans %}Request an Account{% endtrans %}</a><br>
+            </li>
+          {% else %}
+            <li>
+              <i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Logged In{% endtrans %}<br>
+            </li>
+          {% endif %}
+          {% if is_restricted%}
+            {% if cnet_id%}
+              <li>
+                <form action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
+                  <input type="hidden" name="rcpt" value="vitor">
+                  {# <input type="hidden" name="whom" value="MLC website"> #}
+                  <input type="hidden" name="from" value="MLC website">
+                  {# <input type="hidden" name="vrfy" value="trivial"> #}
+                  <input type="hidden" name="subject" value="Request access for MLC series">
+                  <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
+                  <input type="hidden" name="Series ID" value="{{ series_id }}" required>
+                  <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
+                </form>
+              </li>
+            {% else %}
+              <li>
+                <button onclick="alert('{% trans %}Request an account before requesting access.{% endtrans %}')">{% trans %}Request Access to this Series/Item{% endtrans %}</button>
+              </li>
+            {% endif %}
+          {% endif %}
+          <li>
+            <a href="/access-terms">Terms of Access</a><br>
+          </li>
+        </ul>
+        {#<p>-<a href="http://dma.uchicago.edu/forms/request-research-access">[DMA]-Request-Research-Access</a>-</p><br> #}
       </div>
     </div>
     <div class="col-xs-6 col-sm-12">
@@ -52,12 +87,6 @@
         {% set ts = "ittt=" ~ title_slug if title_slug else "" %}
         {% if identifier %}
           {% set ri = "rcid=" ~ identifier.0 %}
-        {#
-        {% elif query_field %}
-          {% set ri = "rcid=" ~ query_field %}
-        {% elif browse_type %}
-          {% set ri = "rcid=" ~ browse_type %}
-          #}
         {% endif %}
         {% set ru = "iurl=" ~ request.url | urlencode if request.url else "" %}
         <p><a href="/suggest-corrections?{{ ts }}&{{ ri }}&{{ ru }}">{% trans %}Suggest Corrections{% endtrans %}</a></p>
