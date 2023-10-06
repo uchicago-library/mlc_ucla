@@ -250,6 +250,9 @@ ul.no-style-list{
 	color: black;
 	text-decoration: none !important;
 }
+.items-listing .item-card span.text-muted{
+	color: #949494;
+}
 .items-listing .item-card span.item-card-title{
 	max-width: 100%;
   white-space: nowrap;
@@ -286,6 +289,11 @@ ul.no-style-list{
 .items-listing .item-card .item-card-title-row .item-icon{
   top: .3rem;
   position: relative;
+}
+@media (min-width:500px) and (max-width:992px){
+	.items-listing li{
+  	width: 50%;
+	}
 }
 
 .sr-link-in-row:not(:last-child){

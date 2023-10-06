@@ -458,6 +458,13 @@ def series(noid):
         ))
     items.sort(key=sortListOfItems)
 
+    grouped_items = {}
+    for i in items:
+        medium = i[1]['medium'][0]
+        if medium not in grouped_items:
+            grouped_items[medium] = []        
+        grouped_items[medium].append(i[1])
+
     try:
         title_slug = series_data['titles'][0]
     except (IndexError, KeyError):
@@ -466,7 +473,7 @@ def series(noid):
     return render_template(
         'series.html',
         **(series_data | {
-            'items': items,
+            'grouped_items': grouped_items,
             'title_slug': title_slug,
             'access_rights': get_access_label_obj(series_data)
         })
