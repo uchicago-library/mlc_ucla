@@ -40,6 +40,11 @@ def inject_dict():
             cnetid = request.environ["REMOTE_USER"]
     return {
         'cnet_id' : cnetid,
+        'cgimail' : {
+            'request_access': 'vitor',
+            'request_account': 'vitor',
+            'feedback': 'vitor',
+        },
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
@@ -221,7 +226,7 @@ access_key = {
         'class': ''
     },
     'public domain':  {
-        'trans': lazy_gettext(u'Public Domain'),
+        'trans': lazy_gettext(u'Open'),
         'class': 'success'
     }
 }

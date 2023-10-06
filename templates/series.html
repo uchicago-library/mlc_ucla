@@ -5,89 +5,91 @@
     <div class="title-wrapper">
       <h1>
         <strong>{% trans %}Series Title{% endtrans %}:</strong> {{ title_slug }}
-        <span class="text-muted-extra"> {{ identifier.0 }}</span>
       </h1>
-      <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+      <div class="title-id-badge">
+        <!-- <span class="text-muted-extra"> {{ identifier.0 }}</span> -->
+        <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+      </div>
     </div>
 
-    <dl>
-      {% if alternative_title %}
-        <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
-        <dd>
-          {% for i in alternative_title %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+    <div class="object-metadata">
+      <dl>
+        {% if alternative_title %}
+          <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
+          <dd>
+            {% for i in alternative_title %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if identifier %}
-        <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
-        <dd>
-          {% for i in identifier %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if identifier %}
+          <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
+          <dd>
+            {% for i in identifier %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      <dt>{% trans %}Collection{% endtrans %}:</dt>
-      <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
+        <dt>{% trans %}Collection{% endtrans %}:</dt>
+        <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
 
-      {% if creator %}
-        <dt>{% trans %}Creator{% endtrans %}:</dt>
-        <dd>
-          {% for i in creator %}
-            <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if creator %}
+          <dt>{% trans %}Creator{% endtrans %}:</dt>
+          <dd>
+            {% for i in creator %}
+              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if subject_language %}
-        <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
-        <dd>
-          {% for i in subject_language %}
-            <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if subject_language %}
+          <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
+          <dd>
+            {% for i in subject_language %}
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if primary_language %}
-        <dt>{% trans %}Language{% endtrans %}:</dt>
-        <dd>
-          {% for i in primary_language %}
-            <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if primary_language %}
+          <dt>{% trans %}Language{% endtrans %}:</dt>
+          <dd>
+            {% for i in primary_language %}
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if location %}
-        <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
-        <dd>
-          {% for i in location %}
-            <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if location %}
+          <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
+          <dd>
+            {% for i in location %}
+              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if date %}
-        <dt>{% trans %}Date{% endtrans %}:</dt>
-        <dd>
-          {% for i in date %}
-            <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if date %}
+          <dt>{% trans %}Date{% endtrans %}:</dt>
+          <dd>
+            {% for i in date %}
+              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if description %}
-        <dt>{% trans %}Description{% endtrans %}:</dt>
-        <dd>
-          {% for i in description %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
-
-    </dl>
-
+        {% if description %}
+          <dt>{% trans %}Description{% endtrans %}:</dt>
+          <dd>
+            {% for i in description %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
+      </dl>
+    </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
     {% for medium, item_list in grouped_items.items() %}
       <h3>{{ medium }}</h3>

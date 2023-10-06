@@ -1,42 +1,3 @@
-{% set language_to_code = {
-"Mam": "mam",
-"Spanish": "spa",
-"K'iche'": "quc",
-"Tzotzil": "tzo",
-"Tzeltal": "tzh",
-"Yucatec Maya": "yua",
-"English": "eng",
-"Q'anjob'al": "kjb",
-"Tlaxcala-Puebla-Central Nahuatl": "nhn",
-"Ng\u00e4bere": "gym",
-"Huastec": "hus",
-"Classical Nahuatl": "nci",
-"Highland Totonac": "tos",
-"Purepecha": "tsz",
-"Buglere": "sab",
-"Central Guerrero Nahuatl": "ngu",
-"Akateko": "knj",
-"Popti'": "jac",
-"Chuj": "cac",
-"Kekch\u00ed": "kek",
-"Aguacateco": "agu",
-"Zapotec": "zap",
-"Ixcatec": "ixc",
-"Ixil": "ixl",
-"Mezquital Otomi": "ote",
-"Chol": "ctu",
-"Tojolabal": "toj",
-"Central Huasteca Nahuatl": "nch",
-"Poqomchi'": "poh",
-"Poqomam": "poc",
-"Pipil": "ppl",
-"Mop\u00e1n Maya": "mop",
-"Huichol": "hch",
-"German": "deu",
-"Mocho": "mhc",
-"Garifuna": "cab",
-"Huautla Mazatec": "mau"
-} %}
 <li class="col-xs-12 col-md-6 col-lg-4">
   <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
     <div class="item-card-title-row">
@@ -60,10 +21,13 @@
       {% endif %}
     </div>
     <div class="item-card-content-row">
-      <span title="Subject language">
-        {% for lan in item.subject_language %}
-          {{ language_to_code[lan]|upper }}{{ ", " if not loop.last else "" }}
-        {% endfor %}
+        <span title="Subject language">
+        {% if item.subject_language %}
+          <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
+          {% for lan in item.subject_language %}
+            {{ lan }}{{ ", " if not loop.last else "" }}
+          {% endfor %}
+        {%  endif %}
       </span>
       <span class="text-muted-extra">{{ item.identifier.0 }}</span>
     </div>

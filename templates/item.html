@@ -24,118 +24,118 @@
         </dd>
       {% endif %}
     </span>
-    <dl>
+    <div class="object-metadata">
+      <dl>
+        {% if titles %}
+          <dt>{% trans %}Item Title{% endtrans %}:</dt>
+          <dd>
+            {% for i in titles %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if titles %}
-        <dt>{% trans %}Item Title{% endtrans %}:</dt>
-        <dd>
-          {% for i in titles %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if identifier %}
+          <dt>{% trans %}Item Identifier{% endtrans %}:</dt>
+          <dd>
+            {% for i in identifier %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if identifier %}
-        <dt>{% trans %}Item Identifier{% endtrans %}:</dt>
-        <dd>
-          {% for i in identifier %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if contributor %}
+          <dt>{% trans %}Contributor{% endtrans %}:</dt>
+          <dd>
+            {% for i in contributor %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if contributor %}
-        <dt>{% trans %}Contributor{% endtrans %}:</dt>
-        <dd>
-          {% for i in contributor %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if subject_language %}
+          <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
+          <dd>
+            {% for i in subject_language %}
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if subject_language %}
-        <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
-        <dd>
-          {% for i in subject_language %}
-            <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if primary_language %}
+          <dt>{% trans %}Language{% endtrans %}:</dt>
+          <dd>
+            {% for i in primary_language %}
+              <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if primary_language %}
-        <dt>{% trans %}Language{% endtrans %}:</dt>
-        <dd>
-          {% for i in primary_language %}
-            <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if location %}
+          <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
+          <dd>
+            {% for i in location %}
+              <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if location %}
-        <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
-        <dd>
-          {% for i in location %}
-            <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a><br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if date %}
+          <dt>Date:</dt>
+          <dd>
+            {% for i in date %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if date %}
-        <dt>Date:</dt>
-        <dd>
-          {% for i in date %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if description %}
+          <dt>{% trans %}Description{% endtrans %}:</dt>
+          <dd>
+            {% for i in description %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if description %}
-        <dt>{% trans %}Description{% endtrans %}:</dt>
-        <dd>
-          {% for i in description %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if linguistic_data_type %}
+          <dt>{% trans %}Linguistic Data Type{% endtrans %}:</dt>
+          <dd>
+            {% for i in linguistic_data_type %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if linguistic_data_type %}
-        <dt>{% trans %}Linguistic Data Type{% endtrans %}:</dt>
-        <dd>
-          {% for i in linguistic_data_type %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if discourse_type %}
+          <dt>{% trans %}Discourse Type{% endtrans %}:</dt>
+          <dd>
+            {% for i in discourse_type %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if discourse_type %}
-        <dt>{% trans %}Discourse Type{% endtrans %}:</dt>
-        <dd>
-          {% for i in discourse_type %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if content_type %}
+          <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
+          <dd>
+            {% for i in content_type %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if content_type %}
-        <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
-        <dd>
-          {% for i in content_type %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
+        {% if medium %}
+          <dt>{% trans %}Media Type{% endtrans %}:</dt>
+          <dd>
+            {% for i in medium %}
+              {{ i }}<br>
+            {% endfor %}
+          </dd>
+        {% endif %}
 
-      {% if medium %}
-        <dt>{% trans %}Media Type{% endtrans %}:</dt>
-        <dd>
-          {% for i in medium %}
-            {{ i }}<br>
-          {% endfor %}
-        </dd>
-      {% endif %}
-
-    </dl>
-
+      </dl>
+    </div>
     <h2>{% trans %}Part of Series{% endtrans %}</h2>
     <ul>
     {% for serie in series %}
@@ -147,7 +147,7 @@
     
     {% if has_format %}
       <hr>
-      <h2>{% trans %}Has Format{% endtrans %}</h2>
+      <h2>{% trans %}Converted to{% endtrans %}</h2>
       {% for medium, item_list in has_format.items() %}
         <h3>{{ medium }}</h3>
         <div class="items-listing">
@@ -166,7 +166,7 @@
     
     {% if is_format_of %}
       <hr>
-      <h2>{% trans %}Is Format of{% endtrans %}</h2>
+      <h2>{% trans %}Converted from{% endtrans %}</h2>
       {% for medium, item_list in is_format_of.items() %}
         <h3>{{ medium }}</h3>
         <div class="items-listing">

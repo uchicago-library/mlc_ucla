@@ -8,10 +8,10 @@
         <p>{% trans %}
           Small paragraph briefly explaining that a user can request a temporary account to access restricted content, that it is done case-by-case, and what to expect after they fill in the form.
         {% endtrans %}</p>
-  <form id="suggestCorrections" class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
+  <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
     <div class="row">
       <div class="col-xs-12">
-        <input type="hidden" name="rcpt" value="vitor">
+        <input type="hidden" name="rcpt" value="{{cgimail.request_account}}">
         {# <input type="hidden" name="whom" value="MLC website"> #}
         <input type="hidden" name="from" value="MLC website">
         {# <input type="hidden" name="vrfy" value="trivial"> #}

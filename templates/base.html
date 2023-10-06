@@ -46,38 +46,41 @@
   </div>
   <div>
     {% include "header.html" %}
+    <div class="mlc-banner">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            <p>Indigenous Mesoamerican Languages Portal</p>
+          </div>
+        </div>
+      </div>
+      </div>
 
     <!-- Awesome Page Content -->
-    <div class="container-fluid"> <!-- Main Container Wrapper -->
-      <div class="row"> <!-- Banner -->
-        <div class="col-xs-12 mlc-banner"> 
-          <p>Indigenous Mesoamerican Languages Portal</p>
+    <div class="container"> <!-- Main Container Wrapper -->
+      <div class="row"> <!-- Off Canvas Wrapper Row -->
+        <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
+        <div class="col-xs-9 breadcrumbs">
+          <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
+          <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
+          <a href="/">{{ trans.collection_title }}</a> 
+          {% if breadcrumb or title_slug %}
+            &gt;
+            {{ breadcrumb|safe or title_slug}}
+          {% endif %}
+        </div> <!-- // Breadcrumbs -->
+        <div class="col-xs-3 text-right">
+          <form action="/language-change" method="POST">
+            <button type="submit"class="btn language-selector-btn">
+              <span class="lang-en">EN</span>/<span class="lang-es">ES</span>
+            </button>
+          </form>
+          <!-- locale is:{{ locale }} -->
         </div>
       </div>
 
-      <div class="row"> <!-- Off Canvas Wrapper Row -->
-        <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
-          <div class="col-xs-9 breadcrumbs">
-            <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
-            <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
-            <a href="/">{{ trans.collection_title }}</a> 
-            {% if breadcrumb or title_slug %}
-              &gt;
-              {{ breadcrumb|safe or title_slug}}
-            {% endif %}
-          </div> <!-- // Breadcrumbs -->
-          <div class="col-xs-3 text-right">
-            <form action="/language-change" method="POST">
-              <button type="submit"class="btn language-selector-btn">
-                <span class="lang-en">EN</span>/<span class="lang-es">ES</span>
-              </button>
-            </form>
-            <!-- locale is:{{ locale }} -->
-          </div>
-        </div>
-
         <div class="row">
-          <div class="col-xs-12 pt-5 main-content">
+          <div id="content" class="col-xs-12 pt-5 main-content">
             <div class="row">
 
               <div class="col-xs-12 {{ 'col-sm-8 col-md-8 col-lg-9' if not hide_right_column else 'col-md-12' }}">
