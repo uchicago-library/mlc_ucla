@@ -389,14 +389,14 @@ def item(noid):
         series[0][1]['titles'][0],
         item_data['titles'][0]
     )
-
+    
     return render_template(
         'item.html',
         **(item_data | {'series': series,
-                        'title_slug': title_slug,
-                        'access_rights': get_access_label_obj(item_data),
-                        'panopto_identifier': panopto_identifier,
-                        'breadcrumb': breadcrumb})
+            'title_slug': title_slug,
+            'access_rights': get_access_label_obj(item_data),
+            'panopto_identifier': panopto_identifier,
+            'breadcrumb': breadcrumb})
     )
 
 @app.route('/search/')
