@@ -361,9 +361,7 @@ def search():
 
         series_data['sub_items'] = []
         for i in db_series[1]:
-            info = mlc_db.get_item_info(i)
-            # JEJ
-            print(json.dumps(info, indent=2))
+            info = mlc_db.get_item(i)
             series_data['sub_items'].append(info)
         series_data['sub_items'].sort(key=sortListOfItems)
         processed_results.append((db_series[0], series_data))
@@ -436,10 +434,7 @@ def item(noid):
         )
         abort(400)
 
-    item_data = mlc_db.get_item(BASE + noid)
-
-    # JEJ
-    print(json.dumps(item_data, indent=2))
+    item_data = mlc_db.get_item(BASE + noid, True)
 
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]

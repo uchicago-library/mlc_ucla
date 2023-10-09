@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import sqlite3
@@ -534,7 +535,7 @@ class MLCGraph:
             panopto_links.add(str(row[0]))
         data['panopto_links'] = list(panopto_links)
 
-        # panopto identifiers (JEJ TESTING)
+        # panopto identifiers
         panopto_identifiers = set()
         panopto_prefix = 'https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id='
         for row in self.graph.query(
@@ -1541,12 +1542,13 @@ class MLCDB:
             results.append((row[0], json.loads(row[1]), row[2]))
         return results
 
-    def get_item(self, identifier):
+    def get_item(self, identifier, get_format_relationships=False):
         """
         Get item metadata.
 
         Parameters:
             identifier (str): item identifier.
+            get_format_relationships (bool): get format relationships.
 
         Returns:
             dict: a metadata dictionary.
@@ -1554,41 +1556,17 @@ class MLCDB:
         if not self.con:
             self.connect()
 
-        info = json.loads(
-            self.cur.execute(
-                'select info from item where id = ?',
-                (identifier,)
-            ).fetchone()[0]
-        )
+        info = copy.deepcopy(self._item_info[identifier])
 
         # load item hasFormat / isFormatOf relationships
-        for p in ('has_format', 'is_format_of'):
-            if p in info:
-                for m in info[p].keys():
-                    for i in range(len(info[p][m])):
-                        url = info[p][m][i]
-                        for row in self.cur.execute(
-                            'select info from item where id = ?;',
-                            (url,)
-                        ).fetchall():
-                            info[p][m][i] = json.loads(row[0])
-
+        if get_format_relationships:
+            for p in ('has_format', 'is_format_of'):
+                if p in info:
+                    for m in info[p].keys():
+                        for i in range(len(info[p][m])):
+                            url = info[p][m][i]
+                            info[p][m][i] = self._item_info[url]
         return info
-
-    def get_item_info(self, item_id):
-        """
-        Get info dict for an item.
-
-        Parameters:
-            item_id (str): item identifier.
-
-        Returns:
-            dict: a dictionary of item information.
-        """
-        if not self.con:
-            self.connect()
-
-        return self._item_info[item_id]
 
     def get_item_list(self):
         """
