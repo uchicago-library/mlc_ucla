@@ -3,14 +3,22 @@ doesn't seem necessary. */
 /*.digitalobjectpage .body-container{
 	padding: 0;
 }*/
-html{
-	font-size: 14px;
+html{	font-size: 14px; }
+body{	color: #000 }
+pre{	text-wrap: wrap; }
+a{		color: #3174ae }
+.breadcrumbs{ padding-left: 15px; }
+
+.main-content{padding-top: 2rem; }
+@media (min-width: 1400px){
+	.container {
+	    width: 1300px;
+	}
 }
-pre{
-	text-wrap: wrap;
-}
-.main-content{
-	padding-top: 2rem;
+@media (min-width: 1500px){
+	.container {
+	    width: 1400px;
+	}
 }
 .navbar-default .navbar-toggle .icon-bar {
     background-color: #fff;
@@ -83,6 +91,8 @@ h1{
   padding-left: 1rem;
   margin-bottom: 0;
   margin-top: 0;
+  line-height: 1.5em;
+  display: inline-block;
 }
 
 /* ======= UTILS */
@@ -211,6 +221,7 @@ ul.no-style-list{
 .search-results-page ul li.search-result .search-results-series-title{
 	display: flex;
 	align-items: flex-start;
+	margin: 0;
 }
 .search-results-page ul li.search-result .search-results-series-title>*:not(:last-child){
 	margin-right: 0.5rem
@@ -229,22 +240,26 @@ ul.no-style-list{
 	margin: 0;
 }
 
-.series-metadata .sr-link-in-row{
+.object-metadata .sr-link-in-row{
 	color: inherit;
 }
-.series-metadata dl{
+.object-metadata dl{
 	display: flex;
   flex-wrap: wrap;
   margin: 0;
 }
-.series-metadata dt{
+.object-metadata dt{
 	border-top: none;
 	border-bottom: 1px dashed #ddd;
-	color: #777;/* same as .text-muted */
+	color: #757575;/* same as .text-muted */
 	padding: 0;
-	max-width: 180px;
 }
-.series-metadata dd{
+@media (min-width:992px){
+	.object-metadata dt{
+		max-width: 180px;
+	}
+}
+.object-metadata dd{
 	border-top: none;
 	border-bottom: 1px dashed #ddd;
 	padding: 0 0 0 .5rem;
@@ -268,7 +283,7 @@ ul.no-style-list{
 	text-decoration: none !important;
 }
 .text-muted-extra{
-	color: #949494 !important;
+	color: #757575 !important;
 }
 .items-listing .item-card span.item-card-title{
 	max-width: 100%;
@@ -299,6 +314,11 @@ ul.no-style-list{
 .items-listing .item-card .item-card-title-row>*:first-child,
 .items-listing .item-card .item-card-content-row>*:first-child {
   flex-grow: 1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 1rem;
 }
 .items-listing .item-card .item-card-content-row p{
   margin: 0;
@@ -367,11 +387,14 @@ ul.no-style-list{
 	flex-grow: 1;
 	margin: 0;
 }
-/*.title-wrapper .badge{
-	position: absolute;
-	top: 0;
-	right: 0;
-}*/
+.title-wrapper .title-id-badge{
+	display: flex;
+	flex-direction: column;    
+	align-items: flex-end;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
 
 /* Panopto */
 .panopto-iframe{

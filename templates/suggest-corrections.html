@@ -5,34 +5,44 @@
   <div class="title-wrapper">
     <h1>{% trans %}Suggest Corrections{% endtrans %}</h1>
   </div>
-  <form id="suggestCorrections" class="gray-surface" action="" method="">
+  <form id="suggestCorrections" class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
+    <div class="row">
+      <div class="col-xs-12">
+
+
+  <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
+    <input type="hidden" name="rcpt" value="{{cgimail.feedback}}">
+    {# <input type="hidden" name="whom" value="MLC website"> #}
+    <input type="hidden" name="from" value="MLC website">
+    {# <input type="hidden" name="vrfy" value="trivial"> #}
+    <input type="hidden" name="subject" value="Feedback about MLC website">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-sm-push-6">
           
         <div class="form-group">
-          <label for="scItemTitle">{% trans %}Item Title{% endtrans %}</label>
-          <input type="text" class="form-control" id="scItemTitle" value="{{ item_title }}" readonly>
+          <label for="scItemTitle">{% trans %}Series or Item Title{% endtrans %}</label>
+          <input type="text" class="form-control" id="scItemTitle" name="Series or Item Title" value="{{ item_title }}" readonly>
         </div>
         {% if rec_id %}
           <div class="form-group">
-            <label for="scRecordIdentifier">{% trans %}Record Identifier{% endtrans %}</label>
-            <input type="number" class="form-control" id="scRecordIdentifier" value="{{ rec_id }}" readonly>
+            <label for="scRecordIdentifier">{% trans %}Series or Item Identifier{% endtrans %}</label>
+            <input type="number" class="form-control" id="scRecordIdentifier" name="Series or Item Identifier" value="{{ rec_id }}" readonly>
           </div>
         {% endif %}
         <div class="form-group">
-          <label for="scItemURL">{% trans %}Item URL{% endtrans %}</label>
-          <input type="url" class="form-control" id="scItemURL" value="{{ item_url }}" readonly>
+          <label for="scItemURL">{% trans %}Series or Item URL{% endtrans %}</label>
+          <input type="url" class="form-control" id="scItemURL" name="Series or Item URL" value="{{ item_url }}" readonly>
         </div>
       </div>
       <div class="col-xs-12 col-sm-6 col-sm-pull-6">
 
           <div class="form-group">
             <label for="scName">{% trans %}Name{% endtrans %}*</label>
-            <input type="text" class="form-control" id="scName" placeholder="{% trans %}Enter your name{% endtrans %}" required>
+            <input type="text" class="form-control" id="scName" name="User's name" placeholder="{% trans %}Enter your name{% endtrans %}" required>
           </div>
           <div class="form-group">
             <label for="scEmail">{% trans %}Email address{% endtrans %}*</label>
-            <input type="email" class="form-control" id="scEmail" placeholder="{% trans %}Enter your email address{% endtrans %}" required>
+            <input type="email" class="form-control" id="scEmail" name="User's Email" placeholder="{% trans %}Enter your email address{% endtrans %}" required>
           </div>
           <div class="form-group">
             <label for="scSuggestions">{% trans %}Problems, comments, questions, or suggestions{% endtrans %}*</label>
@@ -40,7 +50,7 @@
               {% trans %}Please use the area below to report errors, omissions, or other issues in the description of this collection.{% endtrans %} 
               {% trans %}Corrections may include misspellings, incorrect or missing dates, misidentified languages, individuals, locations, pointing out outdated or harmful terminology/language, etc.{% endtrans %}
             </p>
-            <textarea class="form-control" rows="3" id="scSuggestions" placeholder="{% trans %}Provide a description of the correction{% endtrans %}" required></textarea>
+            <textarea class="form-control" rows="3" id="scSuggestions" name="User's Message" placeholder="{% trans %}Provide a description of the correction{% endtrans %}" required></textarea>
           </div>
           <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
       </div>

@@ -48,7 +48,7 @@
             {% if cnet_id%}
               <li>
                 <form action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-                  <input type="hidden" name="rcpt" value="vitor">
+                  <input type="hidden" name="rcpt" value="{{cgimail.request_access}}">
                   {# <input type="hidden" name="whom" value="MLC website"> #}
                   <input type="hidden" name="from" value="MLC website">
                   {# <input type="hidden" name="vrfy" value="trivial"> #}
