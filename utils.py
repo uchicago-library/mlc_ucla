@@ -700,14 +700,14 @@ class MLCGraph:
             for row in r:
                 search_tokens.append(str(row[0]))
 
-        # edm:datasetName
+        # fn:collection
         r = self.graph.query(
             prepareQuery('''
-                PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+                PREFIX fn: <http://www.w3.org/2005/xpath-functions>
 
                 SELECT ?o
                     WHERE {
-                        ?series_aggregation_id edm:datasetName ?o .
+                        ?series_aggregation_id fn:collection ?o .
                    }
             '''),
             initBindings={
@@ -716,10 +716,11 @@ class MLCGraph:
             }
         )
         lookup = {
-            'DMA': 'Digital Media Archive'
+            'dma': 'Digital Media Archive'
         }
         for row in r:
-            search_tokens.append(lookup[str(row[0])])
+            if str(row[0]) in lookup:
+                search_tokens.append(lookup[str(row[0])])
 
         # dc:language
         r = self.graph.query(
@@ -1004,7 +1005,6 @@ class MLCGraph:
         """
         data = {}
 
-        # edm:datasetName translate "DMA" to "Digital Media Archive"
         # language (indigenous and interview)
 
         for label, p in {
