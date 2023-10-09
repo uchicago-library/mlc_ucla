@@ -3,13 +3,9 @@ import os
 import sqlite3
 import urllib.parse
 import rdflib
-import requests
-import requests_cache
 from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
-
-requests_cache.install_cache('requests_cache')
 
 
 def regularize_string(_):
@@ -538,24 +534,24 @@ class MLCGraph:
             panopto_links.add(str(row[0]))
         data['panopto_links'] = list(panopto_links)
 
-        # panopto identifiers
+        # panopto identifiers (JEJ TESTING)
         panopto_identifiers = set()
-        for panopto_link in panopto_links:
-            try:
-                r = requests.head(panopto_link, allow_redirects=True)
-                identifier = urllib.parse.parse_qs(
-                    urllib.parse.urlparse(
-                        urllib.parse.parse_qs(
-                            urllib.parse.urlparse(r.url).query
-                        )['ReturnUrl'][0]
-                    ).query
-                )["id"][0]
-                panopto_identifiers.add(identifier)
-            except requests.exceptions.ConnectionError:
-                data['panopto_links'].remove(panopto_link)
-                print(
-                    'unable to retrieve panopto identifier from ' +
-                    panopto_link)
+        panopto_prefix = 'https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id='
+        for row in self.graph.query(
+            prepareQuery('''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
+
+                SELECT ?identifier
+                WHERE {
+                    ?web_resource dcterms:identifier ?identifier
+                }
+            '''),
+            initBindings={
+                'web_resource': rdflib.URIRef(item_id + '/file.wav')
+            }
+        ):
+            if str(row[0]).startswith(panopto_prefix):
+                panopto_identifiers.add(str(row[0]).replace(panopto_prefix, ''))
         data['panopto_identifiers'] = list(panopto_identifiers)
 
         # access rights
