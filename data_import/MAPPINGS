@@ -1,0 +1,25 @@
+TypeItemContent_t_Item	bf:content	ProvidedCHO
+Contents_t_Collection	dc:description	ProvidedCHO
+Content_t_Item	dc:description	ProvidedCHO
+__kp_CollectionID_Collection	dc:identifier	ProvidedCHO
+__kp_ItemID_Item	dc:identifier	ProvidedCHO
+CodesAccess_t_Collection	dcterms:accessRights	ProvidedCHO
+title_CollectionTitles	dcterms:alternative	ProvidedCHO
+title_ItemTitle	dcterms:alternative	ProvidedCHO
+GeoNameID_n_Coverage	dcterms:spatial	ProvidedCHO
+DateCreationRangeDisplay_t_Item	dcterms:temporal	ProvidedCHO
+title_CollectionTitles	dc:title	ProvidedCHO
+title_CollectionTitles	dcterms:title	ProvidedCHO
+title_ItemTitle	dc:title	ProvidedCHO
+title_ItemTitle	dcterms:title	ProvidedCHO
+TypeDMAContent_t_Item	dma:contentType	ProvidedCHO
+TypeOLACData_t_Item	dma:olacLinguisticDataType	ProvidedCHO
+TypeDiscourse_t_Item	olac:discourseType	ProvidedCHO
+#
+#dc:contributor: If role_ItemContributors [speaker, consultant, performer, participant, singer] then dc:contributor name_ItemContributors (please refer to row 6 in the mapping interface elements spreadsheet: https://uchicago.box.com/s/xtmwhzac02d5px6kzf1wkf6pvn2n2aj6)
+#
+#dc:creator: If role_ItemContributors [author, researcher, interviewer, compiler, translator, editor, depositor, recorder] then dc:creator name_ItemContributors (please refer to row 6 in the mapping interface elements spreadsheet: https://uchicago.box.com/s/xtmwhzac02d5px6kzf1wkf6pvn2n2aj6)
+#
+#Note:
+#If bf:content [performed music; spoken word] then dc:type Sound and edm:type SOUND
+#If bf:content [text] then dc:type Text and edm:type TEXT

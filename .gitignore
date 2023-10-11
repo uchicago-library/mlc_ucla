@@ -7,3 +7,5 @@ db.sql
 *.sqlite
 flask_session/
 *.pyc
+data_import/local_db/
+data_import/export*

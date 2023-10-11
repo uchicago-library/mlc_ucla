@@ -108,3 +108,75 @@ convert csv back to po
 
 compile the translations
 `pybabel compile -d translations`
+
+## Converting FileMaker to Linked Data
+
+Getting data from FileMaker to the triplestore is a multi-step process. First, export the FileMaker database as a sequence of XLSX files. Then import those XLSX files into a local SQLite database, and finally produce triples from that SQLite database. 
+
+You need to use FileMaker 18 to work with this database. Do not upgrade to FileMaker 19. 
+
+Scripts for importing data are in the data_import directory.
+
+### Exporting the FileMaker database as a sequence of XLSX files
+
+1. Save the exported database in a local_db directory. I rename each database
+   to include a datestamp, like LA_ACS.yyyymm.fmp12.
+2. Create a new export directory using the following format:
+   export.&lt;yyyy&gt;.&lt;mm&gt; where yyyy and mm are the current year and month.
+3. Open the database. The encryption password and password for the user "Admin"
+   are the same- after you have entered the encryption password be sure to 
+   log in as the "Admin" user.
+4. import.py contains a dictionary of filenames/layouts and database tables. For each:
+    1. Go to the "Items" layout in FileMaker.
+    2. Go to File > Manage > Layouts.
+    3. Click "New", "Layout/Report" in the lower left corner. 
+    4. Under "Show records from" select the basename of the filename from
+       import.py.
+    5. Under "Layout Name" enter export_&lt;basename&gt;. 
+    6. Below, select "Computer" and "Table". 
+    7. Click "Finish". 
+    8. Under "Add Fields", select all fields. 
+    9. Click "OK". 
+    10. Go to the "Items" layout.
+    11. Select the new layout, "export_&lt;basename&gt;". 
+    12. Go to File > Export Records. 
+    13. Under "Save As" enter "&lt;basename&gt;.xlsx". 
+    14. Save the table export in your export.&lt;yyyy&gt;.&lt;mm&gt; directory.
+    15. Under "Type" select "Excel Workbooks (.xlsx)". 
+    16. Be sure the "Use field names as column names in first row" boolean is
+       checked. It's ok to leave all other fields blank. Click "Continue..."
+    17. Under "Specify Field Order for Export", click "Move All". Click "Export".
+       Repeat for each file. 
+5. Run python check_FM_to_XLSX_export.py to check the export directory.
+   This script will check to be sure that files are named correctly, and it
+   will report back on differences between the number of rows and columns in
+   the exported data. It's normal for the number of rows in export data to
+   differ when the data is being edited.
+
+### Importing data from XLSX to SQLite
+Run import.py to import the XLSX outputs from FileMaker into SQLite tables.
+
+### Check the import
+Run check_import.py. 
+
+### Build triples
+Run the following commands to export SQLite data as triples:
+time python sqlite_to_triples.py --mesoamerican | python kernel_metadata.py > mlp.big.yyyymmdd.ttl
+time python sqlite_to_triples.py --ucla | python kernel_metadata.py > ucla.big.yyyymmdd.ttl
+(as of February 2023, the ucla export takes longer, and runs in about 5.6 hours.)
+
+### find_value_in_database.py
+
+Find which database tables and fields contain a particular value. This command can be handy if you see a value in the FileMaker GUI and you're not exactly sure where it's being stored in the underlying database. 
+
+### Diagram relationships in the data
+Look at diagram_has_part_relationships.py for an example of how to do this. 
+
+### noid_to_panopto_mapping.py
+
+Create a NOID to Panopto mapping, for the ARK resolver.
+
+### tables.py
+
+List tables and fields in the SQLite database. Use -v for verbose output.
+

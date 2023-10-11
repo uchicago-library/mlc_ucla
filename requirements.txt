@@ -1,5 +1,7 @@
 docopt
 flask
+openpyxl
+pytz
 rdflib
 regex
 sqlite_dump
