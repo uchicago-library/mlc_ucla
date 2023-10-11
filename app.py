@@ -41,9 +41,18 @@ def inject_dict():
     return {
         'cnet_id' : cnetid,
         'cgimail' : {
-            'request_access': 'vitor',
-            'request_account': 'vitor',
-            'feedback': 'vitor',
+            'request_access': {
+                'rcpt': 'askscrc',
+                'subject': 'Request for an Account for MLC',
+            },
+            'request_account': {
+                'rcpt': 'askscrc',
+                'subject': 'Request access for MLC series',
+            }, 
+            'feedback': {
+                'rcpt': 'askscrc',
+                'subject': 'Feedback about Mesoamerican Language Collection Portal',
+            }, 
         },
         'locale': get_locale(),
         'trans': {

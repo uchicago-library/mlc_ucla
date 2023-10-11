@@ -11,11 +11,11 @@
   <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
     <div class="row">
       <div class="col-xs-12">
-        <input type="hidden" name="rcpt" value="{{cgimail.request_account}}">
+        <input type="hidden" name="rcpt" value="{{cgimail.request_account.rcpt}}">
         {# <input type="hidden" name="whom" value="MLC website"> #}
         <input type="hidden" name="from" value="MLC website">
         {# <input type="hidden" name="vrfy" value="trivial"> #}
-        <input type="hidden" name="subject" value="Request for an Account for MLC">
+        <input type="hidden" name="subject" value="{{cgimail.request_account.subject}}">
         <div class="form-group">
           <label for="name">{% trans %}Name{% endtrans %}*</label>
           <input type="text" class="form-control" id="name" name="Name" placeholder="{% trans %}Enter your name{% endtrans %}" required>
