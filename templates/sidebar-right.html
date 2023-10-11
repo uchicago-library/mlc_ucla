@@ -48,11 +48,11 @@
             {% if cnet_id%}
               <li>
                 <form action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-                  <input type="hidden" name="rcpt" value="{{cgimail.request_access}}">
+                  <input type="hidden" name="rcpt" value="{{cgimail.request_access.rcpt}}">
                   {# <input type="hidden" name="whom" value="MLC website"> #}
                   <input type="hidden" name="from" value="MLC website">
                   {# <input type="hidden" name="vrfy" value="trivial"> #}
-                  <input type="hidden" name="subject" value="Request access for MLC series">
+                  <input type="hidden" name="subject" value="{{cgimail.request_access.surrogate}}">
                   <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
                   <input type="hidden" name="Series ID" value="{{ series_id }}" required>
                   <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>

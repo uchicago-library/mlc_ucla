@@ -11,11 +11,11 @@
 
 
   <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-    <input type="hidden" name="rcpt" value="{{cgimail.feedback}}">
+    <input type="hidden" name="rcpt" value="{{cgimail.feedback.rcpt}}">
     {# <input type="hidden" name="whom" value="MLC website"> #}
     <input type="hidden" name="from" value="MLC website">
     {# <input type="hidden" name="vrfy" value="trivial"> #}
-    <input type="hidden" name="subject" value="Feedback about MLC website">
+    <input type="hidden" name="subject" value="{{cgimail.feedback.subject}}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-sm-push-6">
           

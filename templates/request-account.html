@@ -5,17 +5,18 @@
   <div class="title-wrapper">
     <h1>{% trans %}Request Account for Access{% endtrans %}</h1>
   </div>
-        <p>{% trans %}
-          Small paragraph briefly explaining that a user can request a temporary account to access restricted content, that it is done case-by-case, and what to expect after they fill in the form.
-        {% endtrans %}</p>
+        <p>
+          {% trans %}This form allows visitors without a UChicago ID to request an account with specific privileges to access the contents of the Mesoamerican Language Collection Portal that might be of controlled access. For more information visit /access-terms.
+          Please provide a brief summary of the purpose for your access. Account requests are analyzed on a case-by-case basis, and take typically 1 week to be processed.{% endtrans %}
+        </p>
   <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
     <div class="row">
       <div class="col-xs-12">
-        <input type="hidden" name="rcpt" value="{{cgimail.request_account}}">
+        <input type="hidden" name="rcpt" value="{{cgimail.request_account.rcpt}}">
         {# <input type="hidden" name="whom" value="MLC website"> #}
         <input type="hidden" name="from" value="MLC website">
         {# <input type="hidden" name="vrfy" value="trivial"> #}
-        <input type="hidden" name="subject" value="Request for an Account for MLC">
+        <input type="hidden" name="subject" value="{{cgimail.request_account.subject}}">
         <div class="form-group">
           <label for="name">{% trans %}Name{% endtrans %}*</label>
           <input type="text" class="form-control" id="name" name="Name" placeholder="{% trans %}Enter your name{% endtrans %}" required>
