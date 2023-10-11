@@ -8,12 +8,10 @@
   <form id="suggestCorrections" class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
     <div class="row">
       <div class="col-xs-12">
-
-
   <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
     <input type="hidden" name="rcpt" value="{{cgimail.feedback.rcpt}}">
     {# <input type="hidden" name="whom" value="MLC website"> #}
-    <input type="hidden" name="from" value="MLC website">
+    <input type="hidden" id="cgimailfrom" name="from" value="{{cgimail.default.from}}">
     {# <input type="hidden" name="vrfy" value="trivial"> #}
     <input type="hidden" name="subject" value="{{cgimail.feedback.subject}}">
     <div class="row">
@@ -42,7 +40,7 @@
           </div>
           <div class="form-group">
             <label for="scEmail">{% trans %}Email address{% endtrans %}*</label>
-            <input type="email" class="form-control" id="scEmail" name="User's Email" placeholder="{% trans %}Enter your email address{% endtrans %}" required>
+            <input type="email" class="form-control" id="scEmail" name="User's Email" placeholder="{% trans %}Enter your email address{% endtrans %}" onchange="document.getElementById('cgimailfrom').value =(this.value)" required>
           </div>
           <div class="form-group">
             <label for="scSuggestions">{% trans %}Problems, comments, questions, or suggestions{% endtrans %}*</label>

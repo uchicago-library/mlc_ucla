@@ -50,7 +50,7 @@
                 <form action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
                   <input type="hidden" name="rcpt" value="{{cgimail.request_access.rcpt}}">
                   {# <input type="hidden" name="whom" value="MLC website"> #}
-                  <input type="hidden" name="from" value="MLC website">
+                  <input type="hidden" name="from" value="{{cgimail.default.from}}">
                   {# <input type="hidden" name="vrfy" value="trivial"> #}
                   <input type="hidden" name="subject" value="{{cgimail.request_access.surrogate}}">
                   <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
@@ -81,7 +81,7 @@
           1-773-834-3181
         </p>
       </div>
-      <div class="collections access"> <!-- Feedback -->
+      <div class="collections feedback"> <!-- Feedback -->
         <h2>{% trans %}Feedback{% endtrans %}</h2>
         <!-- <p>Report errors, omissions, or other issues in the description of this collection.</p> -->
         {% set ts = "ittt=" ~ title_slug if title_slug else "" %}
