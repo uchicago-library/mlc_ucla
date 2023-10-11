@@ -46,11 +46,11 @@ def inject_dict():
             },
             'request_access': {
                 'rcpt': 'askscrc',
-                'subject': '[TEST] Request access for MLC series',
+                'subject': '[TEST] Request for access to MLC restricted series',
             },
             'request_account': {
                 'rcpt': 'askscrc',
-                'subject': '[TEST] Request for an Account for MLC',
+                'subject': '[TEST] Request for MLC account',
             }, 
             'feedback': {
                 'rcpt': 'vitor',
