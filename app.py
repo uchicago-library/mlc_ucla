@@ -53,7 +53,7 @@ def inject_dict():
                 'subject': '[TEST] Request for MLC account',
             }, 
             'feedback': {
-                'rcpt': 'vitor',
+                'rcpt': 'woken',
                 'subject': '[TEST] Feedback about Mesoamerican Language Collection Portal',
             }, 
         },
