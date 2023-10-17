@@ -40,8 +40,23 @@
           {% endfor %}
           </dd>
         {% endif %}
+        {% if result.1.creator %}
+          <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+          <dd>
+          {% if result.1.creator|length > 3 %}
+            {% for creator in result.1.creator[:3] %}
+              <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+            {% endfor %}
+            (+{{ result.1.creator|length -3 }})
+          {% else %}
+            {% for creator in result.1.creator %}
+              <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+            {% endfor %}
+          {% endif %}
+          </dd>
+        {% endif %}
         {% if result.1.contributor %}
-          <dt>{% trans %}Contributor{% endtrans %}:</dt>
+          <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
           {% if result.1.contributor|length > 3 %}
             {% for contributor in result.1.contributor[:3] %}
