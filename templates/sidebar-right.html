@@ -35,6 +35,14 @@
       <div class="collections access"> <!-- Access -->
         <h2>{% trans %}Access{% endtrans %}</h2>
         <ul>
+          <li>
+            <form action="/send-cgimail" method="POST">
+              sid:{{ series_id or 'empty'}}, cid: {{ cnet_id or 'empty'}}
+              <input type="hidden" name="cnetid" value="{{ cnet_id }}" required>
+              <input type="hidden" name="seriesid" value="{{ series_id }}" required>
+              <button type="submit">{% trans %}Request series access iii{% endtrans %}</button><br>
+            </form>
+          </li>
           {% if not cnet_id %}
             <li>
               <a href="http://www.lib.uchicago.edu/myaccount"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>

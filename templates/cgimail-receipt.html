@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="" id="content" role="main">
+    <h1>{{ title_slug }}</h1>
+
+    <h2>CGIMail Receipt</h2>
+    <pre>{{ request.args.cnetid }}</pre>
+    <pre>{{ request.args.seriesid }}</pre>
+
+
+    {% include 'elements-browse-bar.html' %}
+  </div>
+{% endblock %}

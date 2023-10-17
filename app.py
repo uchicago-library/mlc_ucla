@@ -6,6 +6,7 @@ import re
 import sqlite3
 import sqlite_dump
 import sys
+import requests
 from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
 from utils import MLCDB
@@ -279,10 +280,82 @@ def change_language():
         session['language'] = 'en'
     return redirect(request.referrer)
 
+
+
+
+
+
+
+@app.route('/send-cgimail', methods=['POST'])
+def send_cgimail():
+    cnet_id = request.form.get('cnetid')
+    series_id = request.form.get('seriesid')
+    # # for testing
+    # print("series id")
+    # print(series_id)
+    # goto = '/submission-receipt'
+    # goto += '?cnetid='+cnet_id+'&seriesid='+series_id
+    # if cnet_id and series_id:
+    # return redirect(goto)
+
+    args = {
+    'rcpt': 'vitor',
+    'from': 'misc@vitordesign.pt',
+    'subject': 'test cgimail iii',
+    'CNET ID': cnet_id or 'empty',
+    'Series ID': series_id or 'empty',
+    }
+
+    cgiurl = 'https://www.lib.uchicago.edu/cgi-bin/cgimail'
+    # ================= 1
+    # r = requests.post(cgiurl, json = args)
+    # r = requests.post(cgiurl, data = args)
+
+    # ================= 2
+    # headers = {'User-Agent': 'Mozilla/5.0'}
+    # payload = {'username':'niceusername','password':'123456'}
+
+    # session = requests.Session()
+    # r = session.post(cgiurl, headers = headers, data = args)
+    # ================= 3
+    reqt = requests.Request(
+        'POST',
+        cgiurl,
+        files ={
+            'rcpt': (None, args['rcpt']),
+            'from': (None, args['from']),
+            'subject': (None, args['subject']),
+            'CNET ID': (None, args['CNET ID']),
+            'Series ID': (None, args['Series ID']),
+        }
+    ).prepare()
+    s = requests.Session()
+    r = s.send(reqt)
+
+    print("response")
+    print(r.text)
+    # return Response(
+    #     r.text,
+    #     status=r.status_code,
+    #     content_type=r.headers['content-type'],
+    # )
+    goto = '/submission-receipt'
+    return redirect(goto)
+
+
+@app.route('/submission-receipt')
+def submission_receipt():
+    return (render_template('cgimail-receipt.html'),400)
+
+
+
+
+
+
+
 @app.errorhandler(400)
 def bad_request(e):
     return (render_template('400.html'), 400)
-
 
 @app.errorhandler(404)
 def not_found(e):
@@ -432,6 +505,8 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'is_restricted': series_data['access_rights'][0].lower() == 'restricted',
+            'series_id': series_data['identifier'][0],
             'access_rights': get_access_label_obj(series_data)
         })
     )
