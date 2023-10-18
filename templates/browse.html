@@ -6,21 +6,17 @@
       <h1>{{ title_slug }}</h1>
       {% if not request.args.sort == 'count' %}
         <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}&sort=count">
-        {# {% trans %}Sort by count{% endtrans %} #}
         <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
           </a>
       {% else %} 
-        <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}">
-        {#  {% trans %}Sort by name{% endtrans %} #}
+        <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}">\
         <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
           </a>
       {% endif %} 
     </div>
           
   <div class="browse-list-wrapper container-fluid">
-  <div class="row">
-    {# request.args: {{ request.args }}<br>
-    request.args.type: {{ request.args.type }}<br> #}
+  <div class="row">\
   </div>
     <ul class="row no-style-list">
       {% for b in browse_terms %}
