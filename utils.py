@@ -4,6 +4,7 @@ import os
 import sqlite3
 import urllib.parse
 import rdflib
+import sys
 from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
@@ -89,6 +90,8 @@ class MLCGraph:
                 }
             )
             for date_str, identifier in qres:
+                if str(date_str) == '(:unav)':
+                    continue
                 dates = []
                 for year in date_str.split('/'):
                     match = re.search('([0-9]{4})', year)
@@ -98,7 +101,11 @@ class MLCGraph:
                     dates.append(dates[0])
                 if len(dates) > 2:
                     dates = dates[:2]
-                year = dates[0]
+                try:
+                    year = dates[0]
+                except IndexError:
+                    print(date_str)
+                    sys.exit()
                 while year <= dates[1]:
                     decade = str(year)[:3] + '0s'
                     if decade not in browse_dict:
