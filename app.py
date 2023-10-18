@@ -336,25 +336,26 @@ def browse():
 
         results = mlc_db.get_browse_term(browse_type, browse_term, sort_field)
 
-        mod_results = []
+        results_with_label_ui_data = []
         for item in results:
             item_data = item[1]
             item_data['access_rights'] = get_access_label_obj(item_data)
-            mod_results.append((item[0], item_data))
+            results_with_label_ui_data.append((item[0], item_data))
 
         return render_template(
             'search.html',
             facets=[],
             query=browse_term,
             query_field=browse_type,
-            results=mod_results,
+            results=results_with_label_ui_data,
             title_slug=title_slug
         )
     else:
+        browse_sort = request.args.get('sort')
         return render_template(
             'browse.html',
             title_slug=title_slugs[browse_type],
-            browse_terms=mlc_db.get_browse(browse_type),
+            browse_terms=mlc_db.get_browse(browse_type, browse_sort),
             browse_type=browse_type
         )
 
