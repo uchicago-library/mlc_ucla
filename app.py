@@ -8,7 +8,7 @@ import sqlite_dump
 import sys
 from flask import abort, Flask, render_template, request, session, redirect
 from flask_session import Session
-from utils import MLCDB
+from utils import GlottologLookup, MLCDB
 from flask_babel import Babel, gettext, lazy_gettext, get_locale
 
 app = Flask(__name__)
@@ -133,6 +133,15 @@ def print_series(series_info):
 def cli_build_db():
     """Build a SQLite database from linked data triples."""
     mlc_db.build_db()
+
+
+@app.cli.command(
+    'build-glottolog-lookup',
+    short_help='Build or rebuild Glottolog lookup from linked data triples.'
+)
+def cli_build_glottolog_lookup():
+    """Build JSON data structure from linked data triples."""
+    GlottologLookup(app.config).build_lookup()
 
 
 @app.cli.command(

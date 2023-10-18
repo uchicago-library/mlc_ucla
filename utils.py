@@ -22,13 +22,114 @@ def regularize_string(_):
     return ' '.join(_.split())
 
 
+class GlottologLookup:
+    def __init__(self, config):
+        self.config = config
+
+        if os.path.exists(self.config['GLOTTO_LOOKUP']):
+            with open(self.config['GLOTTO_LOOKUP']) as f:
+                self._lookup = json.load(f)
+        else: 
+            self._lookup = {
+                'altLabel': {},
+                'prefLabel': {}
+            }
+
+    def build_lookup(self):
+        g = rdflib.Graph()
+        g.parse(self.config['GLOTTO_TRIPLES'], format='turtle')
+
+        lookup = {
+            'altLabel': {},
+            'prefLabel': {}
+        }
+
+        # load altLabel.
+        for row in g.query('''
+            PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT ?code ?label
+            WHERE {
+                ?identifier lexvo:iso639P3PCode ?code .
+                ?identifier skos:altLabel ?label
+            }
+        '''):
+            code = str(row[0]).strip()
+            label = str(row[1]).strip()
+            if not code in lookup['altLabel']:
+                lookup['altLabel'][code] = []
+            if not label in lookup['altLabel'][code]:
+                lookup['altLabel'][code].append(label)
+
+        # load prefLabel.
+        for row in g.query('''
+            PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT ?code ?label
+            WHERE {
+                ?identifier lexvo:iso639P3PCode ?code .
+                ?identifier skos:prefLabel ?label
+            }
+        '''):
+            code = str(row[0]).strip()
+            label = str(row[1]).strip()
+            if not code in lookup['prefLabel']:
+                lookup['prefLabel'][code] = []
+            if not label in lookup['prefLabel'][code]:
+                lookup['prefLabel'][code].append(label)
+
+        del g
+
+        with open(self.config['GLOTTO_LOOKUP'], 'w') as f:
+            f.write(json.dumps(lookup))
+
+    def get_glottolog_codes(self):
+        """Get all ISO639P3P Codes from the Glottolog graph.
+
+        Parameters:
+            (none)
+
+        Returns:
+            list: all identifiers.
+        """
+        return set(self._lookup['altLabel'].keys()) | \
+               set(self._lookup['prefLabel'].keys())
+
+    def get_glottolog_language_names(self, c):
+        """Get all language names from Glottolog for a given identifier.
+
+        Parameters:
+            c (str): ISO 639P3P code, e.g., "eng"
+
+        Returns:
+            list: a list of language names as unicode strings.
+        """
+        return set(self._lookup['altLabel'][c]) | \
+               set(self._lookup['prefLabel'][c])
+
+    def get_glottolog_language_names_preferred(self, c):
+        """Get preferred language names from Glottolog.
+ 
+        Parameters:
+            c (str): ISO 639P3P code, e.g., "eng"
+
+        Returns:
+            list: a list of language names, e.g., "English"
+        """
+        return self._lookup['prefLabel'][c]
+
+
 class MLCGraph:
-    def __init__(self, graph):
+    def __init__(self, config, graph):
         """
         Parameters:
             g (rdflib.Graph): a graph containing triples for the project.
         """
+        self.config = config
         self.graph = graph
+        self.glottolog_lookup = GlottologLookup(self.config)
 
     def get_browse_terms(self, browse_type):
         """
@@ -129,7 +230,7 @@ class MLCGraph:
             )
             for browse_term, identifier in qres:
                 browse_term = regularize_string(str(browse_term))
-                for label in self.get_glottolog_language_names_preferred(
+                for label in self.glottolog_lookup.get_glottolog_language_names_preferred(
                     browse_term
                 ):
                     label = regularize_string(label)
@@ -193,88 +294,6 @@ class MLCGraph:
             browse_dict[k] = sorted(list(browse_dict[k]))
 
         return browse_dict
-
-    def get_glottolog_codes(self):
-        """Get all ISO639P3P Codes from the Glottolog graph.
-
-        Parameters:
-            (none)
-
-        Returns:
-            list: all identifiers.
-        """
-        results = set()
-        for row in self.graph.query('''
-            PREFIX lexvo: <https://www.iso.org/standard/39534.html>
-
-            SELECT ?code
-            WHERE {
-                ?_ lexvo:iso639P3PCode ?code
-            }
-        '''):
-            results.add(str(row[0]))
-        return results
-
-    def get_glottolog_language_names(self, c):
-        """Get all language names from Glottolog for a given identifier.
-
-        Parameters:
-            c (str): ISO 639P3P code, e.g., "eng"
-
-        Returns:
-            list: a list of language names as unicode strings.
-        """
-        results = set()
-        for row in self.graph.query(
-            prepareQuery('''
-                PREFIX lexvo: <https://www.iso.org/standard/39534.html>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-                SELECT ?label
-                WHERE {
-                    ?i lexvo:iso639P3PCode ?code .
-                    {
-                        ?i skos:altLabel ?label
-                    } UNION {
-                        ?i skos:prefLabel ?label
-                    }
-
-                }
-            '''),
-            initBindings={
-                'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
-            }
-        ):
-            results.add(str(row[0]).strip())
-        return list(results)
-
-    def get_glottolog_language_names_preferred(self, c):
-        """Get preferred language names from Glottolog.
-
-        Parameters:
-            c (str): ISO 639P3P code, e.g., "eng"
-
-        Returns:
-            list: a list of language names, e.g., "English"
-        """
-        results = set()
-        for row in self.graph.query(
-            prepareQuery('''
-                PREFIX lexvo: <https://www.iso.org/standard/39534.html>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-                SELECT ?label
-                WHERE {
-                    ?identifier lexvo:iso639P3PCode ?code .
-                    ?identifier skos:prefLabel ?label
-                }
-            '''),
-            initBindings={
-                'code': rdflib.Literal(c, datatype=rdflib.XSD.string)
-            }
-        ):
-            results.add(str(row[0]).strip())
-        return list(results)
 
     def get_item_dbid(self, item_id):
         """
@@ -410,11 +429,11 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            codes.add(row[0])
+            codes.add(str(row[0]))
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
+            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -443,11 +462,11 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            codes.add(row[0])
+            codes.add(str(row[0]))
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
+            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -741,7 +760,7 @@ class MLCGraph:
             }
         )
         for row in r:
-            for label in self.get_glottolog_language_names(str(row[0])):
+            for label in self.glottolog_lookup.get_glottolog_language_names(str(row[0])):
                 search_tokens.append(label)
 
         # dcterms:spatial
@@ -1072,11 +1091,11 @@ class MLCGraph:
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
-            codes.add(row[0])
+            codes.add(str(row[0]))
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
+            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -1105,11 +1124,11 @@ class MLCGraph:
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
-            codes.add(row[0])
+            codes.add(str(row[0]))
 
         preferred_names = set()
         for c in codes:
-            for preferred_name in self.get_glottolog_language_names_preferred(
+            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
                 c
             ):
                 preferred_names.add(preferred_name)
@@ -1299,7 +1318,7 @@ class MLCDB:
         g.parse(self.config['GLOTTO_TRIPLES'], format='turtle')
         g.parse(self.config['TGN_TRIPLES'])
 
-        mlc_graph = MLCGraph(g)
+        mlc_graph = MLCGraph(self.config, g)
 
         # build an item to series lookup
         item_series_lookup = {}
