@@ -1,5 +1,6 @@
 import click, unittest, urllib.parse
-from app import app, cli_get_browse, cli_list_items, cli_list_series
+from app import app
+from mlc_ucla_search import cli_get_browse, cli_list_items, cli_list_series
 from click.testing import CliRunner
 
 
