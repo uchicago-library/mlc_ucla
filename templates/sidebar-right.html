@@ -37,7 +37,7 @@
         <ul>
           {% if not cnet_id %}
             <li>
-              <a href="/Shibboleth.sso/Login?target={{request.full_path}}"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
+              <a href="/Shibboleth.sso/Login?target={{request.url}}"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
             </li>
             <li>
               <a href="/request-account">{% trans %}Request an Account{% endtrans %}</a><br>
