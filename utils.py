@@ -1459,7 +1459,7 @@ class MLCDB:
 
         return match_string
 
-    def get_browse(self, browse_type):
+    def get_browse(self, browse_type, browse_sort):
         """
         Get browse.
 
@@ -1485,17 +1485,32 @@ class MLCDB:
         # out things like leading quotation marks. Because SQLite doesn't let
         # us strip out things like punctuation for sorting we do that after
         # the query in python.
-        return sorted(
-            self.cur.execute('''
-                select term, count(id)
-                from browse
-                where type=?
-                group by term
-                ''',
-                             (browse_type,)
-                             ).fetchall(),
-            key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
-        )
+            # key=lambda i: i[1]*-1
+
+        if( browse_sort == 'count' ):
+           return sorted(
+                self.cur.execute('''
+                    select term, count(id)
+                    from browse
+                    where type=?
+                    group by term
+                    ''',
+                                 (browse_type,)
+                                 ).fetchall(),
+                key=lambda i: i[1]*-1
+            )
+        else:
+            return sorted(
+                self.cur.execute('''
+                    select term, count(id)
+                    from browse
+                    where type=?
+                    group by term
+                    ''',
+                                 (browse_type,)
+                                 ).fetchall(),
+                key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
+            )
 
     def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
         """

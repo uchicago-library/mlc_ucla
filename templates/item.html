@@ -44,11 +44,20 @@
           </dd>
         {% endif %}
 
+        {% if creator %}
+          <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+          <dd>
+            {% for i in creator %}
+              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
+
         {% if contributor %}
-          <dt>{% trans %}Contributor{% endtrans %}:</dt>
+          <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              {{ i }}<br>
+              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a><br>
             {% endfor %}
           </dd>
         {% endif %}

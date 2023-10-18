@@ -19,83 +19,94 @@
     {% for result in results %}
       <li class="search-result">
       {# SERIES #}
-      <div class="search-results-series-title title-wrapper">
-        <span class="series-result-series-label">{% trans %}Series{% endtrans %}: </span>
-        <h3><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-          {{ result.1.titles.0 }}
-        </a></h3>
-        <div class="title-id-badge">
-          {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
-          <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+      <div class="search-results-series-title">
+        <span class="series-result-series-label">
+          {% trans %}Series{% endtrans %}
+          {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
+        </span>
+        <div class="search-results-series-title-badge">
+          <h3><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+            {{ result.1.titles.0 }}
+          </a></h3>
+          <div class="title-id-badge">
+            {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
+            <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+          </div>
         </div>
       </div>
       {# METADATA #}
       <div class="object-metadata">
         <dl>
-        {% if result.1.identifier %}
-          <dt>{% trans %}Series Identifier{% endtrans %}: </dt>
-          <dd>
-          {% for identifier in result.1.identifier %}
-            {{ identifier }}
-          {% endfor %}
-          </dd>
-        {% endif %}
-        {% if result.1.contributor %}
-          <dt>{% trans %}Contributor{% endtrans %}:</dt>
-          <dd>
-          {% if result.1.contributor|length > 3 %}
-            {% for contributor in result.1.contributor[:3] %}
-              <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+          {% if result.1.subject_language %}
+            <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
+            <dd>
+            {% for language in result.1.subject_language %}
+              <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
             {% endfor %}
-            (+{{ result.1.contributor|length -3 }})
-          {% else %}
-            {% for contributor in result.1.contributor %}
-              <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
-            {% endfor %}
+            </dd>
           {% endif %}
-          </dd>
-        {% endif %}
-        {% if result.1.subject_language %}
-          <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
-          <dd>
-          {% for language in result.1.subject_language %}
-            <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
-          {% endfor %}
-          </dd>
-        {% endif %}
-        {% if result.1.primary_language %}
-          <dt>{% trans %}Language{% endtrans %}: </dt>
-          <dd>
-          {% for language in result.1.primary_language %}
-            <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
-          {% endfor %}
-          </dd>
-        {% endif %}
-        {% if result.1.location %}
-          <dt>{% trans %}Location{% endtrans %}:</dt>
-          <dd>
-          {% for location in result.1.location %}
-            <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
-          {% endfor %}
-          </dd>
-        {% endif %}
-        {% if result.1.date %}
-          <dt>{% trans %}Date{% endtrans %}:</dt>
-          <dd>
-          {% for date in result.1.date %}
-            <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
-          {% endfor %}
-          </dd>
-          </dl>
-        {% endif %}
-        {% if result.1.content_type %}
-          <dt>{% trans %}Resource Type{% endtrans %}:</dt>
-          <dd>
-          {% for content_type in result.1.content_type %}
-            <span>{{ content_type }}</span>
-          {% endfor %}
-          </dd>
-        {% endif %}
+          {% if result.1.primary_language %}
+            <dt>{% trans %}Language(s){% endtrans %}: </dt>
+            <dd>
+            {% for language in result.1.primary_language %}
+              <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
+            {% endfor %}
+            </dd>
+          {% endif %}
+          {% if result.1.location %}
+            <dt>{% trans %}Location{% endtrans %}:</dt>
+            <dd>
+            {% for location in result.1.location %}
+              <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
+            {% endfor %}
+            </dd>
+          {% endif %}
+          {% if result.1.date %}
+            <dt>{% trans %}Date{% endtrans %}:</dt>
+            <dd>
+            {% for date in result.1.date %}
+              <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
+            {% endfor %}
+            </dd>
+          {% endif %}
+          {% if result.1.creator %}
+            <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+            <dd>
+            {% if result.1.creator|length > 3 %}
+              {% for creator in result.1.creator[:3] %}
+                <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+              {% endfor %}
+              (+{{ result.1.creator|length -3 }})
+            {% else %}
+              {% for creator in result.1.creator %}
+                <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+              {% endfor %}
+            {% endif %}
+            </dd>
+          {% endif %}
+          {% if result.1.contributor %}
+            <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
+            <dd>
+            {% if result.1.contributor|length > 3 %}
+              {% for contributor in result.1.contributor[:3] %}
+                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+              {% endfor %}
+              (+{{ result.1.contributor|length -3 }})
+            {% else %}
+              {% for contributor in result.1.contributor %}
+                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+              {% endfor %}
+            {% endif %}
+            </dd>
+          {% endif %}
+          {% if result.1.content_type %}
+            <dt>{% trans %}Resource Type{% endtrans %}:</dt>
+            <dd>
+            {% for content_type in result.1.content_type %}
+              <span>{{ content_type }}</span>
+            {% endfor %}
+            </dd>
+          {% endif %}
         </dl>
       </div>
 
