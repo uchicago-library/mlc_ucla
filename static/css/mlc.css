@@ -194,6 +194,12 @@ h1{
 	padding-right: .8rem;
 }
 /* =============== BROWSE */
+.browse-bar{
+	margin-bottom: 2rem;
+}
+.browse-bar h2{
+	margin-top: 0rem;
+}
 .browse-bar .btn{	
 	background-color: #645E5E;
 }

@@ -2,21 +2,24 @@
 
 {% block content %}
 <div class="" id="content" role="main">
-    <div class="title-wrapper">
-      <h1>{{ title_slug }}</h1>
-      {% if not request.args.sort == 'count' %}
-        <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}&sort=count">
-        <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
-          </a>
-      {% else %} 
-        <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}">\
-        <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-          </a>
-      {% endif %} 
-    </div>
+
+  {% include 'elements-browse-bar.html' %}
+  
+  <div class="title-wrapper">
+    <h1>{{ title_slug }}</h1>
+    {% if not request.args.sort == 'count' %}
+      <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}&sort=count">
+      <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
+        </a>
+    {% else %} 
+      <a class="btn btn-link btn-xs" href="{{request.path}}?type={{request.args.type}}">
+      <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+        </a>
+    {% endif %} 
+  </div>
           
   <div class="browse-list-wrapper container-fluid">
-  <div class="row">\
+  <div class="row">
   </div>
     <ul class="row no-style-list">
       {% for b in browse_terms %}
@@ -29,7 +32,5 @@
     </ul>
   </div>
   </ul>
-
-  {% include 'elements-browse-bar.html' %}
 </div>
 {% endblock %}
