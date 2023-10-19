@@ -1,358 +1,501 @@
-#. extracted from .\translations-csv\messages-translated.csv
+# Spanish translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-15 10:38-0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-10-19 11:09-0500\n"
+"PO-Revision-Date: 2023-10-19 11:13-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 3.10.1\n"
+"Generated-By: Babel 2.12.1\n"
 
-#: app.py:31
+#: app.py:62
 msgid "Mesoamerican Language Collections"
-msgstr "Colecciones de Idiomas Mesoamericanos"
+msgstr ""
 
-#: app.py:242
-msgid "Restricted"
-msgstr "Restringido"
+#: app.py:241
+msgid "Open"
+msgstr ""
 
-#: app.py:246
-msgid "Public Domain"
-msgstr "Dominio publico"
-
-#: app.py:292+templates/sidebar-right.html:62
-msgid "Suggest Corrections"
-msgstr "Sugerir correcciones"
+#: app.py:306
+msgid "Browse by Contributors"
+msgstr ""
 
 #: app.py:307
-msgid "Browse by Contributors"
-msgstr "Navegar por los Contribuyentes"
+msgid "Browse by Creator"
+msgstr ""
 
 #: app.py:308
-msgid "Browse by Creator"
-msgstr "Navegar por el Creador"
+msgid "Browse by Date"
+msgstr ""
 
 #: app.py:309
-msgid "Browse by Date"
-msgstr "Navegar por Fecha"
+msgid "Browse by Decade"
+msgstr ""
 
 #: app.py:310
-msgid "Browse by Decade"
-msgstr "Navegar por Década"
+msgid "Browse by Language"
+msgstr ""
 
 #: app.py:311
-msgid "Browse by Language"
-msgstr "Navegar por Idioma"
-
-#: app.py:312
 msgid "Browse by Location"
-msgstr "Navegar por Ubicación"
+msgstr ""
 
-#: app.py:328
+#: app.py:327
 msgid "Results with"
-msgstr "Resultados con"
+msgstr ""
 
 #: app.py:330
 msgid "Results for search"
-msgstr "Resultados para la búsqueda"
+msgstr ""
 
-#: app.py:420+app.py:422
+#: app.py:383 app.py:385
 msgid "Search Results for"
-msgstr "Resultados de búsqueda para"
+msgstr ""
+
+#: app.py:387
+msgid "Search Results"
+msgstr ""
+
+#: app.py:500 templates/sidebar-right.html:95
+#: templates/suggest-corrections.html:6
+msgid "Suggest Corrections"
+msgstr ""
 
 #: templates/base.html:45
 msgid "Skip to Main Content"
-msgstr "Saltar al Contenido Principal"
+msgstr ""
 
-#: templates/base.html:55
+#: templates/base.html:64
 msgid "Collections & Exhibits"
-msgstr "Colecciones y exhibiciones"
+msgstr ""
 
-#: templates/base.html:56
+#: templates/base.html:65
 msgid "Collections"
-msgstr "Colecciones"
+msgstr ""
 
-#: templates/elements-browse-bar.html:2+templates/sidebar-right.html:16
+#: templates/elements-browse-bar.html:2 templates/sidebar-right.html:16
 msgid "Browse Collection by"
-msgstr "Navegar Coleccione por"
+msgstr ""
 
-#: templates/elements-browse-bar.html:4+templates/item.html:66+templates/search.html:41+templates/series.html:50+templates/sidebar-right.html:19
+#: templates/elements-browse-bar.html:4 templates/item.html:75
+#: templates/series.html:66 templates/sidebar-right.html:19
 msgid "Language"
-msgstr "Idioma"
+msgstr ""
 
-#: templates/elements-browse-bar.html:5+templates/search.html:48+templates/sidebar-right.html:22
+#: templates/elements-browse-bar.html:5 templates/search.html:57
+#: templates/sidebar-right.html:22
 msgid "Location"
-msgstr "Ubicación"
+msgstr ""
 
-#: templates/elements-browse-bar.html:6+templates/sidebar-right.html:25
+#: templates/elements-browse-bar.html:6 templates/sidebar-right.html:25
+msgid "Creators"
+msgstr ""
+
+#: templates/elements-browse-bar.html:7 templates/sidebar-right.html:28
 msgid "Contributors"
-msgstr "Colaboradores"
+msgstr ""
 
-#: templates/elements-browse-bar.html:7+templates/sidebar-right.html:28
+#: templates/elements-browse-bar.html:8 templates/sidebar-right.html:31
 msgid "Dates"
-msgstr "Fechas"
+msgstr ""
 
 #: templates/home.html:9
 msgid "Indigenous Mesoamerican Languages Portal"
-msgstr "Portal das Colecciones de Idiomas Mesoamericanos"
+msgstr ""
+
+#: templates/home.html:12
+msgid "Accessing the collection"
+msgstr ""
+
+#: templates/home.html:14
+msgid ""
+"Some items require <a href=\"/access-terms\">specific permission</a> to "
+"have access whether they are in digital or physical form. You can request"
+" access to a specific set of items, or request that your CNET ID be given"
+" privilege to access some of the restricted content. Access to the "
+"collection is managed by the Hanna Holborn Gray Special Collections "
+"Research Center."
+msgstr ""
+
+#: templates/home.html:17
+msgid "Welcome!"
+msgstr ""
+
+#: templates/home.html:19
+msgid ""
+"The Mesoamerican Language Collections (MLC) brings together multiple "
+"collections of materials documenting Mesoamerican Languages produced by "
+"University of Chicago linguists and ethnographers since 1932. They are "
+"the legacy of work started by Norman McQuown (1914-2004), University of "
+"Chicago anthropologist and linguist, and carried on by his former student"
+" John Lucy, who collected and preserved primary documentation about "
+"Mesoamerican languages produced by their colleagues and students over the"
+" bulk of the 20th and early 21st Centuries. "
+msgstr ""
+
+#: templates/home.html:22
+msgid ""
+"These collections consist of the Manuscripts in Cultural Anthropology "
+"(MCA), a manuscript collections of field notes, vocabulary lists, "
+"dictionaries, grammars, corpora of texts and elicited sentences, "
+"concordances, and guides to holdings of other research collections; the "
+"Digital Media Archives (DMA), a broader digital collection of recorded "
+"audio one of the largest components of which are the field recordings of "
+"Mesoamerican linguists; the Chicago Archive of Indigenous Language "
+"Literatures of the Americas, published works in indigenous languages "
+"(again overwhelmingly Mesoamerican) collected by MCA and DMA "
+"contributors, including original prose and poetry, translations from "
+"other languages, children’s literature, pedagogical materials, "
+"periodicals, and more; and language teaching materials produced by "
+"University of Chicago linguists and anthropologists to train their future"
+" colleagues."
+msgstr ""
 
 #: templates/item.html:19
 msgid "Panopto Links"
-msgstr "Enlaces de Panopto"
+msgstr ""
 
-#: templates/item.html:30+templates/suggest-corrections.html:13
+#: templates/item.html:30
 msgid "Item Title"
-msgstr "Título de artículo"
+msgstr ""
 
 #: templates/item.html:39
 msgid "Item Identifier"
-msgstr "Identificador de Artículos"
+msgstr ""
 
-#: templates/item.html:48+templates/search.html:27
-msgid "Contributor"
-msgstr "Contribuyente"
+#: templates/item.html:48 templates/search.html:73 templates/series.html:39
+msgid "Creator(s)"
+msgstr ""
 
-#: templates/item.html:57+templates/series.html:41
+#: templates/item.html:57 templates/search.html:88 templates/series.html:48
+msgid "Contributor(s)"
+msgstr ""
+
+#: templates/item.html:66 templates/series.html:57
 msgid "Indigenous Language"
-msgstr "Lengua indígena"
+msgstr ""
 
-#: templates/item.html:75+templates/series.html:59
+#: templates/item.html:84 templates/series.html:75
 msgid "Location Where Indigenous Language Is Spoken"
-msgstr "Ubicación donde se habla el idioma indígena"
+msgstr ""
 
-#: templates/item.html:93+templates/series.html:77
-msgid "Description"
-msgstr "Descripción"
-
-#: templates/item.html:102
-msgid "Linguistic Data Type"
-msgstr "Tipo de Datos Lingüísticos"
+#: templates/item.html:102 templates/series.html:93
+msgid "Notes"
+msgstr ""
 
 #: templates/item.html:111
-msgid "Discourse Type"
-msgstr "Tipo de Discurso"
+msgid "Linguistic Data Type"
+msgstr ""
 
 #: templates/item.html:120
-msgid "Item Content Type"
-msgstr "Tipo de Contenido del Elemento"
+msgid "Discourse Type"
+msgstr ""
 
 #: templates/item.html:129
+msgid "Item Content Type"
+msgstr ""
+
+#: templates/item.html:138
+msgid "Media Type"
+msgstr ""
+
+#: templates/item.html:148
 msgid "Part of Series"
-msgstr "Parte de la Serie"
+msgstr ""
 
-#: templates/search.html:16
-msgid "Found %(num)s results"
-msgstr "Se encontraron %(num)s resultados."
+#: templates/item.html:159
+msgid "Converted to"
+msgstr ""
 
-#: templates/search.html:22
+#: templates/item.html:178
+msgid "Converted from"
+msgstr ""
+
+#: templates/request-account.html:6
+msgid "Request Account for Access"
+msgstr ""
+
+#: templates/request-account.html:9
+msgid ""
+"This form is for visitors who do not have a UChicago ID. It allows them "
+"to request an account for accessing the Mesoamerican Language Collection "
+"Portal. An account is required to access content that is restricted or "
+"under controlled access. For more information visit <a href=\"/access-"
+"terms\">/access-terms</a>."
+msgstr ""
+
+#: templates/request-account.html:12
+msgid ""
+"Please briefly describe the purpose of your access. Once you click "
+"'Submit,' you will be directed to a confirmation receipt of your request."
+" Account requests are reviewed individually and typically processed "
+"within five business days. You will receive an email with instructions on"
+" how to use your account."
+msgstr ""
+
+#: templates/request-account.html:23 templates/suggest-corrections.html:33
+msgid "Name"
+msgstr ""
+
+#: templates/request-account.html:24 templates/suggest-corrections.html:34
+msgid "Enter your name"
+msgstr ""
+
+#: templates/request-account.html:27 templates/suggest-corrections.html:37
+msgid "Email address"
+msgstr ""
+
+#: templates/request-account.html:28 templates/suggest-corrections.html:38
+msgid "Enter your email address"
+msgstr ""
+
+#: templates/request-account.html:31
+msgid "Birthdate"
+msgstr ""
+
+#: templates/request-account.html:35
+msgid "Please describe your research project"
+msgstr ""
+
+#: templates/request-account.html:36
+msgid "Provide a description of your project."
+msgstr ""
+
+#: templates/request-account.html:40
+msgid "I agree to the terms stated in the"
+msgstr ""
+
+#: templates/request-account.html:40
+msgid "policy"
+msgstr ""
+
+#: templates/request-account.html:43 templates/suggest-corrections.html:48
+msgid "Submit"
+msgstr ""
+
+#: templates/search.html:11
+#, python-format
+msgid "Search found in %(num)s serie(s)"
+msgstr ""
+
+#: templates/search.html:24
 msgid "Series"
-msgstr "Serie"
+msgstr ""
 
-#: templates/search.html:34
+#: templates/search.html:41
 msgid "Indigenous Language(s)"
-msgstr "Lenguas indigenas"
+msgstr ""
 
-#: templates/search.html:55+templates/series.html:68
+#: templates/search.html:49
+msgid "Language(s)"
+msgstr ""
+
+#: templates/search.html:65 templates/series.html:84
 msgid "Date"
-msgstr "Fecha"
+msgstr ""
 
-#: templates/search.html:62
+#: templates/search.html:103
 msgid "Resource Type"
-msgstr "Tipo de Recurso"
+msgstr ""
 
-#: templates/search.html:73
+#: templates/search.html:116
+#, python-format
+msgid " \"%(query)s\" Found in %(num)s item(s): "
+msgstr ""
+
+#: templates/search.html:134
 msgid "No results found"
-msgstr "No se han encontrado resultados"
+msgstr ""
 
-#: templates/series.html:6
+#: templates/series.html:7
 msgid "Series Title"
-msgstr "Título de la Serie"
+msgstr ""
 
-#: templates/series.html:11
+#: templates/series.html:18
 msgid "Alternative Series Title"
-msgstr "Título Alternativo de la Serie"
+msgstr ""
 
-#: templates/series.html:20
+#: templates/series.html:27
 msgid "Series Identifier"
-msgstr "Identificador de la Serie"
+msgstr ""
 
-#: templates/series.html:28
+#: templates/series.html:35
 msgid "Collection"
-msgstr "Colección"
+msgstr ""
 
-#: templates/series.html:29
+#: templates/series.html:36
 msgid "Digital Media Archive"
-msgstr "Archivo de Medios Digitales"
+msgstr ""
 
-#: templates/series.html:32
-msgid "Creator"
-msgstr "Creador"
-
-#: templates/series.html:87
+#: templates/series.html:102
 msgid "Items in the Series"
-msgstr "Elementos de la Serie"
+msgstr ""
 
 #: templates/sidebar-left.html:4
 msgid "Project navigation"
-msgstr "Navegación de Proyectos"
+msgstr ""
 
 #: templates/sidebar-left.html:10
 msgid "About the Project"
-msgstr "Sobre el Proyecto"
+msgstr ""
 
 #: templates/sidebar-left.html:11
 msgid "About the Collections"
-msgstr "Sobre las Colecciones"
+msgstr ""
 
 #: templates/sidebar-left.html:12
 msgid "Terms of Access"
-msgstr "Términos de Acceso"
+msgstr ""
 
 #: templates/sidebar-left.html:13
 msgid "How to Deposit Materials"
-msgstr "Cómo Depositar los Materiales"
+msgstr ""
 
 #: templates/sidebar-left.html:14
 msgid "Related Collections at UChicago"
-msgstr "Colecciones Relacionadas en UChicago"
+msgstr ""
 
 #: templates/sidebar-left.html:15
 msgid "Additional Resources"
-msgstr "Recursos Adicionales"
+msgstr ""
 
 #: templates/sidebar-right.html:2
 msgid "Search & Browse"
-msgstr "Buscar y Navegar"
+msgstr ""
 
 #: templates/sidebar-right.html:8
 msgid "Search language, location, people, etc."
-msgstr "Lenguaje de búsqueda, ubicación, gente, etc."
+msgstr ""
 
-#: templates/sidebar-right.html:33
+#: templates/sidebar-right.html:36
 msgid "Access"
-msgstr "Acceso"
-
-#: templates/sidebar-right.html:34
-msgid "Logged In"
-msgstr "Conectado"
+msgstr ""
 
 #: templates/sidebar-right.html:40
-msgid "Subject Specialist"
-msgstr "Especialista en Sujeto"
+msgid "Log In"
+msgstr ""
 
 #: templates/sidebar-right.html:43
+msgid "Request an Account"
+msgstr ""
+
+#: templates/sidebar-right.html:47
+msgid "Log out"
+msgstr ""
+
+#: templates/sidebar-right.html:61
+msgid ""
+"You are being forwarded to a confirmation receipt of your request. "
+"Requests are typically processed within 3 business days, and you will "
+"receive an email when approved."
+msgstr ""
+
+#: templates/sidebar-right.html:61 templates/sidebar-right.html:66
+msgid "Request Access to this Series/Item"
+msgstr ""
+
+#: templates/sidebar-right.html:66
+msgid "Request an account before requesting access."
+msgstr ""
+
+#: templates/sidebar-right.html:79
+msgid "Subject Specialist"
+msgstr ""
+
+#: templates/sidebar-right.html:82
 msgid "Latin American and Caribbean Studies Librarian"
-msgstr "Bibliotecario de Estudios Latinoamericanos y del Caribe"
+msgstr ""
 
-#: templates/sidebar-right.html:49
+#: templates/sidebar-right.html:88
 msgid "Feedback"
-msgstr "Comentario"
+msgstr ""
 
-#: templates/sidebar-right.html:68
+#: templates/sidebar-right.html:101
 msgid "Credits"
-msgstr "Créditos"
+msgstr ""
 
-#: templates/sidebar-right.html:69
+#: templates/sidebar-right.html:102
 msgid ""
 "The presentation of this material is based upon work supported by the "
 "National Science Foundation under Grant No. 1953104."
 msgstr ""
-"La presentación de este material se basa en un trabajo apoyado por la "
-"National Science Foundation bajo la subvención No. 1953104."
 
-#: templates/sidebar-right.html:72
+#: templates/sidebar-right.html:105
 msgid "Principal Investigators"
-msgstr "Investigadores Principales"
+msgstr ""
 
-#: templates/sidebar-right.html:77
+#: templates/sidebar-right.html:110
 msgid "Project Manager"
-msgstr "Gerente de Proyecto"
+msgstr ""
 
-#: templates/sidebar-right.html:82
+#: templates/sidebar-right.html:115
 msgid "Senior Personnel"
-msgstr "Personal Superior"
+msgstr ""
 
-#: templates/sidebar-right.html:87
+#: templates/sidebar-right.html:120
 msgid "Senior Developer"
-msgstr "Desarrollador Senior"
+msgstr ""
 
-#: templates/sidebar-right.html:92
+#: templates/sidebar-right.html:125
 msgid "Post-doctoral Fellow"
-msgstr "Becario Postdoctoral"
+msgstr ""
 
-#: templates/sidebar-right.html:97
+#: templates/sidebar-right.html:130
 msgid "Graduate Student Fellow"
-msgstr "Estudiante Graduado"
+msgstr ""
 
-#: templates/sidebar-right.html:102
+#: templates/sidebar-right.html:135
 msgid ""
-"User Experience and Digital Collections Design Intern, and Metcalf Odyssey "
+"User Experience and Digital Collections Design Intern, and Metcalf "
+"Odyssey Intern"
+msgstr ""
+
+#: templates/sidebar-right.html:140
+msgid ""
+"Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey "
 "Intern"
 msgstr ""
-"Experiencia del Usuario y Pasante de Diseño de Colecciones Digitales, y "
-"Pasante de Metcalf Odyssey"
 
-#: templates/sidebar-right.html:107
-msgid ""
-"Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern"
+#: templates/suggest-corrections.html:16
+msgid "Series or Item Title"
 msgstr ""
-"Pasante de Portal das Colecciones de Idiomas Mesoamericanos Indigenas, y "
-"Pasante de Metcalf Odyssey"
 
-#: templates/suggest-corrections.html:18
-msgid "Record Identifier"
-msgstr "Identificador de Registro"
-
-#: templates/suggest-corrections.html:23
-msgid "Item URL"
-msgstr "URL de Artículos"
-
-#: templates/suggest-corrections.html:30
-msgid "Name"
-msgstr "Nombre"
-
-#: templates/suggest-corrections.html:31
-msgid "Enter your name"
-msgstr "Introduzca su nombre"
-
-#: templates/suggest-corrections.html:34
-msgid "Email address"
-msgstr "Dirección de correo electrónico"
-
-#: templates/suggest-corrections.html:35
-msgid "Enter your email address"
-msgstr "Ingrese su dirección de correo electrónico"
-
-#: templates/suggest-corrections.html:38
-msgid "Problems, comments, questions, or suggestions"
-msgstr "Problemas, comentarios, preguntas o sugerencias"
-
-#: templates/suggest-corrections.html:40
-msgid ""
-"Please use the area below to report errors, omissions, or other issues in "
-"the description of this collection."
+#: templates/suggest-corrections.html:21
+msgid "Series or Item Identifier"
 msgstr ""
-"Utilice el área a continuación para informar errores, omisiones u otros "
-"problemas en la descripción de esta colección."
+
+#: templates/suggest-corrections.html:26
+msgid "Series or Item URL"
+msgstr ""
 
 #: templates/suggest-corrections.html:41
-msgid ""
-"Corrections may include misspellings, incorrect or missing dates, "
-"misidentified languages, individuals, locations, pointing out outdated or "
-"harmful terminology/language, etc."
+msgid "Problems, comments, questions, or suggestions"
 msgstr ""
-"Las correcciones pueden incluir errores ortográficos, fechas incorrectas o "
-"faltantes, idiomas mal identificados, individuos, ubicaciones, señalización "
-"de terminología/idioma obsoleto o dañino, etc."
 
 #: templates/suggest-corrections.html:43
-msgid "Provide a description of the correction"
-msgstr "Proporcionar una descripción de la corrección"
+msgid ""
+"Please use the area below to report errors, omissions, or other issues in"
+" the description of this collection."
+msgstr ""
 
-#: templates/suggest-corrections.html:45
-msgid "Submit"
-msgstr "Entregar"
+#: templates/suggest-corrections.html:44
+msgid ""
+"Corrections may include misspellings, incorrect or missing dates, "
+"misidentified languages, individuals, locations, pointing out outdated or"
+" harmful terminology/language, etc."
+msgstr ""
+
+#: templates/suggest-corrections.html:46
+msgid "Describe the proposed correction"
+msgstr ""
+
