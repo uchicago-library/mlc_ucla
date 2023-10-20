@@ -45,6 +45,9 @@ def inject_dict():
         'trans': {
             'collection_title': lazy_gettext(
                 'Mesoamerican Language Collections'
+            ),
+            'collection_title_banner': lazy_gettext(
+                'Indigenous Mesoamerican Languages Portal'
             )
         }
     }
