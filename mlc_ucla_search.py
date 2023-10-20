@@ -4,7 +4,7 @@ import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
 from utils import GlottologLookup, MLCDB
 from flask_babel import lazy_gettext
-from local import BASE, DB, MESO_TRIPLES, TGN_TRIPLES
+from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
@@ -12,6 +12,7 @@ mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, templat
 
 mlc_db = MLCDB({
     'DB': DB,
+    'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
     'MESO_TRIPLES': MESO_TRIPLES,
     'TGN_TRIPLES': TGN_TRIPLES
 })
