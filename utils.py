@@ -106,8 +106,18 @@ class GlottologLookup:
         Returns:
             list: a list of language names as unicode strings.
         """
-        return set(self._lookup['altLabel'][c]) | \
-               set(self._lookup['prefLabel'][c])
+        result = set()
+        try:
+            result = set(self._lookup['altLabel'][c])
+        except KeyError:
+            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
+            pass
+        try:
+            result |= set(self._lookup['prefLabel'][c])
+        except KeyError:
+            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
+            pass
+        return result
 
     def get_glottolog_language_names_preferred(self, c):
         """Get preferred language names from Glottolog.
@@ -118,7 +128,11 @@ class GlottologLookup:
         Returns:
             list: a list of language names, e.g., "English"
         """
-        return self._lookup['prefLabel'][c]
+        try:
+            return self._lookup['prefLabel'][c]
+        except KeyError:
+            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
+            return ''
 
 
 class MLCGraph:
@@ -1315,7 +1329,6 @@ class MLCDB:
 
         g = rdflib.Graph()
         g.parse(self.config['MESO_TRIPLES'], format='turtle')
-        g.parse(self.config['GLOTTO_TRIPLES'], format='turtle')
         g.parse(self.config['TGN_TRIPLES'])
 
         mlc_graph = MLCGraph(self.config, g)
