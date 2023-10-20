@@ -1,5 +1,5 @@
-import click, unittest, urllib.parse
-from app import app
+import click, subprocess, unittest, urllib.parse
+from mlc import app
 from mlc_ucla_search import cli_get_browse, cli_list_items, cli_list_series
 from click.testing import CliRunner
 
@@ -12,26 +12,37 @@ class TestMLCCLI(unittest.TestCase):
     def test_browse(self):
         for b in ('contributor', 'creator', 'date', 'decade', 'language'):
             self.assertEqual(
-                self.runner.invoke(cli_get_browse, [b]).exit_code,
+                subprocess.run(
+                    ['flask', 'get-browse', b], 
+                    stdout=subprocess.DEVNULL
+                ).returncode,
                 0
             )
 
     # list items
     def test_list_item(self):
         self.assertEqual(
-            self.runner.invoke(cli_list_items).exit_code,
+            subprocess.run(
+                ['flask', 'list-items'],
+                stdout=subprocess.DEVNULL
+            ).returncode,
             0
         )
-        # omitting the verbose option to speed up test.
 
     # list series
     def test_list_series(self):
         self.assertEqual(
-            self.runner.invoke(cli_list_series).exit_code,
+            subprocess.run(
+                ['flask', 'list-series'],
+                stdout=subprocess.DEVNULL
+            ).returncode,
             0
         )
         self.assertEqual(
-            self.runner.invoke(cli_list_series, ['--verbose']).exit_code,
+            subprocess.run(
+                ['flask', 'list-series', '--verbose'],
+                stdout=subprocess.DEVNULL
+            ).returncode,
             0
         )
 

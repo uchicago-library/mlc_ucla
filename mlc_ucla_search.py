@@ -1,27 +1,28 @@
 import click
-import json
-import logging
-import os
 import re
-import sqlite3
-import sqlite_dump
 import sys
-from flask import abort, Blueprint, Flask, render_template, request, session, redirect
-from flask_session import Session
+from flask import abort, Blueprint, current_app, render_template, request, session, redirect
 from utils import GlottologLookup, MLCDB
-from flask_babel import Babel, gettext, lazy_gettext, get_locale
-from local import DB, MESO_TRIPLES, TGN_TRIPLES
+from flask_babel import lazy_gettext
+from local import BASE, DB, MESO_TRIPLES, TGN_TRIPLES
 
 
-mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, template_folder='templates/mlc_ucla_search')
+mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
 
 
-BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
 mlc_db = MLCDB({
     'DB': DB,
     'MESO_TRIPLES': MESO_TRIPLES,
     'TGN_TRIPLES': TGN_TRIPLES
 })
+
+# FUNCTIONS
+
+def get_locale():
+    """Language switching."""
+    if 'language' not in session:
+        session['language'] = 'en'
+    return session.get('language')
 
 # CLI
 
