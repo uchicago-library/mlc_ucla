@@ -5,10 +5,10 @@
     <h1>{{ title_slug }}</h1>
 
     <h2>CGIMail Receipt</h2>
-    <pre>{{ request.args.cnetid }}</pre>
-    <pre>{{ request.args.seriesid }}</pre>
+    <pre>{{ request.args.status }}</pre>
+    {% if request.args.status == 'success' %}
+      <p>Your request has been received.</p>
+    {% endif %}
 
-
-    {% include 'elements-browse-bar.html' %}
   </div>
 {% endblock %}

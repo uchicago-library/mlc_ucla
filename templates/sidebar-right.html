@@ -37,7 +37,7 @@
         <ul>
           <li>
             <form action="/send-cgimail" method="POST">
-              sid:{{ series_id or 'empty'}}, cid: {{ cnet_id or 'empty'}}
+              sid:{{ series_id or 'empty'}}, cid: {{ cnet_id or 'empty'}}, request.path: {{request.url}}
               <input type="hidden" name="cnetid" value="{{ cnet_id }}" required>
               <input type="hidden" name="seriesid" value="{{ series_id }}" required>
               <button type="submit">{% trans %}Request series access iii{% endtrans %}</button><br>

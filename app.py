@@ -290,13 +290,6 @@ def change_language():
 def send_cgimail():
     cnet_id = request.form.get('cnetid')
     series_id = request.form.get('seriesid')
-    # # for testing
-    # print("series id")
-    # print(series_id)
-    # goto = '/submission-receipt'
-    # goto += '?cnetid='+cnet_id+'&seriesid='+series_id
-    # if cnet_id and series_id:
-    # return redirect(goto)
 
     args = {
     'rcpt': 'vitor',
@@ -307,39 +300,21 @@ def send_cgimail():
     }
 
     cgiurl = 'https://www.lib.uchicago.edu/cgi-bin/cgimail'
-    # ================= 1
-    # r = requests.post(cgiurl, json = args)
-    # r = requests.post(cgiurl, data = args)
+    payload = {'username':'niceusername','password':'123456'}
 
-    # ================= 2
-    # headers = {'User-Agent': 'Mozilla/5.0'}
-    # payload = {'username':'niceusername','password':'123456'}
+    session = requests.Session()
+    session.headers.update({'referer': 'https://mlc.lib.uchicago.edu/'})
 
-    # session = requests.Session()
-    # r = session.post(cgiurl, headers = headers, data = args)
-    # ================= 3
-    reqt = requests.Request(
-        'POST',
-        cgiurl,
-        files ={
-            'rcpt': (None, args['rcpt']),
-            'from': (None, args['from']),
-            'subject': (None, args['subject']),
-            'CNET ID': (None, args['CNET ID']),
-            'Series ID': (None, args['Series ID']),
-        }
-    ).prepare()
-    s = requests.Session()
-    r = s.send(reqt)
+    r = session.post(cgiurl, data = args)
+    
 
-    print("response")
-    print(r.text)
-    # return Response(
-    #     r.text,
-    #     status=r.status_code,
-    #     content_type=r.headers['content-type'],
-    # )
-    goto = '/submission-receipt'
+    # print("=============> response.find()")
+    # print(r.text.find("Your message was delivered to the addressee"))
+    # print("=============> response")
+    # print(r)
+
+    r_status = 'success' if r.text.find("Your message was delivered to the addressee") > -1 else 'failed'
+    goto = '/submission-receipt?status=' + r_status
     return redirect(goto)
 
 
