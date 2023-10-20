@@ -1,6 +1,6 @@
 from local import APP
 
-if app == 'mlc':
+if APP == 'mlc':
     from mlc import app as application
-elif app == 'ucla':
+elif APP == 'ucla':
     from ucla import app as application
