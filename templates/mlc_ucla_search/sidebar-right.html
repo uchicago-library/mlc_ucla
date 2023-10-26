@@ -54,7 +54,7 @@
                   <input type="hidden" name="msg_type" value="request_access">
                   <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
                   <input type="hidden" name="Series ID" value="{{ series_id }}" required>
-                  <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request. Requests are typically processed within 3 business days, and you will receive an email when approved.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
+                  <button type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
                 </form>
               </li>
             {% else %}
