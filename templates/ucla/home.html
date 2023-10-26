@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-4 col-lg-3">
+        {% include 'sidebar-left.html' %}
+    </div>
+    <div class="col-xs-12 col-md-8">
+        <h1>{% trans %}University of Chicago Language Archive{% endtrans %}</h1>
+        <!-- locale is:{{ locale }} -->
+
+        <p>Coming soon.</p>
+
+        {% include 'elements-browse-bar.html' %}
+    </div>
+</div>
+{% endblock %}

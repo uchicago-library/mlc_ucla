@@ -1,70 +1,29 @@
 import click
-import json
-import logging
-import os
 import re
-import sqlite3
-import sqlite_dump
 import sys
-from flask import abort, Flask, render_template, request, session, redirect
-from flask_session import Session
-from utils import MLCDB
-from flask_babel import Babel, gettext, lazy_gettext, get_locale
-
-app = Flask(__name__)
-app.config.from_pyfile('local.py')
-
-Session(app)
-
-BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
-mlc_db = MLCDB(app.config)
+from flask import abort, Blueprint, current_app, render_template, request, session, redirect
+from utils import GlottologLookup, MLCDB
+from flask_babel import lazy_gettext
+from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
 
 
-# Language switching
+mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
+
+
+mlc_db = MLCDB({
+    'DB': DB,
+    'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
+    'MESO_TRIPLES': MESO_TRIPLES,
+    'TGN_TRIPLES': TGN_TRIPLES
+})
+
+# FUNCTIONS
 
 def get_locale():
     """Language switching."""
     if 'language' not in session:
         session['language'] = 'en'
     return session.get('language')
-
-
-babel = Babel(app, default_locale='en', locale_selector=get_locale)
-
-
-@app.context_processor
-def inject_dict():
-    cnetid = None
-    if request.environ:
-        if 'REMOTE_USER' in request.environ: 
-            cnetid = request.environ["REMOTE_USER"]
-    return {
-        'cnet_id' : cnetid,
-        'cgimail' : {
-            'default' : {
-                'from' : 'Vitor G <vitorg@uchicago.edu>'
-            },
-            'request_access': {
-                'rcpt': 'askscrc',
-                'subject': '[TEST] Request for access to MLC restricted series',
-            },
-            'request_account': {
-                'rcpt': 'askscrc',
-                'subject': '[TEST] Request for MLC account',
-            }, 
-            'feedback': {
-                'rcpt': 'woken',
-                'subject': '[TEST] Feedback about Mesoamerican Language Collection Portal',
-            }, 
-        },
-        'locale': get_locale(),
-        'trans': {
-            'collection_title': lazy_gettext(
-                'Mesoamerican Language Collections'
-            )
-        }
-    }
-
 
 # CLI
 
@@ -126,7 +85,7 @@ def print_series(series_info):
     ))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'build-db',
     short_help='Build or rebuild SQLite database from linked data triples.'
 )
@@ -135,7 +94,16 @@ def cli_build_db():
     mlc_db.build_db()
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
+    'build-glottolog-lookup',
+    short_help='Build or rebuild Glottolog lookup from linked data triples.'
+)
+def cli_build_glottolog_lookup():
+    """Build JSON data structure from linked data triples."""
+    GlottologLookup(mlc_ucla_search.config).build_lookup()
+
+
+@mlc_ucla_search.cli.command(
     'get-browse',
     short_help='Get a contributor, creator, date, decade, language or ' +
                'location browse.'
@@ -147,7 +115,7 @@ def cli_get_browse(browse_type):
         sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'get-browse-term',
     short_help='Get series for a specific browse term.'
 )
@@ -158,7 +126,7 @@ def cli_get_browse_term(browse_type, browse_term):
         print_series(row[1])
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'get-item',
     short_help='Get item info for an item identifier.'
 )
@@ -167,7 +135,7 @@ def cli_get_item(item_identifier):
     print_item(mlc_db.get_item(item_identifier))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'get-series',
     short_help='Get series info for a series identifier.'
 )
@@ -176,7 +144,7 @@ def cli_get_series(series_identifier):
     print_series(mlc_db.get_series(series_identifier))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'list-items',
     short_help='List item objects.'
 )
@@ -189,7 +157,7 @@ def cli_list_items(verbose):
             sys.stdout.write('{}\n'.format(i))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'list-series',
     short_help='List series objects.'
 )
@@ -202,7 +170,7 @@ def cli_list_series(verbose):
             sys.stdout.write('{}\n'.format(i))
 
 
-@app.cli.command(
+@mlc_ucla_search.cli.command(
     'search',
     short_help='Search for term.'
 )
@@ -271,7 +239,7 @@ def get_access_label_obj(item):
     else:
         return ['emtpy', 'By Request', 'info']
 
-@app.route('/language-change', methods=['POST'])
+@mlc_ucla_search.route('/language-change', methods=['POST'])
 def change_language():
     if 'language' in session and session['language'] == 'en':
         session['language'] = 'es'
@@ -279,28 +247,28 @@ def change_language():
         session['language'] = 'en'
     return redirect(request.referrer)
 
-@app.errorhandler(400)
+@mlc_ucla_search.errorhandler(400)
 def bad_request(e):
     return (render_template('400.html'), 400)
 
 
-@app.errorhandler(404)
+@mlc_ucla_search.errorhandler(404)
 def not_found(e):
     return (render_template('404.html'), 404)
 
 
-@app.errorhandler(500)
+@mlc_ucla_search.errorhandler(500)
 def bad_request(e):
     return (render_template('500.html'), 500)
 
 
-@app.route('/')
+@mlc_ucla_search.route('/')
 def home():
     return render_template(
         'home.html'
     )
 
-@app.route('/browse/')
+@mlc_ucla_search.route('/browse/')
 def browse():
     title_slugs = {
         'contributor': lazy_gettext(u'Browse by Contributors'),
@@ -313,7 +281,7 @@ def browse():
 
     browse_type = request.args.get('type')
     if browse_type not in title_slugs.keys():
-        app.logger.debug(
+        mlc_ucla_search.logger.debug(
             'in {}(), type parameter not a key in browses dict.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -359,7 +327,7 @@ def browse():
             browse_type=browse_type
         )
 
-@app.route('/search/')
+@mlc_ucla_search.route('/search/')
 def search():
     facets = request.args.getlist('facet')
     query = request.args.get('query')
@@ -396,10 +364,10 @@ def search():
     )
 
 
-@app.route('/series/<noid>/')
+@mlc_ucla_search.route('/series/<noid>/')
 def series(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        app.logger.debug(
+        mlc_ucla_search.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -437,10 +405,10 @@ def series(noid):
         })
     )
 
-@app.route('/item/<noid>/')
+@mlc_ucla_search.route('/item/<noid>/')
 def item(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        app.logger.debug(
+        mlc_ucla_search.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -484,13 +452,13 @@ def item(noid):
             'breadcrumb': breadcrumb})
     )
 
-@app.route('/request-account')
+@mlc_ucla_search.route('/request-account')
 def request_account():
     return render_template(
         'request-account.html'
     )
 
-@app.route('/suggest-corrections/')
+@mlc_ucla_search.route('/suggest-corrections/')
 def suggest_corrections():
     return render_template(
         'suggest-corrections.html',
@@ -500,6 +468,3 @@ def suggest_corrections():
         title_slug = lazy_gettext(u'Suggest Corrections'),
         hide_right_column = True
     )
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

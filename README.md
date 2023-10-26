@@ -33,8 +33,9 @@ pip install -r requirements.txt
 Get a copy of local.py from another developer or from one of the production
 servers and place it in the mlc directory.
 
-Build an SQlite data dump from triples:
+Build a Glottolog lookup and SQLite database for the site.
 ```console
+flask build-glottolog-lookup
 flask build-db
 ```
 
