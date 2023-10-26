@@ -1,5 +1,6 @@
 import click
 import re
+import requests
 import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
 from utils import GlottologLookup, MLCDB
