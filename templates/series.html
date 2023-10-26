@@ -36,10 +36,19 @@
         <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
 
         {% if creator %}
-          <dt>{% trans %}Creator{% endtrans %}:</dt>
+          <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
               <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
+
+        {% if contributor %}
+          <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
+          <dd>
+            {% for i in contributor %}
+              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a><br>
             {% endfor %}
           </dd>
         {% endif %}

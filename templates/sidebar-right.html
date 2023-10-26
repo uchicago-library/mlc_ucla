@@ -21,11 +21,11 @@
           <li><a href="/browse/?type=location">
             {% trans %}Location{% endtrans %}
           </a></li>
-          <li><a href="/browse/?type=contributor">
-            {% trans %}Contributors{% endtrans %}
-          </a></li>
           <li><a href="/browse/?type=creator">
             {% trans %}Creators{% endtrans %}
+          </a></li>
+          <li><a href="/browse/?type=contributor">
+            {% trans %}Contributors{% endtrans %}
           </a></li>
           <li><a href="/browse/?type=decade">
             {% trans %}Dates{% endtrans %}
@@ -37,14 +37,14 @@
         <ul>
           {% if not cnet_id %}
             <li>
-              <a href="http://www.lib.uchicago.edu/myaccount"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
+              <a href="/Shibboleth.sso/Login?target={{request.url}}"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
             </li>
             <li>
               <a href="/request-account">{% trans %}Request an Account{% endtrans %}</a><br>
             </li>
           {% else %}
             <li>
-              <i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Logged In{% endtrans %}<br>
+              <a href="/Shibboleth.sso/Logout"><i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Log out{% endtrans %}</a><br>
             </li>
           {% endif %}
           {% if is_restricted%}
@@ -54,7 +54,7 @@
                   <input type="hidden" name="msg_type" value="request_access">
                   <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
                   <input type="hidden" name="Series ID" value="{{ series_id }}" required>
-                  <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
+                  <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request. Requests are typically processed within 3 business days, and you will receive an email when approved.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
                 </form>
               </li>
             {% else %}
