@@ -5,15 +5,8 @@
   <div class="title-wrapper">
     <h1>{% trans %}Suggest Corrections{% endtrans %}</h1>
   </div>
-  <form id="suggestCorrections" class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-    <div class="row">
-      <div class="col-xs-12">
-  <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-    <input type="hidden" name="rcpt" value="{{cgimail.feedback.rcpt}}">
-    {# <input type="hidden" name="whom" value="MLC website"> #}
-    <input type="hidden" id="cgimailfrom" name="from" value="{{cgimail.default.from}}">
-    {# <input type="hidden" name="vrfy" value="trivial"> #}
-    <input type="hidden" name="subject" value="{{cgimail.feedback.subject}}">
+  <form class="gray-surface" action="/send-cgimail" method="POST">
+    <input type="hidden" name="msg_type" value="feedback">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-sm-push-6">
           

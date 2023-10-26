@@ -3,12 +3,8 @@
 {% block content %}
   <div class="" id="content" role="main">
     <h1>{{ title_slug }}</h1>
-
-    <h2>CGIMail Receipt</h2>
-    <pre>{{ request.args.status }}</pre>
-    {% if request.args.status == 'success' %}
-      <p>Your request has been received.</p>
-    {% endif %}
-
+    <h2>{{msg_title}}</h2>
+    {# <pre>{{ request.args.status }}</pre> #}
+    <p>{{msg_text}}</p>
   </div>
 {% endblock %}
