@@ -24,23 +24,6 @@ def inject_dict():
             cnetid = request.environ["REMOTE_USER"]
     return {
         'cnet_id' : cnetid,
-        'cgimail' : {
-            'default' : {
-                'from' : 'Vitor G <vitorg@uchicago.edu>'
-            },
-            'request_access': {
-                'rcpt': 'askscrc',
-                'subject': '[TEST] Request for access to UCLA restricted series',
-            },
-            'request_account': {
-                'rcpt': 'askscrc',
-                'subject': '[TEST] Request for UCLA account',
-            }, 
-            'feedback': {
-                'rcpt': 'vitor',
-                'subject': '[TEST] Feedback about University of Chicago Language Archive',
-            }, 
-        },
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
