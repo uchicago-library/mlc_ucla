@@ -197,6 +197,90 @@ def cli_search(term, facet):
         print('')
 
 
+# CGIMAIL
+# this dictionary and the following two functions
+# serve as middleman to use cgimail https://dldc.lib.uchicago.edu/local/programming/cgimail.html
+# so that users receive a controlled receipt customized to our platform,
+# but still making use of the security features provided by cgimail.
+
+cgimail_dic= {
+    'default' : {
+        'from' : 'MLC Website <vitorg@uchicago.edu>'
+    },
+    'error': {
+        'title': lazy_gettext('Error status'),
+        'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine it\'s nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library dldc-info@lib.uchicago.edu')
+    },
+    'request_account': {
+        'rcpt': 'askscrc',
+        'subject': '[TEST] Request for MLC account',
+        'title': lazy_gettext('Your request was successfully sent'),
+        'text': lazy_gettext('Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.')
+    },
+    'request_access': {
+        'rcpt': 'askscrc',
+        'subject': '[TEST] Request for access to MLC restricted series',
+        'title': lazy_gettext('Your request was successfully sent'),
+        'text': lazy_gettext('Thank you for your interest in this content. Request to content access is typically processed within 3 businessdays. You will be notified of any status change to the email associated with your account.')
+    },
+    'feedback': {
+        'rcpt': 'woken',
+        'subject': '[TEST] Feedback about Mesoamerican Language Collection Portal',
+        'title': lazy_gettext('Thank you for your submission'),
+        'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
+    }
+}
+
+@mlc_ucla_search.route('/send-cgimail', methods=['POST'])
+def send_cgimail():
+    # msg_type specifies which form it is coming from.
+    msg_type = request.form.get('msg_type')
+
+    if msg_type not in cgimail_dic:
+        return redirect('/submission-receipt?status=error')
+
+    # forward all form fields to cgimail except for the msg_type
+    # and add cgimail required fields
+    args = {}
+    for arg in request.form:
+        if arg == 'msg_type':
+            continue
+        args[arg] = request.form[arg]
+
+    args['from'] = cgimail_dic['default']['from']
+    args['rcpt'] = cgimail_dic[msg_type]['rcpt']
+    args['subject'] = cgimail_dic[msg_type]['subject']
+
+    # Send the request to CGIMail.
+    # CGIMail looks for a referer in the request header.
+    cgiurl = 'https://www.lib.uchicago.edu/cgi-bin/cgimail'
+    session = requests.Session()
+    session.headers.update({'referer': 'https://mlc.lib.uchicago.edu/'})
+    r = session.post(cgiurl, data = args)
+
+    # Interpret the request result and redirect to receipt.
+    # cgimial returns a 200 even when it refuses a request.
+    # developer says that cgimail is unlikely to be changed in any predictable future.
+    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else 'failed'
+    goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
+    return redirect(goto)
+
+@mlc_ucla_search.route('/submission-receipt')
+def submission_receipt():
+    title_slug = lazy_gettext('Receipt status for Request')
+
+    view = 'error'
+    if request.args.get('status') == 'success' and request.args.get('view') in cgimail_dic:
+        view = request.args.get('view')
+
+    return (render_template(
+        'cgimail-receipt.html',
+        title_slug = title_slug,
+        msg_title = cgimail_dic[view]['title'],
+        msg_text = cgimail_dic[view]['text']
+        ),400
+    )
+
 # WEB
 
 # removed restricted label due to issue https://github.com/uchicago-library/ucla/issues/84
@@ -401,6 +485,8 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'is_restricted': series_data['access_rights'][0].lower() == 'restricted',
+            'series_id': series_data['identifier'][0],
             'access_rights': get_access_label_obj(series_data)
         })
     )

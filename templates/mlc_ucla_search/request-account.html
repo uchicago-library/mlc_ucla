@@ -11,14 +11,10 @@
         <p style="max-width: 600px">
           {% trans %}Please briefly describe the purpose of your access. Once you click 'Submit,' you will be directed to a confirmation receipt of your request. Account requests are reviewed individually and typically processed within five business days. You will receive an email with instructions on how to use your account.{% endtrans %}
         </p>
-  <form class="gray-surface" action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST" style="max-width: 600px">
+  <form class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
     <div class="row">
       <div class="col-xs-12">
-        <input type="hidden" name="rcpt" value="{{cgimail.request_account.rcpt}}">
-        {# <input type="hidden" name="whom" value="MLC website"> #}
-        <input type="hidden" id="cgimailfrom" name="from" value="{{cgimail.default.from}}">
-        {# <input type="hidden" name="vrfy" value="trivial"> #}
-        <input type="hidden" name="subject" value="{{cgimail.request_account.subject}}">
+        <input type="hidden" name="msg_type" value="request_account">
         <div class="form-group">
           <label for="name">{% trans %}Name{% endtrans %}*</label>
           <input type="text" class="form-control" id="name" name="User's Name" placeholder="{% trans %}Enter your name{% endtrans %}" required>

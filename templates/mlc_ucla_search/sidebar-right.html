@@ -50,12 +50,8 @@
           {% if is_restricted%}
             {% if cnet_id%}
               <li>
-                <form action="https://www.lib.uchicago.edu/cgi-bin/cgimail" method="POST">
-                  <input type="hidden" name="rcpt" value="{{cgimail.request_access.rcpt}}">
-                  {# <input type="hidden" name="whom" value="MLC website"> #}
-                  <input type="hidden" name="from" value="{{cgimail.default.from}}">
-                  {# <input type="hidden" name="vrfy" value="trivial"> #}
-                  <input type="hidden" name="subject" value="{{cgimail.request_access.surrogate}}">
+                <form action="/send-cgimail" method="POST">
+                  <input type="hidden" name="msg_type" value="request_access">
                   <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
                   <input type="hidden" name="Series ID" value="{{ series_id }}" required>
                   <button onclick="alert('{% trans %}You are being forwarded to a confirmation receipt of your request. Requests are typically processed within 3 business days, and you will receive an email when approved.{% endtrans %}')" type="submit">{% trans %}Request Access to this Series/Item{% endtrans %}</button><br>
