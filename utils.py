@@ -1,11 +1,12 @@
 import copy
 import json
 import os
+import requests
+import requests_cache
 import sqlite3
 import urllib.parse
 import rdflib
 import sys
-from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
 
@@ -136,14 +137,16 @@ class GlottologLookup:
 
 
 class MLCGraph:
-    def __init__(self, config, graph):
+    def __init__(self, config):
         """
         Parameters:
             g (rdflib.Graph): a graph containing triples for the project.
         """
+        self.backend = 'http://marklogic.lib.uchicago.edu:8031'
         self.config = config
-        self.graph = graph
         self.glottolog_lookup = GlottologLookup(self.config)
+        self.named_graph = 'http://lib.uchicago.edu/mlc'
+        self.requests = requests_cache.CachedSession('requests_cache')
 
     def get_browse_terms(self, browse_type):
         """
@@ -190,17 +193,18 @@ class MLCGraph:
 
         browse_dict = {}
         if browse_type == 'decade':
-            qres = self.graph.query(
-                prepareQuery('''
+            qres = self.query(
+                '''
                     PREFIX dcterms: <http://purl.org/dc/terms/>
 
                     SELECT ?date_str ?identifier
+                    FROM <{}>
                     WHERE {{
                         ?identifier ?browse_type ?date_str .
                         ?identifier dcterms:hasPart ?_
                     }}
-                '''),
-                initBindings={
+                '''.format(self.named_graph),
+                {
                     'browse_type': rdflib.URIRef(browse_types[browse_type])
                 }
             )
@@ -228,17 +232,18 @@ class MLCGraph:
                     browse_dict[decade].add(str(identifier))
                     year += 1
         elif browse_type == 'language':
-            qres = self.graph.query(
-                prepareQuery('''
+            qres = self.query(
+                '''
                     PREFIX dcterms: <http://purl.org/dc/terms/>
 
                     SELECT ?browse_term ?identifier
-                    WHERE {
+                    FROM <{}>
+                    WHERE {{
                         ?identifier ?browse_type ?browse_term .
                         ?identifier dcterms:hasPart ?_
-                    }
-                '''),
-                initBindings={
+                    }}
+                '''.format(self.named_graph),
+                {
                     'browse_type': rdflib.URIRef(browse_types[browse_type])
                 }
             )
@@ -254,17 +259,18 @@ class MLCGraph:
                         browse_dict[label] = set()
                     browse_dict[label].add(regularize_string(str(identifier)))
         elif browse_type == 'location':
-            qres = self.graph.query(
-                prepareQuery('''
+            qres = self.query(
+                '''
                     PREFIX dcterms: <http://purl.org/dc/terms/>
 
                     SELECT ?browse_term ?identifier
-                    WHERE {
+                    FROM <{}>
+                    WHERE {{
                         ?identifier ?browse_type ?browse_term .
                         ?identifier dcterms:hasPart ?_
-                    }
-                '''),
-                initBindings={
+                    }}
+                '''.format(self.named_graph),
+                {
                     'browse_type': rdflib.URIRef(browse_types[browse_type])
                 }
             )
@@ -282,15 +288,16 @@ class MLCGraph:
                         browse_dict[label].add(
                             regularize_string(str(identifier)))
         else:
-            qres = self.graph.query(
-                prepareQuery('''
+            qres = self.query(
+                '''
                     SELECT ?browse_term ?identifier
-                    WHERE {
+                    FROM <{}>
+                    WHERE {{
                         ?identifier ?browse_type ?browse_term .
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
-                    }
-                '''),
-                initBindings={
+                    }}
+                '''.format(self.named_graph),
+                {
                     'browse_type': rdflib.URIRef(browse_types[browse_type])
                 }
             )
@@ -319,17 +326,19 @@ class MLCGraph:
         Returns:
             str: item identifier.
         """
+
         dbid = ''
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
                 SELECT ?dbid
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id dc:identifier ?dbid
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -347,17 +356,18 @@ class MLCGraph:
             bool
         """
         has_panopto_link = '0'
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
                 SELECT ?url
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?aggregation edm:aggregatedCHO ?item_id .
                     ?aggregation edm:isShownBy ?url
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -395,14 +405,15 @@ class MLCGraph:
                 'discourseType'
         }.items():
             values = set()
-            for row in self.graph.query(
-                prepareQuery('''
+            for row in self.query(
+                '''
                     SELECT ?value
-                    WHERE {
+                    FROM <{}>
+                    WHERE {{
                         ?item_id ?p ?value
-                    }
-                '''),
-                initBindings={
+                    }}
+                '''.format(self.named_graph),
+                {
                     'p': rdflib.URIRef(p),
                     'item_id': rdflib.URIRef(item_id)
                 }
@@ -425,21 +436,22 @@ class MLCGraph:
 
         # primary_language
         codes = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
                 SELECT ?code
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
                     ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Primary'))
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -458,21 +470,22 @@ class MLCGraph:
 
         # subject_language
         codes = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
                 SELECT ?code
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
                     ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Subject'))
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -492,27 +505,28 @@ class MLCGraph:
         # has_format
         data['has_format'] = {}
 
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
                 PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
                 SELECT ?format_item_id ?format_medium
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id dcterms:hasFormat ?format_item_id .
                     ?format_item_id dcterms:medium ?format_medium .
                     ?format_item_id dc:identifier ?format_dbid .
                     ?format_agg edm:aggregatedCHO ?format_item_id .
-                    BIND( EXISTS {
+                    BIND( EXISTS {{
                         ?format_agg edm:isShownBy ?_ .
-                    }
+                    }}
                     AS ?has_panopto
                     )
-                }
+                }}
                 ORDER BY DESC(?has_panopto) ?format_dbid
-            '''),
-            initBindings={
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -525,28 +539,29 @@ class MLCGraph:
         # is_format_of
         data['is_format_of'] = {}
 
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
                 PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
                 SELECT ?format_item_id ?format_medium
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id dcterms:isFormatOf ?format_item_id .
                     ?format_item_id dcterms:medium ?format_medium .
                     ?format_item_id dc:identifier ?format_dbid .
                     ?format_agg edm:aggregatedCHO ?format_item_id .
-                    BIND( EXISTS {
+                    BIND( EXISTS {{
                         ?format_agg edm:isShownBy ?_ .
-                    }
+                    }}
                     AS
                     ?has_panopto
                     )
-                }
+                }}
                 ORDER BY DESC(?has_panopto) ?format_dbid
-            '''),
-            initBindings={
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -558,17 +573,18 @@ class MLCGraph:
 
         # panopto links
         panopto_links = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
                 SELECT ?panopto_link
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?aggregation edm:aggregatedCHO ?item_id .
                     ?aggregation edm:isShownBy ?panopto_link
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -578,16 +594,17 @@ class MLCGraph:
         # panopto identifiers
         panopto_identifiers = set()
         panopto_prefix = 'https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id='
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?identifier
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?web_resource dcterms:identifier ?identifier
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'web_resource': rdflib.URIRef(item_id + '/file.wav')
             }
         ):
@@ -597,17 +614,18 @@ class MLCGraph:
 
         # access rights
         access_rights = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?access_rights
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id dcterms:isPartOf ?series_id .
                     ?series_id dcterms:accessRights ?access_rights
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -628,14 +646,17 @@ class MLCGraph:
         Returns:
             list: item identifiers.
         """
-        qres = self.graph.query('''
-            PREFIX dcterms: <http://purl.org/dc/terms/>
+        qres = self.query(
+            '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
 
-            SELECT ?item_id
-            WHERE {
-                ?_ dcterms:hasPart ?item_id
-            }
-        ''')
+                SELECT ?item_id
+                FROM <{}>
+                WHERE {{
+                    ?_ dcterms:hasPart ?item_id
+                }}
+            '''.format(self.named_graph)
+        )
 
         results = set()
         for row in qres:
@@ -652,16 +673,17 @@ class MLCGraph:
         Returns:
             list: a list of item identifiers.
         """
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?item_id
-                    WHERE {
-                        ?series_id dcterms:hasPart ?item_id
-                   }
-            '''),
-            initBindings={
+                FROM <{}>
+                WHERE {{
+                    ?series_id dcterms:hasPart ?item_id
+               }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(i)
             }
         )
@@ -682,16 +704,17 @@ class MLCGraph:
             str: medium
         """
         medium = ''
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?medium
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?item_id dcterms:medium ?medium
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
@@ -722,14 +745,15 @@ class MLCGraph:
             'http://www.language−archives.org/OLAC/metadata.htmldiscourseType',
             'http://lib.uchicago.edu/dma/contentType'
         ):
-            r = self.graph.query(
-                prepareQuery('''
+            r = self.query(
+                '''
                     SELECT ?o
-                        WHERE {
-                            ?series_id ?p ?o
-                       }
-                '''),
-                initBindings={
+                    FROM <{}>
+                    WHERE {{
+                        ?series_id ?p ?o
+                    }}
+                '''.format(self.named_graph),
+                {
                     'p': rdflib.URIRef(p),
                     'series_id': rdflib.URIRef(i)
                 }
@@ -738,16 +762,17 @@ class MLCGraph:
                 search_tokens.append(str(row[0]))
 
         # fn:collection
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX fn: <http://www.w3.org/2005/xpath-functions>
 
                 SELECT ?o
-                    WHERE {
-                        ?series_aggregation_id fn:collection ?o .
-                   }
-            '''),
-            initBindings={
+                FROM <{}>
+                WHERE {{
+                    ?series_aggregation_id fn:collection ?o .
+                }}
+            '''.format(self.named_graph),
+            {
                 'p': rdflib.URIRef(p),
                 'series_aggregation_id': rdflib.URIRef(i + '/aggregation')
             }
@@ -760,16 +785,17 @@ class MLCGraph:
                 search_tokens.append(lookup[str(row[0])])
 
         # dc:language
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
                 SELECT ?o
-                    WHERE {
-                        ?series_id dc:language ?o
-                   }
-            '''),
-            initBindings={
+                FROM <{}>
+                WHERE {{
+                    ?series_id dc:language ?o
+                }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(i)
             }
         )
@@ -778,16 +804,18 @@ class MLCGraph:
                 search_tokens.append(label)
 
         # dcterms:spatial
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?o
-                    WHERE {
-                        ?series_id dcterms:spatial ?o
-                    }
-            '''),
-            initBindings={
+                FROM <{}>
+           
+                WHERE {{
+                    ?series_id dcterms:spatial ?o
+                }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(i)
             }
         )
@@ -798,16 +826,16 @@ class MLCGraph:
 
         # series-level dc:date
         years = set()
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?o
-                    WHERE {
-                        ?series_id dcterms:date ?o
-                    }
-            '''),
-            initBindings={
+                WHERE {{
+                    ?series_id dcterms:date ?o
+                }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(i)
             }
         )
@@ -846,16 +874,17 @@ class MLCGraph:
 
         # item-level description
         for iid in self.get_item_identifiers_for_series(i):
-            r = self.graph.query(
-                prepareQuery('''
+            r = self.query(
+                '''
                     PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
                     SELECT ?o
-                        WHERE {
-                            ?item_id dc:description ?o
-                       }
-                '''),
-                initBindings={
+                    FROM <{}>
+                    WHERE {{
+                        ?item_id dc:description ?o
+                    }}
+                '''.format(self.named_graph),
+                {
                     'item_id': rdflib.URIRef(iid)
                 }
             )
@@ -884,16 +913,17 @@ class MLCGraph:
         search_tokens = []
 
         # item-level description
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
                 SELECT ?o
-                    WHERE {
-                        ?item_id dc:description ?o
-                   }
-            '''),
-            initBindings={
+                FROM <{}>
+                WHERE {{
+                    ?item_id dc:description ?o
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(i)
             }
         )
@@ -920,17 +950,17 @@ class MLCGraph:
             str: a four-digit year (YYYY) or a year range (YYYY/YYYY)
         """
         years = []
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?date
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?identifier dcterms:date ?date
-                }
-                '''
-                         ),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'identifier': rdflib.URIRef(i)
             }
         ):
@@ -957,17 +987,17 @@ class MLCGraph:
             str: a database identifier.
         """
         dbids = []
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
                 SELECT ?dbid
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?identifier dc:identifier ?dbid
-                }
-                '''
-                         ),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'identifier': rdflib.URIRef(i)
             }
         ):
@@ -987,14 +1017,17 @@ class MLCGraph:
         Returns:
             list: series identifiers.
         """
-        qres = self.graph.query('''
-            PREFIX dcterms: <http://purl.org/dc/terms/>
+        qres = self.query(
+            '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
 
-            SELECT ?series_id
-            WHERE {
-                ?series_id dcterms:hasPart ?_
-            }
-        ''')
+                SELECT ?series_id
+                FROM <{}>
+                WHERE {{
+                    ?series_id dcterms:hasPart ?_
+                }}
+            '''.format(self.named_graph)
+        )
 
         results = set()
         for row in qres:
@@ -1011,16 +1044,17 @@ class MLCGraph:
         Returns:
             list: a list of series identifiers.
         """
-        r = self.graph.query(
-            prepareQuery('''
+        r = self.query(
+            '''
                 PREFIX dcterms: <http://purl.org/dc/terms/>
 
                 SELECT ?series_id
-                    WHERE {
-                        ?series_id dcterms:hasPart ?item_id
-                   }
-            '''),
-            initBindings={
+                FROM <{}>
+                WHERE {{
+                    ?series_id dcterms:hasPart ?item_id
+                }}
+            '''.format(self.named_graph),
+            {
                 'item_id': rdflib.URIRef(i)
             }
         )
@@ -1057,14 +1091,15 @@ class MLCGraph:
             'location': 'http://purl.org/dc/terms/spatial'
         }.items():
             values = set()
-            for row in self.graph.query(
-                prepareQuery('''
+            for row in self.query(
+                '''
                     SELECT ?value
-                    WHERE {
+                    FROM <{}>
+                    WHERE {{
                         ?series_id ?p ?value
-                    }
-                '''),
-                initBindings={
+                    }}
+                '''.format(self.named_graph),
+                {
                     'p': rdflib.URIRef(p),
                     'series_id': rdflib.URIRef(series_id)
                 }
@@ -1087,21 +1122,22 @@ class MLCGraph:
 
         # primary_language
         codes = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
                 SELECT ?code
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?series_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
                     ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Primary'))
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
@@ -1120,21 +1156,22 @@ class MLCGraph:
 
         # subject_language
         codes = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
                 SELECT ?code
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?series_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
                     ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Subject'))
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
@@ -1168,21 +1205,24 @@ class MLCGraph:
             There are only 157 identifiers in the data as of August, 2023.
         """
         results = set()
-        for row in self.graph.query('''
-            PREFIX getty: <http://vocab.getty.edu/ontology#>
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        for row in self.query(
+            '''
+                PREFIX getty: <http://vocab.getty.edu/ontology#>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-            SELECT ?identifier
-            WHERE {
-                ?identifier a ?type .
-                FILTER (?type IN (
-                    getty:Subject,
-                    getty:PhysPlaceConcept,
-                    skos:Concept,
-                    getty:AdminPlaceConcept
-                ))
-            }
-        '''):
+                SELECT ?identifier
+                FROM <{}>
+                WHERE {{
+                    ?identifier a ?type .
+                    FILTER (?type IN (
+                        getty:Subject,
+                        getty:PhysPlaceConcept,
+                        skos:Concept,
+                        getty:AdminPlaceConcept
+                    ))
+                }}
+            '''.format(self.named_graph)
+        ):
             results.add(str(row[0]).replace('http://vocab.getty.edu/tgn/', ''))
         return list(results)
 
@@ -1196,23 +1236,24 @@ class MLCGraph:
             list: a list of place names as unicode strings.
         """
         results = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                 SELECT ?label
-                WHERE {
-                    {
+                FROM <{}>
+                WHERE {{
+                    {{
                         ?tgn rdf:label ?label .
-                    } UNION {
+                    }} UNION {{
                         ?tgn skos:altLabel ?label .
-                    } UNION {
+                    }} UNION {{
                         ?tgn skos:prefLabel ?label .
-                    }
-                }
-            '''),
-            initBindings={
+                    }}
+                }}
+            '''.format(self.named_graph),
+            {
                 'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
             }
         ):
@@ -1233,24 +1274,25 @@ class MLCGraph:
             available.
         """
         results = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                 SELECT ?label
-                WHERE {
-                    {
+                FROM <{}>
+                WHERE {{
+                    {{
                         ?tgn rdf:label ?label .
-                    } UNION {
+                    }} UNION {{
                         ?tgn skos:altLabel ?label .
-                    } UNION {
+                    }} UNION {{
                         ?tgn skos:prefLabel ?label .
-                    }
+                    }}
                     FILTER langMatches(lang(?label), "EN")
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
             }
         ):
@@ -1268,17 +1310,18 @@ class MLCGraph:
             list: a list of strings, e.g., "Guatemala"
         """
         results = set()
-        for row in self.graph.query(
-            prepareQuery('''
+        for row in self.query(
+            '''
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                 SELECT ?label
-                WHERE {
+                FROM <{}>
+                WHERE {{
                     ?tgn skos:prefLabel ?label .
                     FILTER langMatches(lang(?label), "EN")
-                }
-            '''),
-            initBindings={
+                }}
+            '''.format(self.named_graph),
+            {
                 'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
             }
         ):
@@ -1299,6 +1342,49 @@ class MLCGraph:
 
         return []
 
+    def query(self, s, b = {}):
+        """Query the triplestore. 
+
+        Parameters:
+            s (str): a SPARQL query.
+            b (dict): variable bindings for the query.
+
+        Returns:
+            a list of tuples, like those returned by rdflib's graph.query().
+        """
+        # convert all whitespace to a single space, trim string.
+        s = ' '.join(s.split())
+        
+        # build a list of tuples to submit as GET request URL params.
+        params = [('query', s)]
+        for k, v in b.items():
+            params.append(('bind:' + k, str(v)))
+
+        r = self.requests.get('{}/v1/graphs/sparql?{}'.format(
+            self.backend,
+            urllib.parse.urlencode(params)
+        ))
+        data = r.json()
+
+        # handle errors.
+        if 'errorResponse' in data:
+            sys.stderr.write(r.text)
+            sys.exit()
+
+        # collect output into a list of lists, like rdflib's graph.query().
+        output = []
+        for result in data['results']['bindings']:
+            row = []
+            for var in data['head']['vars']:
+                if result[var]['type'] in ('literal', 'uri'):
+                    v = result[var]['value']
+                else:
+                    raise NotImplementedError
+                row.append(v)
+            output.append(row)
+
+        return output
+
 
 class MLCDB:
     def __init__(self, config):
@@ -1314,6 +1400,13 @@ class MLCDB:
         self._item_info = {}
         self._series_info = {}
 
+        self.g = rdflib.Graph()
+        self.g.parse(self.config['MESO_TRIPLES'], format='turtle')
+        self.g.parse(self.config['TGN_TRIPLES'])
+
+        self.mlc_graph = MLCGraph(self.config)
+
+
     def build_db(self):
         """
         Build SQLite database.
@@ -1326,12 +1419,6 @@ class MLCDB:
 
         con = sqlite3.connect(self.config['DB'])
         cur = con.cursor()
-
-        g = rdflib.Graph()
-        g.parse(self.config['MESO_TRIPLES'], format='turtle')
-        g.parse(self.config['TGN_TRIPLES'])
-
-        mlc_graph = MLCGraph(self.config, g)
 
         # build an item to series lookup
         item_series_lookup = {}
@@ -1526,7 +1613,7 @@ class MLCDB:
         # the query in python.
             # key=lambda i: i[1]*-1
 
-        if( browse_sort == 'count' ):
+        if( browse_sort == 'count'):
            return sorted(
                 self.cur.execute('''
                     select term, count(id)
@@ -1607,10 +1694,7 @@ class MLCDB:
         Returns:
             dict: a metadata dictionary.
         """
-        if not self.con:
-            self.connect()
-
-        info = copy.deepcopy(self._item_info[identifier])
+        info = self.mlc_graph.get_item_info(identifier)
 
         # load item hasFormat / isFormatOf relationships
         if get_format_relationships:
@@ -1619,7 +1703,9 @@ class MLCDB:
                     for m in info[p].keys():
                         for i in range(len(info[p][m])):
                             url = info[p][m][i]
-                            info[p][m][i] = self._item_info[url]
+                            info[p][m][i] = self.mlc_graph.get_item_info(
+                                identifier
+                            )
         return info
 
     def get_item_list(self):

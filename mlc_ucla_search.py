@@ -3,19 +3,17 @@ import re
 import requests
 import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
-from utils import GlottologLookup, MLCDB
+from utils import GlottologLookup, MLCDB, MLCGraph
 from flask_babel import lazy_gettext
-from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
+from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, TGN_TRIPLES
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
 
 
-mlc_db = MLCDB({
-    'DB': DB,
+mlc_g = MLCGraph({
     'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
-    'MESO_TRIPLES': MESO_TRIPLES,
-    'TGN_TRIPLES': TGN_TRIPLES
+    'GLOTTO_TRIPLES': GLOTTO_TRIPLES
 })
 
 # FUNCTIONS
@@ -151,9 +149,9 @@ def cli_get_series(series_identifier):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
-    for i in mlc_db.get_item_list():
+    for i in mlc_g.get_item_identifiers():
         if verbose:
-            print_item(mlc_db.get_item(i))
+            print_item(mlc_g.get_item_info(i))
         else:
             sys.stdout.write('{}\n'.format(i))
 
@@ -164,9 +162,9 @@ def cli_list_items(verbose):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
-    for i in mlc_db.get_series_list():
+    for i in mlc_g.get_series_identifiers():
         if verbose:
-            print_series(mlc_db.get_series(i))
+            print_series(mlc_g.get_series_info(i))
         else:
             sys.stdout.write('{}\n'.format(i))
 
