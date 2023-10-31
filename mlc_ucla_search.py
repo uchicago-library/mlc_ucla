@@ -131,7 +131,7 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    print_item(mlc_db.get_item(item_identifier))
+    print_item(mlc_g.get_item_info(item_identifier))
 
 
 @mlc_ucla_search.cli.command(
@@ -140,7 +140,7 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    print_series(mlc_db.get_series(series_identifier))
+    print_series(mlc_g.get_series_info(series_identifier))
 
 
 @mlc_ucla_search.cli.command(
