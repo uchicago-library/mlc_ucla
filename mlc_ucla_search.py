@@ -110,8 +110,10 @@ def cli_build_glottolog_lookup():
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
     """List browse terms."""
-    for row in mlc_db.get_browse(browse_type):
-        sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
+    for browse_term, series_list in mlc_g.get_browse_terms(
+        browse_type
+    ).items():
+        sys.stdout.write('{} ({})\n'.format(browse_term, len(series_list)))
 
 
 @mlc_ucla_search.cli.command(
@@ -121,8 +123,9 @@ def cli_get_browse(browse_type):
 @click.argument('browse_type')
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
-    for row in mlc_db.get_browse_term(browse_type, browse_term):
-        print_series(row[1])
+    browse = mlc_g.get_browse_terms(browse_type)
+    for s in browse[browse_term]:
+        print_series(s)
 
 
 @mlc_ucla_search.cli.command(
