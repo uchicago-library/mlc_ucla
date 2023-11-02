@@ -1,9 +1,10 @@
 import click
+import json
 import re
 import requests
 import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
-from utils import GlottologLookup, MLCDB, MLCGraph
+from utils import GlottologLookup, MLCGraph
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, TGN_TRIPLES
 
@@ -90,7 +91,7 @@ def print_series(series_info):
 )
 def cli_build_db():
     """Build a SQLite database from linked data triples."""
-    mlc_db.build_db()
+    raise NotImplementedError
 
 
 @mlc_ucla_search.cli.command(
@@ -177,26 +178,11 @@ def cli_list_series(verbose):
     short_help='Search for term.'
 )
 @click.argument('term')
-@click.argument('facet')
-def cli_search(term, facet):
-    for i in mlc_db.get_search(term, [facet], 'rank'):
-        print(i[0])
-        print(i[2])
-        sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
-            'Series Title',
-            ' '.join(i[1]['titles']),
-            'Contributor',
-            ' | '.join(i[1]['contributor']),
-            'Indigenous Language',
-            ' | '.join(i[1]['language']),
-            'Location',
-            ' | '.join(i[1]['location']),
-            'Date',
-            ' | '.join(i[1]['date']),
-            'Resource Type',
-            ' | '.join(i[1]['content_type'])
-        ))
-        print('')
+#@click.argument('facet')
+#def cli_search(term, facet):
+def cli_search(term):
+    for i in mlc_g.search(term):
+        print(i)
 
 
 # CGIMAIL
@@ -223,7 +209,11 @@ cgimail_dic= {
         'rcpt': 'askscrc',
         'subject': '[TEST] Request for access to MLC restricted series',
         'title': lazy_gettext('Your request was successfully sent'),
-        'text': lazy_gettext('Thank you for your interest in this content. Request to content access is typically processed within 3 businessdays. You will be notified of any status change to the email associated with your account.')
+        'text': lazy_gettext('Thank you for your interest in this content. '
+            'Request to content access is typically processed within 3 businessdays. '
+            'You will be notified of any status change to the email associated with your account. '
+            'We ask each visitor to avoid making duplicate requests by keeping a record of them, '
+            'as we have no way to display these for each user at the moment.')
     },
     'feedback': {
         'rcpt': 'woken',
@@ -388,7 +378,8 @@ def browse():
         if browse_type == 'decade':
             sort_field = 'date'
 
-        results = mlc_db.get_browse_term(browse_type, browse_term, sort_field)
+        # JEJ need sorting back.
+        results = mlc_g.get_browse_terms(browse_type)[browse_term]
 
         results_with_label_ui_data = []
         for item in results:
@@ -406,10 +397,11 @@ def browse():
         )
     else:
         browse_sort = request.args.get('sort')
+        # JEJ need sorting below.
         return render_template(
             'browse.html',
             title_slug=title_slugs[browse_type],
-            browse_terms=mlc_db.get_browse(browse_type, browse_sort),
+            browse_terms=mlc_g.get_browse_terms(browse_type),
             browse_type=browse_type
         )
 
@@ -419,16 +411,16 @@ def search():
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
-    db_results = mlc_db.get_search(query, facets, sort_type)
+    db_results = mlc_g.search(query, facets, sort_type)
 
     processed_results = []
     for db_series in db_results:
-        series_data = mlc_db.get_series(db_series[0])
+        series_data = mlc_g.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
 
         series_data['sub_items'] = []
         for i in db_series[1]:
-            info = mlc_db.get_item(i)
+            info = mlc_g.get_item_info(i)
             series_data['sub_items'].append(info)
         series_data['sub_items'].sort(key=sortListOfItems)
         processed_results.append((db_series[0], series_data))
@@ -460,35 +452,51 @@ def series(noid):
         )
         abort(400)
 
-    series_data = mlc_db.get_series(BASE + noid)
+    series_data = mlc_g.get_series(BASE + noid)
 
     items = []
-    for i in mlc_db.get_items_for_series(BASE + noid):
+    for i in mlc_g.get_items_identifiers_for_series(BASE + noid):
         items.append((
             i,
-            mlc_db.get_item(i)
+            mlc_g.get_item_info(i)
         ))
     items.sort(key=sortListOfItems)
 
+    has_panopto = False # to display the Request Access button
+    item_id_with_panopto = ''
+    item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
         medium = i[1]['medium'][0]
         if medium not in grouped_items:
             grouped_items[medium] = []        
         grouped_items[medium].append(i[1])
+        if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
+            has_panopto = True
+            item_id_with_panopto = i[1]['identifier'][0]
+            item_title_with_panopto = i[1]['titles'][0]
 
     try:
         title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
 
+    # details for request access button
+    # TODO: needs to check if user already has access
+    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
+    request_access_button = {
+        'show' : is_restricted and has_panopto,
+        'series_id' : series_data['identifier'][0],
+        'item_id' : item_id_with_panopto,
+        'item_title' : item_title_with_panopto
+    }
+
     return render_template(
         'series.html',
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
-            'is_restricted': series_data['access_rights'][0].lower() == 'restricted',
-            'series_id': series_data['identifier'][0],
+            'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
     )
@@ -503,7 +511,7 @@ def item(noid):
         )
         abort(400)
 
-    item_data = mlc_db.get_item(BASE + noid, True)
+    item_data = mlc_g.get_item_info(BASE + noid, True)
 
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
@@ -511,12 +519,22 @@ def item(noid):
         panopto_identifier = ''
 
     series = []
-    for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series_info(s)))
+    for s in mlc_g.get_series_identifiers_for_item(BASE + noid):
+        series.append((s, mlc_g.get_series_info(s)))
 
+    # details for request access button
+    # TODO: needs to check if user already has access
+    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
+    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
+    request_access_button = {
+        'show' : is_restricted and has_panopto,
+        'series_id' : ','.join(series_id), #some items belong to multiple series
+        'item_id' : item_data['identifier'][0],
+        'item_title' : item_data['titles'][0] or 'Unknow item title',
+    }
 
     try:
         title_slug = item_data['titles'][0]
@@ -534,8 +552,7 @@ def item(noid):
         **(item_data | {'series': series,
             'title_slug': title_slug,
             'access_rights': get_access_label_obj(item_data),
-            'is_restricted': item_data['access_rights'][0].lower() == 'restricted',
-            'series_id': ','.join(series_id),
+            'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
             'breadcrumb': breadcrumb})
     )
