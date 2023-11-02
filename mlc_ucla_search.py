@@ -222,7 +222,11 @@ cgimail_dic= {
         'rcpt': 'askscrc',
         'subject': '[TEST] Request for access to MLC restricted series',
         'title': lazy_gettext('Your request was successfully sent'),
-        'text': lazy_gettext('Thank you for your interest in this content. Request to content access is typically processed within 3 businessdays. You will be notified of any status change to the email associated with your account.')
+        'text': lazy_gettext('Thank you for your interest in this content. '
+            'Request to content access is typically processed within 3 businessdays. '
+            'You will be notified of any status change to the email associated with your account. '
+            'We ask each visitor to avoid making duplicate requests by keeping a record of them, '
+            'as we have no way to display these for each user at the moment.')
     },
     'feedback': {
         'rcpt': 'woken',
@@ -469,25 +473,41 @@ def series(noid):
         ))
     items.sort(key=sortListOfItems)
 
+    has_panopto = False # to display the Request Access button
+    item_id_with_panopto = ''
+    item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
         medium = i[1]['medium'][0]
         if medium not in grouped_items:
             grouped_items[medium] = []        
         grouped_items[medium].append(i[1])
+        if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
+            has_panopto = True
+            item_id_with_panopto = i[1]['identifier'][0]
+            item_title_with_panopto = i[1]['titles'][0]
 
     try:
         title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
 
+    # details for request access button
+    # TODO: needs to check if user already has access
+    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
+    request_access_button = {
+        'show' : is_restricted and has_panopto,
+        'series_id' : series_data['identifier'][0],
+        'item_id' : item_id_with_panopto,
+        'item_title' : item_title_with_panopto
+    }
+
     return render_template(
         'series.html',
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
-            'is_restricted': series_data['access_rights'][0].lower() == 'restricted',
-            'series_id': series_data['identifier'][0],
+            'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
     )
@@ -513,9 +533,19 @@ def item(noid):
     for s in mlc_db.get_series_for_item(BASE + noid):
         series.append((s, mlc_db.get_series_info(s)))
 
+    # details for request access button
+    # TODO: needs to check if user already has access
+    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
+    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
+    request_access_button = {
+        'show' : is_restricted and has_panopto,
+        'series_id' : ','.join(series_id), #some items belong to multiple series
+        'item_id' : item_data['identifier'][0],
+        'item_title' : item_data['titles'][0] or 'Unknow item title',
+    }
 
     try:
         title_slug = item_data['titles'][0]
@@ -533,8 +563,7 @@ def item(noid):
         **(item_data | {'series': series,
             'title_slug': title_slug,
             'access_rights': get_access_label_obj(item_data),
-            'is_restricted': item_data['access_rights'][0].lower() == 'restricted',
-            'series_id': ','.join(series_id),
+            'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
             'breadcrumb': breadcrumb})
     )
