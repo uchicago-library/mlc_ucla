@@ -10,6 +10,8 @@ import sys
 
 import regex as re
 
+from local import MARKLOGIC
+
 
 def regularize_string(_):
     """Regularize a string for browses by trimming excess whitespace,
@@ -23,119 +25,6 @@ def regularize_string(_):
     return ' '.join(_.split())
 
 
-class GlottologLookup:
-    def __init__(self, config):
-        self.config = config
-
-        if os.path.exists(self.config['GLOTTO_LOOKUP']):
-            with open(self.config['GLOTTO_LOOKUP']) as f:
-                self._lookup = json.load(f)
-        else: 
-            self._lookup = {
-                'altLabel': {},
-                'prefLabel': {}
-            }
-
-    def build_lookup(self):
-        g = rdflib.Graph()
-        g.parse(self.config['GLOTTO_TRIPLES'], format='turtle')
-
-        lookup = {
-            'altLabel': {},
-            'prefLabel': {}
-        }
-
-        # load altLabel.
-        for row in g.query('''
-            PREFIX lexvo: <https://www.iso.org/standard/39534.html>
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT ?code ?label
-            WHERE {
-                ?identifier lexvo:iso639P3PCode ?code .
-                ?identifier skos:altLabel ?label
-            }
-        '''):
-            code = str(row[0]).strip()
-            label = str(row[1]).strip()
-            if not code in lookup['altLabel']:
-                lookup['altLabel'][code] = []
-            if not label in lookup['altLabel'][code]:
-                lookup['altLabel'][code].append(label)
-
-        # load prefLabel.
-        for row in g.query('''
-            PREFIX lexvo: <https://www.iso.org/standard/39534.html>
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT ?code ?label
-            WHERE {
-                ?identifier lexvo:iso639P3PCode ?code .
-                ?identifier skos:prefLabel ?label
-            }
-        '''):
-            code = str(row[0]).strip()
-            label = str(row[1]).strip()
-            if not code in lookup['prefLabel']:
-                lookup['prefLabel'][code] = []
-            if not label in lookup['prefLabel'][code]:
-                lookup['prefLabel'][code].append(label)
-
-        del g
-
-        with open(self.config['GLOTTO_LOOKUP'], 'w') as f:
-            f.write(json.dumps(lookup))
-
-    def get_glottolog_codes(self):
-        """Get all ISO639P3P Codes from the Glottolog graph.
-
-        Parameters:
-            (none)
-
-        Returns:
-            list: all identifiers.
-        """
-        return set(self._lookup['altLabel'].keys()) | \
-               set(self._lookup['prefLabel'].keys())
-
-    def get_glottolog_language_names(self, c):
-        """Get all language names from Glottolog for a given identifier.
-
-        Parameters:
-            c (str): ISO 639P3P code, e.g., "eng"
-
-        Returns:
-            list: a list of language names as unicode strings.
-        """
-        result = set()
-        try:
-            result = set(self._lookup['altLabel'][c])
-        except KeyError:
-            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
-            pass
-        try:
-            result |= set(self._lookup['prefLabel'][c])
-        except KeyError:
-            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
-            pass
-        return result
-
-    def get_glottolog_language_names_preferred(self, c):
-        """Get preferred language names from Glottolog.
- 
-        Parameters:
-            c (str): ISO 639P3P code, e.g., "eng"
-
-        Returns:
-            list: a list of language names, e.g., "English"
-        """
-        try:
-            return self._lookup['prefLabel'][c]
-        except KeyError:
-            sys.stderr.write('GlottologLookup key error, ' + c + ' not found\n')
-            return ''
-
-
 class MLCGraph:
     def __init__(self, config):
         """
@@ -144,15 +33,13 @@ class MLCGraph:
         """
         self.backend = 'http://marklogic.lib.uchicago.edu:8031'
         self.config = config
-        self.glottolog_lookup = GlottologLookup(self.config)
         self.named_graph = 'http://lib.uchicago.edu/mlc'
         self.requests = requests_cache.CachedSession('requests_cache')
 
     def get_browse_terms(self, browse_type):
         """
-        Get a dictionary of browse terms, along with the items for each term.
-        It's currently not documented whether a browse should return series
-        nodes, item nodes, or both - so this includes both.
+        Get a dictionary of browse terms, along with the series identifiers for
+        each term.
 
         Paramters:
             browse_type (str): e.g., 'contributor', 'creator', 'date',
@@ -160,26 +47,14 @@ class MLCGraph:
 
         Returns:
             dict: a Python dictionary, where the key is the browse term and the
-            value is a list of identifiers.
+            value is a list of series identifiers.
 
         Notes:
             The date browse converts all dates into decades and is range-aware-
             so an item with the date "1933/1955" will appear in "1930s",
             "1940s", and "1950s".
 
-            When I try to match our dc:language to Glottolog's
-            lexvo:iso639P3PCode, I run into trouble in Python's rdflib because
-            Glottolog's data has an explicit datatype of xsd:string() and ours
-            doesn't have an explicit datatype. Making both match manually
-            solves the problem. We may be able to solve this in MarkLogic by
-            casting the variable.
-
-            Here I solved the problem by manually editing the glottolog triples
-            so they match ours.
-
             I would like to get TGN data as triples.
-
-            Go to http://vocab.getty.edu/sparql.
         """
         browse_types = {
             'contributor': 'http://purl.org/dc/terms/contributor',
@@ -235,13 +110,19 @@ class MLCGraph:
             qres = self.query(
                 '''
                     PREFIX dcterms: <http://purl.org/dc/terms/>
+                    PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                     SELECT ?browse_term ?identifier
                     FROM <{}>
+                    FROM <http://lib.uchicago.edu/glottolog>
                     WHERE {{
-                        ?identifier ?browse_type ?browse_term .
-                        ?identifier dcterms:hasPart ?_
+                        ?identifier ?browse_type ?code .
+                        ?identifier dcterms:hasPart ?_ .
+                        ?glottolog_identifier lexvo:iso639P3PCode ?code .
+                        ?glottolog_identifier skos:prefLabel ?browse_term
                     }}
+                    ORDER BY ?browse_term
                 '''.format(self.named_graph),
                 {
                     'browse_type': rdflib.URIRef(browse_types[browse_type])
@@ -249,25 +130,26 @@ class MLCGraph:
             )
             for browse_term, identifier in qres:
                 browse_term = regularize_string(str(browse_term))
-                for label in self.glottolog_lookup.get_glottolog_language_names_preferred(
-                    browse_term
-                ):
-                    label = regularize_string(label)
-                    if not label:
-                        continue
-                    if label not in browse_dict:
-                        browse_dict[label] = set()
-                    browse_dict[label].add(regularize_string(str(identifier)))
+                if not browse_term:
+                    continue
+                if browse_term not in browse_dict:
+                    browse_dict[browse_term] = set()
+                browse_dict[browse_term].add(regularize_string(str(identifier)))
         elif browse_type == 'location':
             qres = self.query(
                 '''
                     PREFIX dcterms: <http://purl.org/dc/terms/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                     SELECT ?browse_term ?identifier
                     FROM <{}>
+                    FROM <http://vocab.getty.edu/tgn/>
                     WHERE {{
-                        ?identifier ?browse_type ?browse_term .
-                        ?identifier dcterms:hasPart ?_
+                        ?identifier ?browse_type ?tgn_number .
+                        ?identifier dcterms:hasPart ?_ .
+                        BIND(IRI(CONCAT('http://vocab.getty.edu/tgn/', ?tgn_number)) AS ?tgn_iri)
+                        ?tgn_iri skos:prefLabel ?browse_term .
+                        FILTER langMatches(lang(?browse_term), 'EN')
                     }}
                 '''.format(self.named_graph),
                 {
@@ -277,16 +159,13 @@ class MLCGraph:
             for browse_terms, identifier in qres:
                 for browse_term in browse_terms.split():
                     browse_term = regularize_string(browse_term)
-                    for label in self.get_tgn_place_names_preferred(
-                        browse_term
-                    ):
-                        label = regularize_string(label)
-                        if not label:
-                            continue
-                        if label not in browse_dict:
-                            browse_dict[label] = set()
-                        browse_dict[label].add(
-                            regularize_string(str(identifier)))
+                    if not browse_term:
+                        continue
+                    if browse_term not in browse_dict:
+                        browse_dict[browse_term] = set()
+                    browse_dict[browse_term].add(
+                        regularize_string(str(identifier))
+                    )
         else:
             qres = self.query(
                 '''
@@ -399,7 +278,6 @@ class MLCGraph:
             'contributor': 'http://purl.org/dc/terms/contributor',
             'date': 'http://purl.org/dc/terms/date',
             'is_part_of': 'http://purl.org/dc/terms/isPartOf',
-            'location': 'http://purl.org/dc/terms/spatial',
             'discourse_type':
                 'http://www.language−archives.org/OLAC/metadata.html' +
                 'discourseType'
@@ -421,86 +299,93 @@ class MLCGraph:
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
 
-        # convert TGN identifiers to preferred names.
-        tgn_identifiers = set()
-        for i in data['location']:
-            for j in i.split():
-                tgn_identifiers.add(j)
+        # Get preferred names for TGN identifiers
+        locations = set()
+        for row in self.query(
+            '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-        data['location'] = []
-        for i in tgn_identifiers:
-            for preferred_name in self.get_tgn_place_names_preferred(
-                i
-            ):
-                data['location'].append(preferred_name)
+                SELECT ?value
+                FROM <{}>
+                FROM <http://vocab.getty.edu/tgn/>
+                WHERE {{
+                    ?item_id dcterms:isPartOf ?_ .
+                    ?item_id dcterms:spatial ?tgn_number .
+                    BIND(IRI(CONCAT('http://vocab.getty.edu/tgn/', ?tgn_number)) AS ?tgn_iri)
+                    ?tgn_iri skos:prefLabel ?value
+                }}
+            '''.format(self.named_graph),
+            {
+                'item_id': rdflib.URIRef(item_id)
+            }
+        ):
+            locations.add(str(row[0]))
+        data['location'] = list(locations)
 
         # primary_language
-        codes = set()
+        primary_languages = set()
         for row in self.query(
             '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
-                SELECT ?code
+                SELECT DISTINCT ?label
                 FROM <{}>
+                FROM <http://lib.uchicago.edu/glottolog>
                 WHERE {{
+                    ?item_id dcterms:isPartOf ?_ .
                     ?item_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
-                    ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Primary'))
+                    ?l lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier skos:prefLabel ?label .
+                    FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
             {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            codes.add(str(row[0]))
+            primary_languages.add(str(row[0]))
 
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['primary_language'] = []
-        for preferred_name in preferred_names:
-            data['primary_language'].append(preferred_name)
+        data['primary_language'] = list(primary_languages)
 
         # subject_language
-        codes = set()
+        subject_languages = set()
         for row in self.query(
             '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
-                SELECT ?code
+                SELECT DISTINCT ?label
                 FROM <{}>
+                FROM <http://lib.uchicago.edu/glottolog>
                 WHERE {{
+                    ?item_id dcterms:isPartOf ?_ .
                     ?item_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
-                    ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Subject'))
+                    ?l lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier skos:prefLabel ?label .
+                    FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
             {
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            codes.add(str(row[0]))
+            subject_languages.add(str(row[0]))
 
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['subject_language'] = []
-        for preferred_name in preferred_names:
-            data['subject_language'].append(preferred_name)
+        data['subject_language'] = list(subject_languages)
 
         # has_format
         data['has_format'] = {}
@@ -860,85 +745,6 @@ class MLCGraph:
         # tokens in a single string.
         return ' '.join([' '.join(s.split()) for s in search_tokens])
 
-    def get_search_tokens_for_series_identifier(self, i):
-        """
-        Get the search tokens for a given series identifier from the graph.
-
-        Parameters:
-            i (str): a series identifier
-
-        Returns:
-            str: a string that can be searched via SQLite.
-        """
-        search_tokens = []
-
-        # item-level description
-        for iid in self.get_item_identifiers_for_series(i):
-            r = self.query(
-                '''
-                    PREFIX dc: <http://purl.org/dc/elements/1.1/>
-
-                    SELECT ?o
-                    FROM <{}>
-                    WHERE {{
-                        ?item_id dc:description ?o
-                    }}
-                '''.format(self.named_graph),
-                {
-                    'item_id': rdflib.URIRef(iid)
-                }
-            )
-            for row in r:
-                search_tokens.append(row[0])
-
-        token_str = self.get_search_tokens_for_identifier(i)
-
-        if token_str and search_tokens:
-            token_str = token_str + \
-                ' ' + \
-                ' '.join([' '.join(s.split()) for s in search_tokens])
-
-        return token_str
-
-    def get_search_tokens_for_item_identifier(self, i):
-        """
-        Get the search tokens for a given item identifier from the graph.
-
-        Parameters:
-            i (str): a series identifier
-
-        Returns:
-            str: a string that can be searched via SQLite.
-        """
-        search_tokens = []
-
-        # item-level description
-        r = self.query(
-            '''
-                PREFIX dc: <http://purl.org/dc/elements/1.1/>
-
-                SELECT ?o
-                FROM <{}>
-                WHERE {{
-                    ?item_id dc:description ?o
-                }}
-            '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(i)
-            }
-        )
-        for row in r:
-            search_tokens.append(row[0])
-
-        token_str = self.get_search_tokens_for_identifier(i)
-
-        if token_str and search_tokens:
-            token_str = token_str + \
-                ' ' + \
-                ' '.join([' '.join(s.split()) for s in search_tokens])
-
-        return token_str
-
     def get_series_date(self, i):
         """
         Get a single date for a given series identifier from the graph.
@@ -1017,22 +823,7 @@ class MLCGraph:
         Returns:
             list: series identifiers.
         """
-        qres = self.query(
-            '''
-                PREFIX dcterms: <http://purl.org/dc/terms/>
-
-                SELECT ?series_id
-                FROM <{}>
-                WHERE {{
-                    ?series_id dcterms:hasPart ?_
-                }}
-            '''.format(self.named_graph)
-        )
-
-        results = set()
-        for row in qres:
-            results.add(str(row[0]))
-        return sorted(list(results))
+        return sorted(self.get_series_item_lookup().keys())
 
     def get_series_identifiers_for_item(self, i):
         """
@@ -1044,25 +835,10 @@ class MLCGraph:
         Returns:
             list: a list of series identifiers.
         """
-        r = self.query(
-            '''
-                PREFIX dcterms: <http://purl.org/dc/terms/>
-
-                SELECT ?series_id
-                FROM <{}>
-                WHERE {{
-                    ?series_id dcterms:hasPart ?item_id
-                }}
-            '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(i)
-            }
-        )
-
-        results = set()
-        for row in r:
-            results.add(str(row[0]))
-        return sorted(list(results))
+        for series_id, item_ids in self.get_series_item_lookup():
+            if i in item_ids:
+                return series_id
+        raise ValueError
 
     def get_series_info(self, series_id):
         """
@@ -1076,8 +852,6 @@ class MLCGraph:
         """
         data = {}
 
-        # language (indigenous and interview)
-
         for label, p in {
             'content_type': 'http://id.loc.gov/ontologies/bibframe/content',
             'creator': 'http://purl.org/dc/terms/creator',
@@ -1087,8 +861,7 @@ class MLCGraph:
             'access_rights': 'http://purl.org/dc/terms/accessRights',
             'alternative_title': 'http://purl.org/dc/terms/alternative',
             'contributor': 'http://purl.org/dc/terms/contributor',
-            'date': 'http://purl.org/dc/terms/date',
-            'location': 'http://purl.org/dc/terms/spatial'
+            'date': 'http://purl.org/dc/terms/date'
         }.items():
             values = set()
             for row in self.query(
@@ -1107,240 +880,340 @@ class MLCGraph:
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
 
-        # convert TGN identifiers to preferred names.
-        tgn_identifiers = set()
-        for i in data['location']:
-            for j in i.split():
-                tgn_identifiers.add(j)
+        # Get preferred names for TGN identifiers
+        locations = set()
+        for row in self.query(
+            '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-        data['location'] = []
-        for i in tgn_identifiers:
-            for preferred_name in self.get_tgn_place_names_preferred(
-                i
-            ):
-                data['location'].append(preferred_name)
+                SELECT ?value
+                FROM <{}>
+                FROM <http://vocab.getty.edu/tgn/>
+                WHERE {{
+                    ?series_id dcterms:hasPart ?_ .
+                    ?series_id dcterms:spatial ?tgn_number .
+                    BIND(IRI(CONCAT('http://vocab.getty.edu/tgn/', ?tgn_number)) AS ?tgn_iri)
+                    ?tgn_iri skos:prefLabel ?value .
+                }}
+            '''.format(self.named_graph),
+            {
+                'series_id': rdflib.URIRef(series_id)
+            }
+        ):
+            locations.add(str(row[0]))
+        data['location'] = list(locations)
 
         # primary_language
-        codes = set()
+        primary_languages = set()
         for row in self.query(
             '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
-                SELECT ?code
+                SELECT DISTINCT ?label
                 FROM <{}>
+                FROM <http://lib.uchicago.edu/glottolog>
                 WHERE {{
+                    ?series_id dcterms:hasPart ?_ .
                     ?series_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
-                    ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Primary'))
+                    ?l lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier skos:prefLabel ?label .
+                    FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
             {
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
-            codes.add(str(row[0]))
+            primary_languages.add(str(row[0]))
 
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['primary_language'] = []
-        for preferred_name in preferred_names:
-            data['primary_language'].append(preferred_name)
+        data['primary_language'] = list(primary_languages)
 
         # subject_language
-        codes = set()
+        subject_languages = set()
         for row in self.query(
             '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
                 PREFIX icu: <http://lib.uchicago.edu/icu/>
                 PREFIX lexvo: <https://www.iso.org/standard/39534.html>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX uchicago: <http://lib.uchicago.edu/>
 
-                SELECT ?code
+                SELECT DISTINCT ?label
                 FROM <{}>
+                FROM <http://lib.uchicago.edu/glottolog>
                 WHERE {{
+                    ?series_id dcterms:hasPart ?_ .
                     ?series_id uchicago:language ?l .
                     ?l icu:languageRole ?role .
-                    ?l lexvo:iso639P3PCode ?code .
                     FILTER (?role IN ('Both', 'Subject'))
+                    ?l lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier lexvo:iso639P3PCode ?code .
+                    ?glottolog_identifier skos:prefLabel ?label .
+                    FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
             {
                 'series_id': rdflib.URIRef(series_id)
             }
         ):
-            codes.add(str(row[0]))
+            subject_languages.add(str(row[0]))
 
-        preferred_names = set()
-        for c in codes:
-            for preferred_name in self.glottolog_lookup.get_glottolog_language_names_preferred(
-                c
-            ):
-                preferred_names.add(preferred_name)
-
-        data['subject_language'] = []
-        for preferred_name in preferred_names:
-            data['subject_language'].append(preferred_name)
+        data['subject_language'] = list(subject_languages)
 
         data['ark'] = series_id
 
         return data
 
-    def get_tgn_identifiers(self):
-        """Get all TGN identifiers from the TGN graph.
+    def get_series_item_lookup(self):
+        """Get a series/item lookup.
 
         Parameters:
             (None)
 
         Returns:
-            list: all identifiers.
-
-        Notes:
-            There are only 157 identifiers in the data as of August, 2023.
+            dict: a dictionary, where keys are series identifiers and values
+                  are lists of item identifiers.
         """
-        results = set()
+        lookup = {}
+
         for row in self.query(
             '''
-                PREFIX getty: <http://vocab.getty.edu/ontology#>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX dcterms: <http://purl.org/dc/terms/>
 
-                SELECT ?identifier
+                SELECT ?series_id ?item_id
                 FROM <{}>
                 WHERE {{
-                    ?identifier a ?type .
-                    FILTER (?type IN (
-                        getty:Subject,
-                        getty:PhysPlaceConcept,
-                        skos:Concept,
-                        getty:AdminPlaceConcept
-                    ))
+                    ?series_id dcterms:hasPart ?item_id
                 }}
             '''.format(self.named_graph)
         ):
-            results.add(str(row[0]).replace('http://vocab.getty.edu/tgn/', ''))
-        return list(results)
+            series_id = row[0]
+            item_id = row[1]
 
-    def get_tgn_place_names(self, i):
-        """Get all place names from TGN for a given identifier.
+            if series_id not in lookup:
+                lookup[series_id] = set()
+            lookup[series_id].add(item_id)
+
+        for series_id in lookup.keys():
+            lookup[series_id] = sorted(list(lookup[series_id]))
+        return lookup
+
+    def search_items(self, search_term, sort_type = 'rank'):
+        """
+        Get items matching a search. 
 
         Parameters:
-            i (str): TGN identifier, e.g., '7005493'
+            search_term (str): a search string.
+            sort_type (str): e.g., 'rank', 'date'
 
         Returns:
-            list: a list of place names as unicode strings.
+            list: a list of item identifiers.
         """
-        results = set()
-        for row in self.query(
-            '''
-                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        q = '''PREFIX cts: <http://marklogic.com/cts#>
+               PREFIX dc: <http://purl.org/dc/elements/1.1/>
+               PREFIX dcterms: <http://purl.org/dc/terms/>
+               PREFIX dma: <http://lib.uchicago.edu/dma/>
+               PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+               PREFIX fn: <http://www.w3.org/2005/xpath-functions>
+               PREFIX olac: <http://www.language−archives.org/OLAC/metadata.html>
+               
+               SELECT DISTINCT ?item
+               FROM <{}>
+               WHERE {{
+                 {{
+                   ?item dc:description ?description .
+                   FILTER cts:contains (?description, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item dc:title ?title .
+                   FILTER cts:contains (?title, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item dcterms:alternative ?alternative .
+                   FILTER cts:contains (?alternative, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item dcterms:creator ?creator .
+                   FILTER cts:contains (?creator, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item dcterms:contributor ?contributor .
+                   FILTER cts:contains (?contributor, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item olac:discourseType ?discourse_type .
+                   FILTER cts:contains (?discourse_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?item dma:contentType ?content_type .
+                   FILTER cts:contains (?content_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }}
+               }}'''.format(self.named_graph)
+    
+        # replace whitespace with single space.
+        q = ' '.join(q.split())
 
-                SELECT ?label
-                FROM <{}>
-                WHERE {{
-                    {{
-                        ?tgn rdf:label ?label .
-                    }} UNION {{
-                        ?tgn skos:altLabel ?label .
-                    }} UNION {{
-                        ?tgn skos:prefLabel ?label .
-                    }}
-                }}
-            '''.format(self.named_graph),
-            {
-                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
-            }
-        ):
-            results.add(str(row[0]))
-        return list(results)
+        params = [
+            ('query', q),
+            ('bind:search_term', search_term)
+        ]
 
-    def get_tgn_place_names_en(self, i):
-        """Get a list of English-language place names from TGN.
+        u = '{}/v1/graphs/sparql?{}'.format(
+            MARKLOGIC,
+            urllib.parse.urlencode(params)
+        )
+        results = requests.get(u).json()
+
+        identifiers = []
+        for binding in results['results']['bindings']:
+            identifiers.append(binding['item']['value'])
+        return identifiers
+
+    def search_series(self, search_term, sort_type = 'rank'):
+        """
+        Get series matching a search. 
 
         Parameters:
-            i (str): TGN identifier, e.g., '7005493'
+            search_term (str): a search string.
+            sort_type (str): e.g., 'rank', 'date'
 
         Returns:
-            list: a list of strings, e.g., "Guatemala"
-
-        Notes:
-            This data is spotty- English-language names are not always
-            available.
+            list: a list of series identifiers.
         """
-        results = set()
-        for row in self.query(
-            '''
-                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        q = '''PREFIX cts: <http://marklogic.com/cts#>
+               PREFIX dc: <http://purl.org/dc/elements/1.1/>
+               PREFIX dcterms: <http://purl.org/dc/terms/>
+               PREFIX dma: <http://lib.uchicago.edu/dma/>
+               PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+               PREFIX fn: <http://www.w3.org/2005/xpath-functions>
+               PREFIX olac: <http://www.language−archives.org/OLAC/metadata.html>
+               
+               SELECT DISTINCT ?series
+               FROM <{}>
+               WHERE {{
+                 {{
+                   ?series dcterms:hasPart ?item .
+                   {{
+                     ?item dc:description ?description .
+                     FILTER cts:contains (?description, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item dc:title ?title .
+                     FILTER cts:contains (?title, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item dcterms:alternative ?alternative .
+                     FILTER cts:contains (?alternative, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item dcterms:creator ?creator .
+                     FILTER cts:contains (?creator, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item dcterms:contributor ?contributor .
+                     FILTER cts:contains (?contributor, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item olac:discourseType ?discourse_type .
+                     FILTER cts:contains (?discourse_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }} UNION {{
+                     ?item dma:contentType ?content_type .
+                     FILTER cts:contains (?content_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   }}
+                 }} UNION {{
+                   ?series dcterms:hasPart ?item .
+                   ?aggregation edm:aggregatedCHO ?series .
+                   ?aggregation fn:collection ?collection .
+                   FILTER cts:contains(?collection, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?series dcterms:hasPart ?_ .
+                   ?series dc:language ?language .
+                   FILTER cts:contains(?language, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?series dcterms:hasPart ?item .
+                   ?series dcterms:spatial ?spatial .
+                   FILTER cts:contains(?spatial, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }} UNION {{
+                   ?series dcterms:hasPart ?item .
+                   ?series dcterms:date ?date .
+                   FILTER cts:contains(?date, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                 }}
+               }}'''.format(self.named_graph)
+    
+        # replace whitespace with single space.
+        q = ' '.join(q.split())
 
-                SELECT ?label
-                FROM <{}>
-                WHERE {{
-                    {{
-                        ?tgn rdf:label ?label .
-                    }} UNION {{
-                        ?tgn skos:altLabel ?label .
-                    }} UNION {{
-                        ?tgn skos:prefLabel ?label .
-                    }}
-                    FILTER langMatches(lang(?label), "EN")
-                }}
-            '''.format(self.named_graph),
-            {
-                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
-            }
-        ):
-            results.add(str(row[0]).strip())
-        return list(results)
+        params = [
+            ('query', q),
+            ('bind:search_term', search_term)
+        ]
 
-    def get_tgn_place_names_preferred(self, i):
-        """Get English-language place names if we can, otherwise get a list of
-           all place names.
+        u = '{}/v1/graphs/sparql?{}'.format(
+            MARKLOGIC,
+            urllib.parse.urlencode(params)
+        )
+        results = requests.get(u).json()
+
+        identifiers = []
+        for binding in results['results']['bindings']:
+            identifiers.append(binding['series']['value'])
+        return identifiers
+
+    def search(self, search_term, facets=[], sort_type = 'rank'):
+        """
+        Get series matching a search. 
 
         Parameters:
-            i (str): TGN identifier, e.g., '7005493'
+            search_term (str): a search string.
+            facets (list):     a list of strings, where each string begins with a
+                               browse/facet type, followed by a colon, followed
+                               by the term.
+            sort_type (str): e.g., 'rank', 'date'
 
         Returns:
-            list: a list of strings, e.g., "Guatemala"
+            list: a list, where each element contains a three-tuple with a
+                  series identifier, a list of item identifiers with hits in
+                  that series, and a rank.
         """
-        results = set()
-        for row in self.query(
-            '''
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        '''
+        # we may want to do this differently, by getting identifiers from the browses ahead of time.
+        for i, facet in enumerate(facets):
+            match = re.match('^([^:]*):(.*)$', facet)
+            params.append(('bind:browsetype' + str(i), match.group(1)))
+            params.append(('bind:browseterm' + str(i), match.group(2)))
+        '''
 
-                SELECT ?label
-                FROM <{}>
-                WHERE {{
-                    ?tgn skos:prefLabel ?label .
-                    FILTER langMatches(lang(?label), "EN")
-                }}
-            '''.format(self.named_graph),
-            {
-                'tgn': rdflib.URIRef('http://vocab.getty.edu/tgn/' + str(i))
-            }
-        ):
-            results.add(str(row[0]).strip())
+        # by default, all identifiers are searchable.
+        facet_identifiers = set(self.get_series_identifiers())
 
-        place_names = list(results)
+        # get the set of identifiers that is present in all active facets.
+        for facet in facets:
+            match = re.match('^([^:]*):(.*)$', facet)
+            browse_type = match_group(1)
+            browse_term = match.group(2)
+            assert browse_term in ('contributor', 'creator', 'date', 'decade',
+                'language', 'location')
+            browse_terms = self.get_browse_terms(browse_term)
+            if browse_term in browse_terms:
+                facet_identifiers |= set(browse_terms[browse_term])
 
-        if len(place_names) > 0:
-            return [place_names[0]]
+        # retrieve search results, filtering for active facets.
+        results = []
+        for s in self.search_series(search_term, sort_type):
+            if s in facet_identifiers:
+                results.append([s, [], 0.0])
 
-        place_names = self.get_tgn_place_names_en(i)
-        if len(place_names) > 0:
-            return [place_names[0]]
+        # retrieve item results.
+        item_results = self.search_items(search_term)
 
-        place_names = self.get_tgn_place_names(i)
-        if len(place_names) > 0:
-            return [self.get_tgn_place_names(i)[0]]
+        # get the series/item lookup.
+        lookup = self.get_series_item_lookup()
 
-        return []
+        # add items to results. 
+        for i in range(len(results)):
+            s = results[i][0]
+            for item in item_results:
+                if item in lookup[s]:
+                    results[i][1].append(item)
+
+        return results
 
     def query(self, s, b = {}):
         """Query the triplestore. 
@@ -1384,582 +1257,3 @@ class MLCGraph:
             output.append(row)
 
         return output
-
-
-class MLCDB:
-    def __init__(self, config):
-        """
-        Parameters:
-            config (dict): a configuration dict, e.g., .config from Flask.
-        """
-        self.config = config
-
-        self.con = None
-        self.cur = None
-
-        self._item_info = {}
-        self._series_info = {}
-
-        self.g = rdflib.Graph()
-        self.g.parse(self.config['MESO_TRIPLES'], format='turtle')
-        self.g.parse(self.config['TGN_TRIPLES'])
-
-        self.mlc_graph = MLCGraph(self.config)
-
-
-    def build_db(self):
-        """
-        Build SQLite database.
-
-        Parameters:
-            None
-        """
-        if os.path.exists(self.config['DB']):
-            os.remove(self.config['DB'])
-
-        con = sqlite3.connect(self.config['DB'])
-        cur = con.cursor()
-
-        # build an item to series lookup
-        item_series_lookup = {}
-        for item_id in mlc_graph.get_item_identifiers():
-            if item_id not in item_series_lookup:
-                item_series_lookup[item_id] = []
-            for series_id in mlc_graph.get_series_identifiers_for_item(
-                    item_id):
-                item_series_lookup[item_id].append(series_id)
-
-        # build tables
-        cur.execute('begin')
-
-        cur.execute('''
-            create table browse(
-                type text,
-                term text,
-                id text
-            );
-        ''')
-        cur.execute('''
-            create virtual table item using fts5(
-                id,
-                dbid,
-                has_panopto_link,
-                info,
-                medium,
-                text,
-                series_ids
-            );
-        ''')
-        cur.execute('''
-            create virtual table series using fts5(
-                id,
-                dbid,
-                date,
-                info,
-                text
-            );
-        ''')
-        cur.execute('commit')
-
-        # load data
-        cur.execute('begin')
-
-        # load browses
-        for browse_type in (
-            'contributor',
-            'creator',
-            'date',
-            'decade',
-            'language',
-            'location'
-        ):
-            for browse_term, identifiers in mlc_graph.get_browse_terms(
-                browse_type
-            ).items():
-                for identifier in identifiers:
-                    cur.execute('''
-                        insert into browse (type, term, id)
-                        values (?, ?, ?);
-                        ''',
-                                (
-                                    browse_type,
-                                    browse_term,
-                                    identifier
-                                )
-                                )
-
-        # load item
-        for i in mlc_graph.get_item_identifiers():
-            cur.execute('''
-                insert into item (
-                    id,
-                    dbid,
-                    has_panopto_link,
-                    info,
-                    medium,
-                    text,
-                    series_ids
-                )
-                values (?, ?, ?, ?, ?, ?, ?);
-                ''',
-                        (
-                            i,
-                            mlc_graph.get_item_dbid(i),
-                            mlc_graph.get_item_has_panopto_link(i),
-                            json.dumps(mlc_graph.get_item_info(i)),
-                            json.dumps(mlc_graph.get_item_medium(i)),
-                            mlc_graph.get_search_tokens_for_item_identifier(i),
-                            '|'.join(item_series_lookup[i])
-                        )
-                        )
-
-        # load series
-        for i in mlc_graph.get_series_identifiers():
-            cur.execute('''
-                insert into series (
-                    id,
-                    dbid,
-                    date,
-                    info,
-                    text) values (?, ?, ?, ?, ?);
-                ''',
-                        (
-                            i,
-                            mlc_graph.get_series_dbid(i),
-                            mlc_graph.get_series_date(i),
-                            json.dumps(mlc_graph.get_series_info(i)),
-                            mlc_graph.get_search_tokens_for_series_identifier(
-                                i)
-                        )
-                        )
-
-        cur.execute('commit')
-
-    def connect(self):
-        """
-        Connect to database.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
-        self.con = sqlite3.connect(self.config['DB'], check_same_thread=False)
-        self.cur = self.con.cursor()
-
-        for row in self.cur.execute('select id, info from item;').fetchall():
-            self._item_info[row[0]] = json.loads(row[1])
-
-        for row in self.cur.execute('select id, info from series;').fetchall():
-            self._series_info[row[0]] = json.loads(row[1])
-
-    def convert_raw_query_to_fts(self, query):
-        """
-        Convert a raw user query to a series of single words, joined by boolean
-        AND, and suitable for passing along to SQLite FTS.
-
-        Parameters:
-            query (str): a search string.
-
-        Returns:
-            str: search terms cleaned and separated by ' AND '.
-        """
-        if query:
-            # limit queries to 256 characters. (size chosen arbitrarily.)
-            query = query[:256]
-
-            # replace all non-unicode letters or numbers in the query with a
-            # single space. This should strip out punctuation, etc.
-            query = re.sub("[^\\p{L}\\p{N}]+", " ", str(query))
-
-            # replace all whitespace with a single space.
-            query = ' '.join(query.split())
-
-        # join all search terms with AND.
-        # limit queries to 32 search terms. (size chosen arbitrarily.)
-        match_string = []
-        for q in query.split(' '):
-            match_string.append(q)
-        match_string = ' AND '.join(match_string[:32])
-
-        return match_string
-
-    def get_browse(self, browse_type, browse_sort):
-        """
-        Get browse.
-
-        Parameters:
-            browse_type (str): type of browse terms to retrieve.
-
-        Returns:
-            list: a list of browse terms.
-        """
-        assert browse_type in (
-            'contributor',
-            'creator',
-            'date',
-            'decade',
-            'language',
-            'location'
-        )
-
-        if not self.con:
-            self.connect()
-
-        # sort browse results on case-insensitive characters only, stripping
-        # out things like leading quotation marks. Because SQLite doesn't let
-        # us strip out things like punctuation for sorting we do that after
-        # the query in python.
-            # key=lambda i: i[1]*-1
-
-        if( browse_sort == 'count'):
-           return sorted(
-                self.cur.execute('''
-                    select term, count(id)
-                    from browse
-                    where type=?
-                    group by term
-                    ''',
-                                 (browse_type,)
-                                 ).fetchall(),
-                key=lambda i: i[1]*-1
-            )
-        else:
-            return sorted(
-                self.cur.execute('''
-                    select term, count(id)
-                    from browse
-                    where type=?
-                    group by term
-                    ''',
-                                 (browse_type,)
-                                 ).fetchall(),
-                key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
-            )
-
-    def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
-        """
-        Get a list of series for a specific browse term.
-
-        Parameters:
-            browse_type (str): type of browse term.
-            browse_term (str): browse term.
-            sort_field (str):  database field to sort on.
-
-        Returns:
-            list: a list of browse results. This should contain all the
-            information that search results contain.
-        """
-        assert browse_type in (
-            'contributor',
-            'creator',
-            'date',
-            'decade',
-            'language',
-            'location'
-        )
-
-        assert sort_field in (
-            'dbid',
-            'date'
-        )
-
-        if not self.con:
-            self.connect()
-
-        results = []
-        for row in self.cur.execute(
-            '''
-                select browse.id, series.info, 0.0
-                from browse
-                inner join series on series.id = browse.id
-                where type=?
-                and term=?
-                order by series.{}
-            '''.format(sort_field),
-            (browse_type, browse_term)
-        ).fetchall():
-            results.append((row[0], json.loads(row[1]), row[2]))
-        return results
-
-    def get_item(self, identifier, get_format_relationships=False):
-        """
-        Get item metadata.
-
-        Parameters:
-            identifier (str): item identifier.
-            get_format_relationships (bool): get format relationships.
-
-        Returns:
-            dict: a metadata dictionary.
-        """
-        info = self.mlc_graph.get_item_info(identifier)
-
-        # load item hasFormat / isFormatOf relationships
-        if get_format_relationships:
-            for p in ('has_format', 'is_format_of'):
-                if p in info:
-                    for m in info[p].keys():
-                        for i in range(len(info[p][m])):
-                            url = info[p][m][i]
-                            info[p][m][i] = self.mlc_graph.get_item_info(
-                                identifier
-                            )
-        return info
-
-    def get_item_list(self):
-        """
-        Get all item identifiers.
-
-        Parameters:
-            None
-
-        Returns:
-            list: a list of item identifiers
-        """
-        if not self.con:
-            self.connect()
-
-        item_ids = []
-        for row in self.cur.execute('select id from item;').fetchall():
-            item_ids.append(row[0])
-        return item_ids
-
-    def get_items_for_series(self, identifier):
-        """
-        Get items for a series.
-
-        Parameters:
-            identifier (str): series identifier.
-
-        Returns:
-            list: a list of series identifiers.
-        """
-        if not self.con:
-            self.connect()
-
-        results = []
-        for row in self.cur.execute('''
-            select id
-            from item
-            where series_ids like ?
-            ''',
-            ('%' + identifier + '%',)
-        ).fetchall():
-            results.append(str(row[0]))
-        return results
-
-    def get_search(self, query, facets=[], sort_type='rank'):
-        """
-        Get search results.
-
-        Parameters:
-            query (str):     a search string.
-            facets (list):   a list of strings, where each string begins with a
-                             browse/facet type, followed by a colon, followed
-                             by the term.
-            sort_type (str): e.g., 'rank', 'date'
-
-        Returns:
-            list: a list, where each element contains a three-tuple with a
-                  series identifier, a list of item identifiers with hits in
-                  that series, and a rank.
-        """
-        assert sort_type in ('date', 'rank', 'series.id')
-
-        if not self.con:
-            self.connect()
-
-        if query:
-            query = self.convert_raw_query_to_fts(query)
-
-        subqueries = []
-        for _ in facets:
-            subqueries.append('''
-                select id
-                from browse
-                where type=?
-                and term=?
-            ''')
-
-        vars = []
-        if query:
-            vars.append(query)
-        for facet in facets:
-            match = re.match('^([^:]*):(.*)$', facet)
-            vars.append(match.group(1))
-            vars.append(match.group(2))
-
-        # Execute series search.
-
-        if query and facets:
-            sql = '''
-                    select id, rank
-                    from series
-                    where text match ?
-                    and id in ({})
-                    order by {};
-            '''.format(' intersect '.join(subqueries), sort_type)
-        elif query:
-            sql = '''
-                    select id, rank
-                    from series
-                    where text match ?
-                    order by {};
-            '''.format(sort_type)
-        elif facets:
-            sql = '''
-                    select id
-                    from series
-                    where id in ({})
-                    order by id
-            '''.format(' intersect '.join(subqueries))
-        else:
-            sql = '''
-                    select id
-                    from series
-                    order by id
-            '''
-
-        series_results = []
-        for row in self.cur.execute(sql, vars).fetchall():
-            if len(row) == 1:
-                series_results.append([row[0], [], 0.0])
-            else:
-                series_results.append([row[0], [], row[1]])
-
-        # Execute item search.
-
-        if query and facets:
-            sql = '''
-                    select id, series_ids
-                    from item
-                    where text match ?
-                    and id in ({})
-                    order by cast (dbid as unsigned);
-            '''.format(' intersect '.join(subqueries))
-        elif query:
-            sql = '''
-                    select id, series_ids
-                    from item
-                    where text match ?
-                    order by cast (dbid as unsigned);
-            '''
-        elif facets:
-            sql = '''
-                    select id, series_ids
-                    from item
-                    where id in ({})
-                    order by cast (dbid as unsigned);
-            '''.format(' intersect '.join(subqueries))
-        else:
-            sql = '''
-                    select id, series_ids
-                    from item
-                    order by cast (dbid as unsigned);
-            '''
-
-        item_results = []
-        for row in self.cur.execute(sql, vars).fetchall():
-            item_results.append((
-                row[0],
-                row[1].split('|')
-            ))
-
-        # Build a series lookup to speed up processing.
-        series_lookup = {}
-
-        for s in range(len(series_results)):
-            series_ids = series_results[s][0].split('|')
-            for series_id in series_ids:
-                series_lookup[series_id] = s
-
-        # Add item result to appropriate series.
-        for i in range(len(item_results)):
-            item_id = item_results[i][0]
-            series_ids = item_results[i][1]
-            for series_id in series_ids:
-                if series_id in series_lookup:
-                    series_index = series_lookup[series_id]
-                    series_results[series_index][1].append(item_id)
-
-        return series_results
-
-    def get_series(self, identifier):
-        """
-        Get series metadata.
-
-        Parameters:
-            identifier (str): a series identifier.
-
-        Returns:
-            dict: a metadata dictionary.
-        """
-        if not self.con:
-            self.connect()
-
-        return json.loads(
-            self.cur.execute(
-                'select info from series where id = ?',
-                (identifier,)
-            ).fetchone()[0]
-        )
-
-    def get_series_for_item(self, identifier):
-        """
-        Get series for item.
-
-        Parameters:
-            identifier (str): item identifier.
-
-        Returns:
-            list: a list of series identifiers.
-        """
-        if not self.con:
-            self.connect()
-
-        results = []
-        for row in self.cur.execute('''
-            select series_ids
-            from item
-            where id = ?
-            ''',
-            (identifier,)
-        ).fetchall():
-            for series_id in row[0].split('|'):
-                results.append(series_id)
-        return results
-
-    def get_series_info(self, series_id):
-        """
-        Get info dict for a series.
-
-        Parameters:
-            series_id (str): item identifier.
-
-        Returns:
-            dict: a dictionary of item information.
-        """
-        if not self.con:
-            self.connect()
-
-        return self._series_info[series_id]
-
-    def get_series_list(self):
-        """
-        Get all series identifiers.
-
-        Parameters:
-            None
-
-        Returns:
-            list: a list of series identifiers.
-        """
-        if not self.con:
-            self.connect()
-
-        series_ids = []
-        for row in self.cur.execute('select id from series;').fetchall():
-            series_ids.append(row[0])
-        return series_ids

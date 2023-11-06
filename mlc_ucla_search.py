@@ -1,12 +1,13 @@
 import click
 import json
-import re
 import requests
 import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
-from utils import GlottologLookup, MLCGraph
+from utils import MLCGraph
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, TGN_TRIPLES
+
+import regex as re
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
@@ -86,21 +87,22 @@ def print_series(series_info):
 
 
 @mlc_ucla_search.cli.command(
-    'build-db',
-    short_help='Build or rebuild SQLite database from linked data triples.'
+    'fill-cache',
+    short_help='Cache all MarkLogic requests.'
 )
-def cli_build_db():
-    """Build a SQLite database from linked data triples."""
+def cli_fill_cache():
+    """Cache all MarkLogic requests."""
+    # JEJ START HERE
     raise NotImplementedError
-
-
-@mlc_ucla_search.cli.command(
-    'build-glottolog-lookup',
-    short_help='Build or rebuild Glottolog lookup from linked data triples.'
-)
-def cli_build_glottolog_lookup():
-    """Build JSON data structure from linked data triples."""
-    GlottologLookup(mlc_ucla_search.config).build_lookup()
+    # delete the cache if it's present.
+    # should we move the name of the cache into local.py? 
+    # run other flask commands to prefill cache,
+    # all browses, get item, get series 
+    # (can we re-write get-item and get-series to use info
+    # blocks?)
+    #cli_get_browse('location')
+    # see https://stackoverflow.com/questions/40091347/call-another-click-command-from-a-click-command
+    # (Call another click command from a click command)
 
 
 @mlc_ucla_search.cli.command(
@@ -355,9 +357,11 @@ def browse():
         'location':    lazy_gettext(u'Browse by Location')
     }
 
+    browse_sort = request.args.get('sort')
+
     browse_type = request.args.get('type')
     if browse_type not in title_slugs.keys():
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), type parameter not a key in browses dict.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -366,13 +370,15 @@ def browse():
 
     browse_term = request.args.get('term')
 
+    browse_dict = mlc_g.get_browse_terms(browse_type)
+
     if browse_term:
         if browse_type:
-            title_slug = lazy_gettext('Results with') + \
-                         ' ' + browse_type + ': ' + browse_term
+            title_slug = lazy_gettext('Results with') + ' ' + \
+                browse_type + ': ' + browse_term
         else:
             title_slug = lazy_gettext('Results for search') + \
-                         ': ' + browse_term
+                ': ' + browse_term
 
         sort_field = 'dbid'
         if browse_type == 'decade':
@@ -382,10 +388,10 @@ def browse():
         results = mlc_g.get_browse_terms(browse_type)[browse_term]
 
         results_with_label_ui_data = []
-        for item in results:
-            item_data = item[1]
-            item_data['access_rights'] = get_access_label_obj(item_data)
-            results_with_label_ui_data.append((item[0], item_data))
+        for result in results:
+            series_data = mlc_g.get_series_info(result)
+            series_data['access_rights'] = get_access_label_obj(series_data)
+            results_with_label_ui_data.append((result, series_data))
 
         return render_template(
             'search.html',
@@ -396,12 +402,20 @@ def browse():
             title_slug=title_slug
         )
     else:
-        browse_sort = request.args.get('sort')
-        # JEJ need sorting below.
+        browse_terms = []
+        for k, v in mlc_g.get_browse_terms(browse_type).items():
+            browse_terms.append((k, len(v)))
+
+        if browse_sort:
+            browse_terms.sort(key=lambda x:x[1], reverse=True)
+        else:
+            # sort alphabetically, ignoring punctuation. 
+            browse_terms.sort(key=lambda x:re.sub('[^\\p{L}\\p{N}]+', '', x[0]))
+
         return render_template(
             'browse.html',
             title_slug=title_slugs[browse_type],
-            browse_terms=mlc_g.get_browse_terms(browse_type),
+            browse_terms=browse_terms,
             browse_type=browse_type
         )
 
@@ -445,17 +459,17 @@ def search():
 @mlc_ucla_search.route('/series/<noid>/')
 def series(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )
         )
         abort(400)
 
-    series_data = mlc_g.get_series(BASE + noid)
+    series_data = mlc_g.get_series_info(BASE + noid)
 
     items = []
-    for i in mlc_g.get_items_identifiers_for_series(BASE + noid):
+    for i in mlc_g.get_item_identifiers_for_series(BASE + noid):
         items.append((
             i,
             mlc_g.get_item_info(i)
@@ -467,10 +481,14 @@ def series(noid):
     item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
-        medium = i[1]['medium'][0]
-        if medium not in grouped_items:
-            grouped_items[medium] = []        
-        grouped_items[medium].append(i[1])
+        try:
+            medium = i[1]['medium'][0]
+        except IndexError:
+            medium = []
+        if medium:
+            if medium not in grouped_items:
+                grouped_items[medium] = []        
+            grouped_items[medium].append(i[1])
         if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
             has_panopto = True
             item_id_with_panopto = i[1]['identifier'][0]
@@ -504,7 +522,7 @@ def series(noid):
 @mlc_ucla_search.route('/item/<noid>/')
 def item(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )

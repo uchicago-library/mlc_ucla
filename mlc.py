@@ -1,7 +1,6 @@
 from flask import Flask, request, session
 from flask_babel import Babel, lazy_gettext
 from flask_session import Session
-from utils import GlottologLookup, MLCDB
 from mlc_ucla_search import get_locale, mlc_ucla_search
 
 

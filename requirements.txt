@@ -7,5 +7,6 @@ regex
 sqlite_dump
 flask_babel
 flask_session
+pysocks
 sqlite_dump
 translate-toolkit
