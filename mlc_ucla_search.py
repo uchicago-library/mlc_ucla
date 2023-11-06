@@ -1,11 +1,12 @@
 import click
 import json
+import os
 import requests
 import sys
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
 from utils import MLCGraph
 from flask_babel import lazy_gettext
-from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, TGN_TRIPLES
+from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, REQUESTS_CACHE_DB, TGN_TRIPLES
 
 import regex as re
 
@@ -26,11 +27,19 @@ def get_locale():
         session['language'] = 'en'
     return session.get('language')
 
-# CLI
+def get_item_info_str(item_info):
+    """Format an item info dictionary for text output, e.g., a command line
+       interface.
 
-def print_item(item_info):
-    sys.stdout.write('{}\n'.format(item_info['ark']))
-    sys.stdout.write(('{}: {}\n' * 15 + '\n').format(
+       Parameters:
+           item_info (dict): an item info dictionary.
+
+       Returns:
+           str: a string for printing to stdout, etc.
+    """
+    s = ''
+    s += '{}\n'.format(item_info['ark'])
+    s += ('{}: {}\n' * 15 + '\n').format(
         'Panopto Links',
         ' '.join(item_info['panopto_links']),
         'Panopto Identifiers',
@@ -61,12 +70,22 @@ def print_item(item_info):
         ' | '.join(item_info['content_type']),
         'Part of Series',
         item_info['is_part_of'][0]
-    ))
+    )
+    return s
 
+def get_series_info_str(series_info):
+    """Format a series info dictionary for text output, e.g., a command line
+       interface.
 
-def print_series(series_info):
-    sys.stdout.write('{}\n'.format(series_info['ark']))
-    sys.stdout.write(('{}: {}\n' * 8 + '\n').format(
+       Parameters:
+           series_info (dict): a series info dictionary.
+
+       Returns:
+           str: a string for printing to stdout, etc.
+    """
+    s = ''
+    s += '{}\n'.format(series_info['ark'])
+    s += ('{}: {}\n' * 8 + '\n').format(
         'Series Title',
         ' '.join(series_info['titles']),
         'Series Identifier',
@@ -83,26 +102,59 @@ def print_series(series_info):
         ' | '.join(series_info['date']),
         'Description',
         ' | '.join(series_info['description'])
-    ))
+    )
+    return s
 
+# CLI
 
 @mlc_ucla_search.cli.command(
     'fill-cache',
     short_help='Cache all MarkLogic requests.'
 )
-def cli_fill_cache():
+@click.option('--clean', '-c', is_flag=True, help='Delete cache before rebuilding.')
+def cli_fill_cache(clean):
     """Cache all MarkLogic requests."""
-    # JEJ START HERE
-    raise NotImplementedError
-    # delete the cache if it's present.
-    # should we move the name of the cache into local.py? 
-    # run other flask commands to prefill cache,
-    # all browses, get item, get series 
-    # (can we re-write get-item and get-series to use info
-    # blocks?)
-    #cli_get_browse('location')
-    # see https://stackoverflow.com/questions/40091347/call-another-click-command-from-a-click-command
-    # (Call another click command from a click command)
+ 
+    # delete the cache, if it exists. 
+    if clean:
+        try:
+            os.remove(REQUESTS_CACHE_DB)
+        except FileNotFoundError:
+            pass
+
+    # browses
+    browse_list = ('contributor', 'creator', 'date', 'decade', 'language', \
+                   'location')
+    for i, browse in enumerate(browse_list):
+        sys.stdout.write(
+            'caching browse {} of {}.\n'.format(
+                i + 1,
+                len(browse_list)
+            )
+        ) 
+        mlc_g.get_browse_terms(browse)
+
+    # items
+    item_list = mlc_g.get_item_identifiers()
+    for i, item in enumerate(item_list):
+        sys.stdout.write(
+            'caching item {} of {}.\n'.format(
+                i + 1, 
+                len(item_list)
+            )
+        )
+        mlc_g.get_item_info(item)
+
+    # series
+    series_list = mlc_g.get_series_identifiers()
+    for i, series in enumerate(series_list):
+        sys.stdout.write(
+            'caching series {} of {}.\n'.format(
+                 i + 1,
+                 len(series_list)
+             )
+        )
+        mlc_g.get_series_info(series)
 
 
 @mlc_ucla_search.cli.command(
@@ -128,7 +180,7 @@ def cli_get_browse(browse_type):
 def cli_get_browse_term(browse_type, browse_term):
     browse = mlc_g.get_browse_terms(browse_type)
     for s in browse[browse_term]:
-        print_series(s)
+        sys.stdout.write(get_series_info_str(mlc_g.get_series_info(s)))
 
 
 @mlc_ucla_search.cli.command(
@@ -136,8 +188,13 @@ def cli_get_browse_term(browse_type, browse_term):
     short_help='Get item info for an item identifier.'
 )
 @click.argument('item_identifier')
-def cli_get_item(item_identifier):
-    print_item(mlc_g.get_item_info(item_identifier))
+@click.option('--json-output', '-j', is_flag=True, help='JSON output.')
+def cli_get_item(item_identifier, json_output):
+    info = mlc_g.get_item_info(item_identifier)
+    if json_output:
+        sys.stdout.write(json.dumps(info))
+    else:
+        sys.stdout.write(get_item_info_str(info))
 
 
 @mlc_ucla_search.cli.command(
@@ -145,8 +202,13 @@ def cli_get_item(item_identifier):
     short_help='Get series info for a series identifier.'
 )
 @click.argument('series_identifier')
-def cli_get_series(series_identifier):
-    print_series(mlc_g.get_series_info(series_identifier))
+@click.option('--json-output', '-j', is_flag=True, help='JSON output.')
+def cli_get_series(series_identifier, json_output):
+    info = mlc_g.get_series_info(series_identifier)
+    if json_output:
+        sys.stdout.write(json.dumps(info))
+    else:
+        sys.stdout.write(get_series_info_str(info))
 
 
 @mlc_ucla_search.cli.command(
@@ -154,10 +216,15 @@ def cli_get_series(series_identifier):
     short_help='List item objects.'
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
-def cli_list_items(verbose):
+@click.option('--json-output', '-j', is_flag=True, help='JSON output.')
+def cli_list_items(verbose, json_output):
     for i in mlc_g.get_item_identifiers():
-        if verbose:
-            print_item(mlc_g.get_item_info(i))
+        if json_output or verbose:
+            info = mlc_g.get_item_info(i)
+        if json_output:
+            sys.stdout.write(json.dumps(info))
+        elif verbose:
+            sys.stdout.write(get_item_info_str(info))
         else:
             sys.stdout.write('{}\n'.format(i))
 
@@ -167,10 +234,15 @@ def cli_list_items(verbose):
     short_help='List series objects.'
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
-def cli_list_series(verbose):
+@click.option('--json-output', '-j', is_flag=True, help='JSON output.')
+def cli_list_series(verbose, json_output):
     for i in mlc_g.get_series_identifiers():
-        if verbose:
-            print_series(mlc_g.get_series_info(i))
+        if json_output or verbose:
+            info = mlc_g.get_series_info(i)
+        if json_output:
+            sys.stdout.write(json.dumps(info))
+        elif verbose:
+            sys.stdout.write(get_series_info_str(info))
         else:
             sys.stdout.write('{}\n'.format(i))
 
@@ -429,7 +501,7 @@ def search():
 
     processed_results = []
     for db_series in db_results:
-        series_data = mlc_g.get_series(db_series[0])
+        series_data = mlc_g.get_series_info(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
 
         series_data['sub_items'] = []
@@ -542,8 +614,16 @@ def item(noid):
 
     # details for request access button
     # TODO: needs to check if user already has access
-    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
-    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
+    if item_data['access_rights'][0].lower() == 'restricted':
+        is_restricted = True
+    else:
+        is_restricted = False
+
+    if item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]:
+        has_panopto = True
+    else:
+        has_panopto = False
+
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
@@ -567,12 +647,14 @@ def item(noid):
     
     return render_template(
         'item.html',
-        **(item_data | {'series': series,
+        **(item_data | {
+            'series': series,
             'title_slug': title_slug,
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
-            'breadcrumb': breadcrumb})
+            'breadcrumb': breadcrumb
+        })
     )
 
 @mlc_ucla_search.route('/request-account')

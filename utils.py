@@ -10,8 +10,125 @@ import sys
 
 import regex as re
 
-from local import MARKLOGIC
+from local import MARKLOGIC, REQUESTS_CACHE_DB
 
+# OVERRIDE AS PER JL, UNTIL MORE ITEMS IN THE DB ARE SET TO PUBLIC DOMAIN.
+# All of these items are from Spoken Yucatec Maya, by Robert W.  Blair and
+# Refugio Vermont-Salas Yucatán Maya
+# (https://mlc.lib.uchicago.edu/series/b2tw6wt2bf1h/)
+
+ADJUST_PERMISSIONS_FOR = (
+    'https://ark.lib.uchicago.edu/ark:61001/b27z7tq17f2p/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2ns2j788j88/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2x35rw20w44/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2b32bm0cc6s/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2xp6p144m5j/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2sv9z53wj4g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2zb56k8272g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2kk51x0nf0z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2xj8mp1mf2w/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2fm4c69rx5z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26226s5q30f/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2bd0kb22h4s/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2pz25j6vr6r/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2jc45r1gt15/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2wz2h56sf1w/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2s60jp86929/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2dd7np9c11x/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2nn4hh3gv92/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2xg1804tx87/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hj0w19mk93/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2rz0nt08s1x/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2fd1h93d30h/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2nx6ht9gs29/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2r11rg54r8n/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2092cs0g415/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2v113n2dd5c/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2c26267q062/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2m95x63mk4b/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2db9dx96x10/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2t13k17j52d/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2d92d45md76/',
+    'https://ark.lib.uchicago.edu/ark:61001/b24p59z2z190/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2g22mq7mg0g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2wh7z086r8p/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2zb1zh1237h/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2q21gp5gd01/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2dt1p02tj1v/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2p72hc6f05g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b24w9th7137b/',
+    'https://ark.lib.uchicago.edu/ark:61001/b22k5pj7kj30/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2v93v03sf4m/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2gx09697j4m/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2g45jm25615/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2qz60h81g2v/',
+    'https://ark.lib.uchicago.edu/ark:61001/b20w2mk13s96/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2986kg1zg6r/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2kf6wg1156r/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2cv6zt8fx9t/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2g334r72v2t/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2cj6d02g311/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2w08504c143/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26n7mt8c979/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2n86h25sc45/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2dv15c7rc3q/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2sm18k8n75j/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2r58933xn1j/',
+    'https://ark.lib.uchicago.edu/ark:61001/b28n1dc7n541/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2kn8b21zc7f/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2917kg25x0z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2s24fg9mp1p/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26h3895d33z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2dk20t1r33s/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2bb80n1rc11/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2kf56f95m07/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2nc1f30z72q/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2np6mb2q02d/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2n21p14kh4f/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2t371j4534n/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2pm0wz05f70/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hf8pr53h5w/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2ss7bf2532g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b20h13d34p6n/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2z57qw38x6t/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2jf2703db41/',
+    'https://ark.lib.uchicago.edu/ark:61001/b23k4xz12b2n/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hh19v36x5x/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2m03t162w1c/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2xv7nc0z617/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26q3115h46d/',
+    'https://ark.lib.uchicago.edu/ark:61001/b21h6xv05h0d/',
+    'https://ark.lib.uchicago.edu/ark:61001/b21f9k88bw4z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b24d8c45wv6b/',
+    'https://ark.lib.uchicago.edu/ark:61001/b29t2ss6jn8d/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2571kt69j1h/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2bq1dt93091/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2t70m723552/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2x384510n19/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2vb7pd0j09g/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hz2wh6dn39/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2d11m85h35n/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hs9nz31p93/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2ts58t0kc0m/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26m2tw4c100/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2n73qx48v7m/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2622vh1j128/',
+    'https://ark.lib.uchicago.edu/ark:61001/b28f6dj1sj98/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2j650d7rc39/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2sp8sr1qr6v/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2vw8jr6gc6c/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2kv54j69w96/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2mx0xk0fv4z/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2ws36c8zt87/',
+    'https://ark.lib.uchicago.edu/ark:61001/b26v6113dn3x/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2hf2v20jt50/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2939qr4b080/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2z18q42tb1f/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2h22px34s6m/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2sk01z2qk4x/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2qs96638g5p/',
+    'https://ark.lib.uchicago.edu/ark:61001/b2391vf47w3n/'
+)
 
 def regularize_string(_):
     """Regularize a string for browses by trimming excess whitespace,
@@ -34,7 +151,7 @@ class MLCGraph:
         self.backend = 'http://marklogic.lib.uchicago.edu:8031'
         self.config = config
         self.named_graph = 'http://lib.uchicago.edu/mlc'
-        self.requests = requests_cache.CachedSession('requests_cache')
+        self.requests = requests_cache.CachedSession(REQUESTS_CACHE_DB)
 
     def get_browse_terms(self, browse_type):
         """
@@ -253,12 +370,13 @@ class MLCGraph:
             has_panopto_link = '1'
         return has_panopto_link
 
-    def get_item_info(self, item_id):
+    def get_item_info(self, item_id, get_format_relationships=False):
         """
         Get info for search snippets and page views of a given item.
 
         Parameters:
             item_id (str): a series identifier.
+            get_format_relationships (bool): get format relationships.
 
         Returns:
             dict: item information.
@@ -299,7 +417,7 @@ class MLCGraph:
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
 
-        # Get preferred names for TGN identifiers
+        # locations
         locations = set()
         for row in self.query(
             '''
@@ -313,7 +431,8 @@ class MLCGraph:
                     ?item_id dcterms:isPartOf ?_ .
                     ?item_id dcterms:spatial ?tgn_number .
                     BIND(IRI(CONCAT('http://vocab.getty.edu/tgn/', ?tgn_number)) AS ?tgn_iri)
-                    ?tgn_iri skos:prefLabel ?value
+                    ?tgn_iri skos:prefLabel ?value .
+                    FILTER (lang(?value) = 'en')
                 }}
             '''.format(self.named_graph),
             {
@@ -456,6 +575,16 @@ class MLCGraph:
                 data['is_format_of'][medium] = []
             data['is_format_of'][medium].append(row[0])
 
+        # JEJ
+        # load item hasFormat / isFormatOf relationships
+        if get_format_relationships:
+            for format_relationship in ('has_format', 'is_format_of'):
+                if format_relationship in data:
+                    for medium in data[format_relationship].keys():
+                        for i in range(len(data[format_relationship][medium])):
+                            url = data[format_relationship][medium][i]
+                            data[format_relationship][medium][i] = self.get_item_info(url)
+
         # panopto links
         panopto_links = set()
         for row in self.query(
@@ -516,6 +645,10 @@ class MLCGraph:
         ):
             access_rights.add(str(row[0]))
         data['access_rights'] = list(access_rights)
+
+        # OVERRIDE AS PER JL, UNTIL MORE ITEMS IN THE DB ARE SET TO PUBLIC DOMAIN.
+        if item_id in ADJUST_PERMISSIONS_FOR:
+            data['access_rights'] = ['Public domain']
 
         data['ark'] = item_id
 
@@ -835,10 +968,11 @@ class MLCGraph:
         Returns:
             list: a list of series identifiers.
         """
-        for series_id, item_ids in self.get_series_item_lookup():
+        series_ids = []
+        for series_id, item_ids in self.get_series_item_lookup().items():
             if i in item_ids:
-                return series_id
-        raise ValueError
+                series_ids.append(series_id)
+        return series_ids
 
     def get_series_info(self, series_id):
         """
@@ -880,7 +1014,7 @@ class MLCGraph:
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
 
-        # Get preferred names for TGN identifiers
+        # locations
         locations = set()
         for row in self.query(
             '''
@@ -895,6 +1029,7 @@ class MLCGraph:
                     ?series_id dcterms:spatial ?tgn_number .
                     BIND(IRI(CONCAT('http://vocab.getty.edu/tgn/', ?tgn_number)) AS ?tgn_iri)
                     ?tgn_iri skos:prefLabel ?value .
+                    FILTER (lang(?value) = 'en')
                 }}
             '''.format(self.named_graph),
             {
