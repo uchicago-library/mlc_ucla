@@ -1158,32 +1158,43 @@ class MLCGraph:
                PREFIX dma: <http://lib.uchicago.edu/dma/>
                PREFIX edm: <http://www.europeana.eu/schemas/edm/>
                PREFIX fn: <http://www.w3.org/2005/xpath-functions>
+               PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                PREFIX olac: <http://www.language−archives.org/OLAC/metadata.html>
+               PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                
                SELECT DISTINCT ?item
                FROM <{}>
+               FROM <http://lib.uchicago.edu/glottolog>
                WHERE {{
+                 ?item dcterms:isPartOf ?_ .
                  {{
-                   ?item dc:description ?description .
-                   FILTER cts:contains (?description, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item dc:title ?title .
-                   FILTER cts:contains (?title, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item dcterms:alternative ?alternative .
-                   FILTER cts:contains (?alternative, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item dcterms:creator ?creator .
-                   FILTER cts:contains (?creator, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item dcterms:contributor ?contributor .
-                   FILTER cts:contains (?contributor, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item olac:discourseType ?discourse_type .
-                   FILTER cts:contains (?discourse_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
-                 }} UNION {{
-                   ?item dma:contentType ?content_type .
-                   FILTER cts:contains (?content_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   {{
+                     ?item dc:description ?description .
+                     FILTER cts:contains (?description, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dc:title ?title .
+                     FILTER cts:contains (?title, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dcterms:alternative ?alternative .
+                     FILTER cts:contains (?alternative, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dcterms:creator ?creator .
+                     FILTER cts:contains (?creator, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dcterms:contributor ?contributor .
+                     FILTER cts:contains (?contributor, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dc:language ?language_code . 
+                     ?glottolog lexvo:iso639P3PCode ?language_code .
+                     ?glottolog rdfs:label ?language_string . 
+                     FILTER cts:contains(?language_string, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item olac:discourseType ?discourse_type .
+                     FILTER cts:contains (?discourse_type, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dma:contentType ?content_type .
+                     FILTER cts:contains (?content_type, cts:word-query(?search_term))
+                   }}
                  }}
                }}'''.format(self.named_graph)
     
@@ -1223,52 +1234,74 @@ class MLCGraph:
                PREFIX dma: <http://lib.uchicago.edu/dma/>
                PREFIX edm: <http://www.europeana.eu/schemas/edm/>
                PREFIX fn: <http://www.w3.org/2005/xpath-functions>
+               PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                PREFIX olac: <http://www.language−archives.org/OLAC/metadata.html>
+               PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                
                SELECT DISTINCT ?series
                FROM <{}>
+               FROM <http://lib.uchicago.edu/glottolog>
                WHERE {{
                  {{
                    ?series dcterms:hasPart ?item .
                    {{
                      ?item dc:description ?description .
-                     FILTER cts:contains (?description, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?description, cts:word-query(?search_term))
                    }} UNION {{
                      ?item dc:title ?title .
-                     FILTER cts:contains (?title, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?title, cts:word-query(?search_term))
                    }} UNION {{
                      ?item dcterms:alternative ?alternative .
-                     FILTER cts:contains (?alternative, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?alternative, cts:word-query(?search_term))
                    }} UNION {{
                      ?item dcterms:creator ?creator .
-                     FILTER cts:contains (?creator, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?creator, cts:word-query(?search_term))
                    }} UNION {{
                      ?item dcterms:contributor ?contributor .
-                     FILTER cts:contains (?contributor, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?contributor, cts:word-query(?search_term))
+                   }} UNION {{
+                     ?item dc:language ?language_code . 
+                     ?glottolog lexvo:iso639P3PCode ?language_code .
+                     ?glottolog rdfs:label ?language_string . 
+                     FILTER cts:contains(?language_string, cts:word-query(?search_term))
                    }} UNION {{
                      ?item olac:discourseType ?discourse_type .
-                     FILTER cts:contains (?discourse_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?discourse_type, cts:word-query(?search_term))
                    }} UNION {{
                      ?item dma:contentType ?content_type .
-                     FILTER cts:contains (?content_type, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                     FILTER cts:contains (?content_type, cts:word-query(?search_term))
                    }}
+                 }} UNION {{
+                   ?series dc:title ?title .
+                   FILTER cts:contains (?title, cts:word-query(?search_term))
+                 }} UNION {{
+                   ?series dcterms:alternative ?alternative .
+                   FILTER cts:contains (?alternative, cts:word-query(?search_term))
+                 }} UNION {{
+                   ?series dc:description ?description .
+                   FILTER cts:contains (?description, cts:word-query(?search_term))
                  }} UNION {{
                    ?series dcterms:hasPart ?item .
                    ?aggregation edm:aggregatedCHO ?series .
                    ?aggregation fn:collection ?collection .
-                   FILTER cts:contains(?collection, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   FILTER cts:contains(?collection, cts:word-query(?search_term))
                  }} UNION {{
-                   ?series dcterms:hasPart ?_ .
-                   ?series dc:language ?language .
-                   FILTER cts:contains(?language, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   ?series dcterms:hasPart ?item .
+                   ?series dc:language ?language_code .
+                   ?glottolog lexvo:iso639P3PCode ?language_code .
+                   ?glottolog rdfs:label ?language_string . 
+                   FILTER cts:contains(?language_string, cts:word-query(?search_term))
                  }} UNION {{
                    ?series dcterms:hasPart ?item .
                    ?series dcterms:spatial ?spatial .
-                   FILTER cts:contains(?spatial, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   FILTER cts:contains(?spatial, cts:word-query(?search_term))
                  }} UNION {{
                    ?series dcterms:hasPart ?item .
                    ?series dcterms:date ?date .
-                   FILTER cts:contains(?date, cts:word-query(?search_term, ('case-insensitive', 'diacritic-insensitive')))
+                   FILTER cts:contains(?date, cts:word-query(?search_term))
+                 }} UNION {{
+                   ?series dma:contentType ?content_type .
+                   FILTER cts:contains (?content_type, cts:word-query(?search_term))
                  }}
                }}'''.format(self.named_graph)
     

@@ -165,10 +165,19 @@ def cli_fill_cache(clean):
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
     """List browse terms."""
-    for browse_term, series_list in mlc_g.get_browse_terms(
-        browse_type
-    ).items():
-        sys.stdout.write('{} ({})\n'.format(browse_term, len(series_list)))
+    browse = mlc_g.get_browse_terms(browse_type)
+
+    browse_terms = list(browse.keys())
+    # sort alphabetically, ignoring punctuation. 
+    browse_terms.sort(key=lambda x:re.sub('[^\\p{L}\\p{N}]+', '', x[0]))
+
+    for browse_term in browse_terms:
+        sys.stdout.write(
+            '{} ({})\n'.format(
+                browse_term,
+                len(browse[browse_term])
+            )
+        )
 
 
 @mlc_ucla_search.cli.command(
@@ -222,7 +231,7 @@ def cli_list_items(verbose, json_output):
         if json_output or verbose:
             info = mlc_g.get_item_info(i)
         if json_output:
-            sys.stdout.write(json.dumps(info))
+            sys.stdout.write(json.dumps(info, indent=2))
         elif verbose:
             sys.stdout.write(get_item_info_str(info))
         else:
@@ -240,7 +249,7 @@ def cli_list_series(verbose, json_output):
         if json_output or verbose:
             info = mlc_g.get_series_info(i)
         if json_output:
-            sys.stdout.write(json.dumps(info))
+            sys.stdout.write(json.dumps(info, indent=2))
         elif verbose:
             sys.stdout.write(get_series_info_str(info))
         else:
