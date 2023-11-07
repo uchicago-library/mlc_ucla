@@ -3,6 +3,7 @@ import json
 import os
 import requests
 import sys
+import time
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
 from utils import MLCGraph
 from flask_babel import lazy_gettext
@@ -506,7 +507,15 @@ def search():
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
+    start = time.time()
     db_results = mlc_g.search(query, facets, sort_type)
+    current_app.logger.debug(
+        'Search for \'{}\' with facets ({}) returned from MarkLogic in {}.'.format(
+            query,
+            ', '.join(facets),
+            time.time() - start
+        )
+    )
 
     processed_results = []
     for db_series in db_results:
