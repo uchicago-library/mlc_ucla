@@ -1281,22 +1281,18 @@ class MLCGraph:
                    ?series dc:description ?description .
                    FILTER cts:contains (?description, cts:word-query(?search_term))
                  }} UNION {{
-                   ?series dcterms:hasPart ?item .
                    ?aggregation edm:aggregatedCHO ?series .
                    ?aggregation fn:collection ?collection .
                    FILTER cts:contains(?collection, cts:word-query(?search_term))
                  }} UNION {{
-                   ?series dcterms:hasPart ?item .
                    ?series dc:language ?language_code .
                    ?glottolog lexvo:iso639P3PCode ?language_code .
                    ?glottolog rdfs:label ?language_string . 
                    FILTER cts:contains(?language_string, cts:word-query(?search_term))
                  }} UNION {{
-                   ?series dcterms:hasPart ?item .
                    ?series dcterms:spatial ?spatial .
                    FILTER cts:contains(?spatial, cts:word-query(?search_term))
                  }} UNION {{
-                   ?series dcterms:hasPart ?item .
                    ?series dcterms:date ?date .
                    FILTER cts:contains(?date, cts:word-query(?search_term))
                  }} UNION {{
