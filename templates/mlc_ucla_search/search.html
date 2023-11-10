@@ -18,108 +18,120 @@
     {# RESULT #}
     {% for result in results %}
       <li class="search-result">
+      {% cache None, "series-snippet", result.0 %}
       {# SERIES #}
+      {% set series_info = get_series_info(result.0) %}
       <div class="search-results-series-title">
         <span class="series-result-series-label">
           {% trans %}Series{% endtrans %}
-          {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
+          {% for identifier in series_info.identifier %}{{ identifier }}{% endfor %}: 
         </span>
         <div class="search-results-series-title-badge">
           <h3><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-            {{ result.1.titles.0 }}
+            {{ series_info.titles.0 }}
           </a></h3>
           <div class="title-id-badge">
-            {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
-            <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+            {# <span class="text-muted-extra"> {{ series_info.identifier.0 }}</span> #}
+            {% if series_info.access_rights.0 == 'Public domain' %}
+              {% set class = 'success' %}
+              {% set label = 'Open' %}
+            {% else %}
+              {% set class = '' %}
+              {% set label = '' %}
+            {% endif %}
+            <span class="badge badge-{{ class }}">{% trans %}{{ label }}{% endtrans %}</span>
           </div>
         </div>
       </div>
       {# METADATA #}
       <div class="object-metadata">
         <dl>
-          {% if result.1.subject_language %}
+          {% if series_info.subject_language %}
             <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
             <dd>
-            {% for language in result.1.subject_language %}
+            {% for language in series_info.subject_language %}
               <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
             {% endfor %}
             </dd>
           {% endif %}
-          {% if result.1.primary_language %}
+          {% if series_info.primary_language %}
             <dt>{% trans %}Language(s){% endtrans %}: </dt>
             <dd>
-            {% for language in result.1.primary_language %}
+            {% for language in series_info.primary_language %}
               <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
             {% endfor %}
             </dd>
           {% endif %}
-          {% if result.1.location %}
+          {% if series_info.location %}
             <dt>{% trans %}Location{% endtrans %}:</dt>
             <dd>
-            {% for location in result.1.location %}
+            {% for location in series_info.location %}
               <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
             {% endfor %}
             </dd>
           {% endif %}
-          {% if result.1.date %}
+          {% if series_info.date %}
             <dt>{% trans %}Date{% endtrans %}:</dt>
             <dd>
-            {% for date in result.1.date %}
+            {% for date in series_info.date %}
               <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
             {% endfor %}
             </dd>
           {% endif %}
-          {% if result.1.creator %}
+          {% if series_info.creator %}
             <dt>{% trans %}Creator(s){% endtrans %}:</dt>
             <dd>
-            {% if result.1.creator|length > 3 %}
-              {% for creator in result.1.creator[:3] %}
+            {% if series_info.creator|length > 3 %}
+              {% for creator in series_info.creator[:3] %}
                 <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
               {% endfor %}
-              (+{{ result.1.creator|length -3 }})
+              (+{{ series_info.creator|length -3 }})
             {% else %}
-              {% for creator in result.1.creator %}
+              {% for creator in series_info.creator %}
                 <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
               {% endfor %}
             {% endif %}
             </dd>
           {% endif %}
-          {% if result.1.contributor %}
+          {% if series_info.contributor %}
             <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
             <dd>
-            {% if result.1.contributor|length > 3 %}
-              {% for contributor in result.1.contributor[:3] %}
+            {% if series_info.contributor|length > 3 %}
+              {% for contributor in series_info.contributor[:3] %}
                 <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
               {% endfor %}
-              (+{{ result.1.contributor|length -3 }})
+              (+{{ series_info.contributor|length -3 }})
             {% else %}
-              {% for contributor in result.1.contributor %}
+              {% for contributor in series_info.contributor %}
                 <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
               {% endfor %}
             {% endif %}
             </dd>
           {% endif %}
-          {% if result.1.content_type %}
+          {% if series_info.content_type %}
             <dt>{% trans %}Resource Type{% endtrans %}:</dt>
             <dd>
-            {% for content_type in result.1.content_type %}
+            {% for content_type in series_info.content_type %}
               <span>{{ content_type }}</span>
             {% endfor %}
             </dd>
           {% endif %}
         </dl>
       </div>
+      {% endcache %}
 
       {# ITEMS #}
-      {% if result.1.sub_items|length > 0 %}
+      {% if result.1|length > 0 %}
         <div class="items-listing">{# well well-sm  #}
-        <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
+        <b class="text-muted"> {% trans num=result.1|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
         <div class="row">
         <ul class="no-style-list">
-        {% for item_o in result.1.sub_items %}
+        {% for item_id in result.1 %}
           {%  with %}
-            {%  set item = item_o %}
+            {% cache None, "item-snippet", item_id %}
+            {%  set item = get_item_info(item_id) %}
             {%  include 'component-item-in-list.html' %}
+            {% endcache %}
           {%  endwith %}
         {% endfor %}
         </ul>

@@ -5,9 +5,10 @@ import requests
 import sys
 import time
 from flask import abort, Blueprint, current_app, render_template, request, session, redirect
+from flask_caching import Cache
 from utils import MLCGraph
 from flask_babel import lazy_gettext
-from local import BASE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, REQUESTS_CACHE_DB, TGN_TRIPLES
+from local import BASE, CACHE_DEFAULT_TIMEOUT, CACHE_DIR, CACHE_THRESHOLD, CACHE_TYPE, DB, GLOTTO_LOOKUP, GLOTTO_TRIPLES, MESO_TRIPLES, REQUESTS_CACHE_DB, TGN_TRIPLES
 
 import regex as re
 
@@ -109,14 +110,14 @@ def get_series_info_str(series_info):
 # CLI
 
 @mlc_ucla_search.cli.command(
-    'fill-cache',
+    'fill-db-cache',
     short_help='Cache all MarkLogic requests.'
 )
 @click.option('--clean', '-c', is_flag=True, help='Delete cache before rebuilding.')
-def cli_fill_cache(clean):
+def cli_fill_db_cache(clean):
     """Cache all MarkLogic requests."""
  
-    # delete the cache, if it exists. 
+    # delete the backend cache, if it exists. 
     if clean:
         try:
             os.remove(REQUESTS_CACHE_DB)
@@ -157,6 +158,44 @@ def cli_fill_cache(clean):
         )
         mlc_g.get_series_info(series)
 
+
+@mlc_ucla_search.cli.command(
+    'fill-template-cache',
+    short_help='Clear template cache.'
+)
+@click.option('--clean', '-c', is_flag=True, help='Delete cache before rebuilding.')
+def cli_fill_template_cache(clean):
+    cache = Cache(config={
+        'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+        'CACHE_DIR': CACHE_DIR,
+        'CACHE_THRESHOLD': CACHE_THRESHOLD,
+        'CACHE_TYPE': CACHE_TYPE
+    })
+
+    cache.init_app(current_app)
+    
+    # delete the backend cache, if it exists. 
+    if clean:
+        with current_app.app_context():
+            cache.clear()
+
+    series_ids = mlc_g.get_series_identifiers()
+    for i, series_id in enumerate(series_ids):
+        print('caching template for series {} of {}.'.format(i + 1, len(series_ids)))
+        with current_app.test_request_context():
+            render_template(
+                'search.html',
+                facets=[],
+                query='',
+                query_field='',
+                results=[[
+                    series_id,
+                    mlc_g.get_item_identifiers_for_series(series_id),
+                    0
+                ]],
+                title_slug=''
+            )
+          
 
 @mlc_ucla_search.cli.command(
     'get-browse',
@@ -359,45 +398,19 @@ def submission_receipt():
 
 # WEB
 
-# removed restricted label due to issue https://github.com/uchicago-library/ucla/issues/84
-access_key = {
-    'restricted': {
-        'trans': '',
-        'class': ''
-    },
-    'public domain':  {
-        'trans': lazy_gettext(u'Open'),
-        'class': 'success'
+# JEJ
+@mlc_ucla_search.context_processor
+def utility_processor():
+    def get_item_request_access_button(identifier):
+        raise NotImplementedError
+    def get_series_request_access_button(identifier):
+        raise NotImplementedError
+    return {
+        'get_item_info': lambda x: mlc_g.get_item_info(x),
+        'get_series_info': lambda x: mlc_g.get_series_info(x),
+        'get_request_access_button': get_request_access_button
     }
-}
 
-def sortListOfItems(item):
-    if isinstance(item, tuple):
-        item = item[1]
-    # Give priority to items with a panopto link, and then items with a 'has_format'
-    # return len(item[1]['panopto_links']) * 10 + len(item[1]['has_format'])
-    if 'panopto_links' in item and len(item['panopto_links']):
-            return 0
-    elif 'has_format' in item and len(item['has_format']):
-        return 1
-    else:
-        return 2
-
-def get_access_label_obj(item):
-    # list of results
-    #   tuple for item
-    #     string for url
-    #     dictionary of data
-    #       list of values
-    ar = item['access_rights']
-    if len(ar) > 0 and ar[0].lower() in access_key:
-        return [
-            ar[0],
-            access_key[ar[0].lower()]['trans'],
-            access_key[ar[0].lower()]['class']
-            ]
-    else:
-        return ['emtpy', 'By Request', 'info']
 
 @mlc_ucla_search.route('/language-change', methods=['POST'])
 def change_language():
@@ -406,6 +419,7 @@ def change_language():
     else:
         session['language'] = 'en'
     return redirect(request.referrer)
+
 
 @mlc_ucla_search.errorhandler(400)
 def bad_request(e):
@@ -472,7 +486,6 @@ def browse():
         results_with_label_ui_data = []
         for result in results:
             series_data = mlc_g.get_series_info(result)
-            series_data['access_rights'] = get_access_label_obj(series_data)
             results_with_label_ui_data.append((result, series_data))
 
         return render_template(
@@ -507,27 +520,14 @@ def search():
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
+    # JEJ
     start = time.time()
-    db_results = mlc_g.search(query, facets, sort_type)
-    current_app.logger.debug(
-        'Search for \'{}\' with facets ({}) returned from MarkLogic in {}.'.format(
-            query,
-            ', '.join(facets),
-            time.time() - start
-        )
-    )
 
-    processed_results = []
-    for db_series in db_results:
-        series_data = mlc_g.get_series_info(db_series[0])
-        series_data['access_rights'] = get_access_label_obj(series_data)
+    results = mlc_g.search(query, facets, sort_type)
 
-        series_data['sub_items'] = []
-        for i in db_series[1]:
-            info = mlc_g.get_item_info(i)
-            series_data['sub_items'].append(info)
-        series_data['sub_items'].sort(key=sortListOfItems)
-        processed_results.append((db_series[0], series_data))
+    # JEJ
+    print('query time {}'.format(time.time() - start))
+    start = time.time()
 
     if facets:
         title_slug = lazy_gettext(u'Search Results for') + ' ' + facets[0]
@@ -541,7 +541,7 @@ def search():
         facets=[],
         query=query,
         query_field='',
-        results=processed_results,
+        results=results,
         title_slug=title_slug
     )
 
@@ -558,13 +558,19 @@ def series(noid):
 
     series_data = mlc_g.get_series_info(BASE + noid)
 
+    grouped_items = mlc_g.get_grouped_item_identifiers_for_series(BASE + noid)
+
+    # JEJ
+    has_panopto = False
+    item_id_with_panopto = ''
+    item_title_with_panopto = ''
+    '''
     items = []
     for i in mlc_g.get_item_identifiers_for_series(BASE + noid):
         items.append((
             i,
             mlc_g.get_item_info(i)
         ))
-    items.sort(key=sortListOfItems)
 
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
@@ -583,6 +589,7 @@ def series(noid):
             has_panopto = True
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
+    '''
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -605,7 +612,7 @@ def series(noid):
             'grouped_items': grouped_items,
             'title_slug': title_slug,
             'request_access_button' : request_access_button,
-            'access_rights': get_access_label_obj(series_data)
+            'access_rights': series_data['access_rights']
         })
     )
 
@@ -668,7 +675,7 @@ def item(noid):
         **(item_data | {
             'series': series,
             'title_slug': title_slug,
-            'access_rights': get_access_label_obj(item_data),
+            'access_rights': item_data['access_rights'],
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
             'breadcrumb': breadcrumb

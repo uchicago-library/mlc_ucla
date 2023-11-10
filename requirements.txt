@@ -6,6 +6,7 @@ rdflib
 regex
 sqlite_dump
 flask_babel
+flask_caching
 flask_session
 pysocks
 sqlite_dump

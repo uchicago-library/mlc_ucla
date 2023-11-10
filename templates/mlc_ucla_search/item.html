@@ -6,7 +6,14 @@
       <h1>
         {{ title_slug }}
       </h1>
-      <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+      {% if access_rights == 'Public domain' %}
+        {% set class = 'success' %}
+        {% set label = 'Open' %}
+      {% else %}
+        {% set class = '' %}
+        {% set label = '' %}
+      {% endif %}
+      <span class="badge badge-{{ class }}">{% trans %}{{ label }}{% endtrans %}</span>
     </div>
     {% if panopto_identifier %}
       <div>

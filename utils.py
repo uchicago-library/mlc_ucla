@@ -196,9 +196,9 @@ class MLCGraph:
                         ?identifier dcterms:hasPart ?_
                     }}
                 '''.format(self.named_graph),
-                {
-                    'browse_type': rdflib.URIRef(browse_types[browse_type])
-                }
+                [
+                    ('browse_type', rdflib.URIRef(browse_types[browse_type]))
+                ]
             )
             for date_str, identifier in qres:
                 if str(date_str) == '(:unav)':
@@ -241,9 +241,9 @@ class MLCGraph:
                     }}
                     ORDER BY ?browse_term
                 '''.format(self.named_graph),
-                {
-                    'browse_type': rdflib.URIRef(browse_types[browse_type])
-                }
+                [
+                    ('browse_type', rdflib.URIRef(browse_types[browse_type]))
+                ]
             )
             for browse_term, identifier in qres:
                 browse_term = regularize_string(str(browse_term))
@@ -269,9 +269,9 @@ class MLCGraph:
                         FILTER langMatches(lang(?browse_term), 'EN')
                     }}
                 '''.format(self.named_graph),
-                {
-                    'browse_type': rdflib.URIRef(browse_types[browse_type])
-                }
+                [
+                    ('browse_type', rdflib.URIRef(browse_types[browse_type]))
+                ]
             )
             for browse_terms, identifier in qres:
                 for browse_term in browse_terms.split():
@@ -293,9 +293,9 @@ class MLCGraph:
                         ?identifier <http://purl.org/dc/terms/hasPart> ?_
                     }}
                 '''.format(self.named_graph),
-                {
-                    'browse_type': rdflib.URIRef(browse_types[browse_type])
-                }
+                [
+                    ('browse_type', rdflib.URIRef(browse_types[browse_type]))
+                ]
             )
             for labels, identifier in qres:
                 for label in labels.split('\n'):
@@ -334,9 +334,9 @@ class MLCGraph:
                     ?item_id dc:identifier ?dbid
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             dbid = row[0]
         return dbid
@@ -363,9 +363,9 @@ class MLCGraph:
                     ?aggregation edm:isShownBy ?url
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             has_panopto_link = '1'
         return has_panopto_link
@@ -409,10 +409,10 @@ class MLCGraph:
                         ?item_id ?p ?value
                     }}
                 '''.format(self.named_graph),
-                {
-                    'p': rdflib.URIRef(p),
-                    'item_id': rdflib.URIRef(item_id)
-                }
+                [
+                    ('p', rdflib.URIRef(p)),
+                    ('item_id', rdflib.URIRef(item_id))
+                ]
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
@@ -435,9 +435,9 @@ class MLCGraph:
                     FILTER (lang(?value) = 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             locations.add(str(row[0]))
         data['location'] = list(locations)
@@ -466,9 +466,9 @@ class MLCGraph:
                     FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             primary_languages.add(str(row[0]))
 
@@ -498,9 +498,9 @@ class MLCGraph:
                     FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             subject_languages.add(str(row[0]))
 
@@ -530,9 +530,9 @@ class MLCGraph:
                 }}
                 ORDER BY DESC(?has_panopto) ?format_dbid
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             format_id = str(row[0])
             medium = str(row[1])
@@ -565,9 +565,9 @@ class MLCGraph:
                 }}
                 ORDER BY DESC(?has_panopto) ?format_dbid
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             format_id = str(row[0])
             medium = str(row[1])
@@ -598,9 +598,9 @@ class MLCGraph:
                     ?aggregation edm:isShownBy ?panopto_link
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             panopto_links.add(str(row[0]))
         data['panopto_links'] = list(panopto_links)
@@ -618,9 +618,9 @@ class MLCGraph:
                     ?web_resource dcterms:identifier ?identifier
                 }}
             '''.format(self.named_graph),
-            {
-                'web_resource': rdflib.URIRef(item_id + '/file.wav')
-            }
+            [
+                ('web_resource', rdflib.URIRef(item_id + '/file.wav'))
+            ]
         ):
             if str(row[0]).startswith(panopto_prefix):
                 panopto_identifiers.add(str(row[0]).replace(panopto_prefix, ''))
@@ -693,23 +693,100 @@ class MLCGraph:
         """
         r = self.query(
             '''
+                PREFIX dc: <http://purl.org/dc/elements/1.1/>
                 PREFIX dcterms: <http://purl.org/dc/terms/>
+                PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
                 SELECT ?item_id
                 FROM <{}>
                 WHERE {{
-                    ?series_id dcterms:hasPart ?item_id
-               }}
+                    ?series_id dcterms:hasPart ?item_id .
+                    ?item_id dc:identifier ?identifier .
+                    ?aggregation_id edm:aggregatedCHO ?item_id .
+                    OPTIONAL {{
+                        ?aggregation_id edm:isShownBy ?panopto_link .
+                    }}
+                    OPTIONAL {{
+                        ?item_id dcterms:hasFormat ?format_item_id .
+                    }}
+                }}
+                ORDER BY DESC(bound(?panopto_link)) DESC(bound(?format_item_id)) ?identifier
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(i)
-            }
+            [
+                ('series_id', rdflib.URIRef(i))
+            ]
         )
 
         results = set()
         for row in r:
             results.add(str(row[0]))
         return sorted(list(results))
+
+    def get_grouped_item_identifiers_for_series(self, i):
+        """
+        Get grouped item identifiers for a given series.
+
+        Parameters:
+            i (str): a series identifier.
+
+        Returns:
+            dict: a list of item identifiers.
+        """
+        r = self.query(
+            '''
+                PREFIX dcterms: <http://purl.org/dc/terms/>
+
+                SELECT DISTINCT ?medium
+                FROM <{}>
+                WHERE {{
+                    ?series_id dcterms:hasPart ?item_id .
+                    ?item_id dcterms:medium ?medium .
+                }}
+            '''.format(self.named_graph),
+            [
+                ('series_id', rdflib.URIRef(i))
+            ]
+        )
+
+        mediums = set()
+        for row in r:
+            mediums.add(str(row[0]))
+
+        grouped_items = {}
+        for medium in list(mediums):
+            grouped_items[medium] = []
+            r = self.query(
+                '''
+                    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+                    PREFIX dcterms: <http://purl.org/dc/terms/>
+                    PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+    
+                    SELECT DISTINCT ?item_id
+                    FROM <{}>
+                    WHERE {{
+                        ?series_id dcterms:hasPart ?item_id .
+                        ?item_id dc:identifier ?identifier .
+                        BIND(str(?medium) as ?medium_str)
+                        ?item_id dcterms:medium ?medium_str .
+                        ?aggregation_id edm:aggregatedCHO ?item_id .
+                        OPTIONAL {{
+                            ?aggregation_id edm:isShownBy ?panopto_link .
+                        }}
+                        OPTIONAL {{
+                            ?item_id dcterms:hasFormat ?format_item_id .
+                        }}
+                    }}
+                    ORDER BY DESC(bound(?panopto_link)) DESC(bound(?format_item_id)) ?identifier
+                '''.format(self.named_graph),
+                [
+                    ('series_id', rdflib.URIRef(i)),
+                    ('medium', medium)
+                ]
+            )
+
+            for row in r:
+                grouped_items[medium].append(str(row[0]))
+        return grouped_items
 
     def get_item_medium(self, item_id):
         """
@@ -732,9 +809,9 @@ class MLCGraph:
                     ?item_id dcterms:medium ?medium
                 }}
             '''.format(self.named_graph),
-            {
-                'item_id': rdflib.URIRef(item_id)
-            }
+            [
+                ('item_id', rdflib.URIRef(item_id))
+            ]
         ):
             medium = str(row[0])
         return medium
@@ -771,10 +848,10 @@ class MLCGraph:
                         ?series_id ?p ?o
                     }}
                 '''.format(self.named_graph),
-                {
-                    'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(i)
-                }
+                [
+                    ('p', rdflib.URIRef(p)),
+                    ('series_id', rdflib.URIRef(i))
+                ]
             )
             for row in r:
                 search_tokens.append(str(row[0]))
@@ -790,10 +867,10 @@ class MLCGraph:
                     ?series_aggregation_id fn:collection ?o .
                 }}
             '''.format(self.named_graph),
-            {
-                'p': rdflib.URIRef(p),
-                'series_aggregation_id': rdflib.URIRef(i + '/aggregation')
-            }
+            [
+                ('p', rdflib.URIRef(p)),
+                ('series_aggregation_id', rdflib.URIRef(i + '/aggregation'))
+            ]
         )
         lookup = {
             'dma': 'Digital Media Archive'
@@ -813,9 +890,9 @@ class MLCGraph:
                     ?series_id dc:language ?o
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(i)
-            }
+            [
+                ('series_id', rdflib.URIRef(i))
+            ]
         )
         for row in r:
             for label in self.glottolog_lookup.get_glottolog_language_names(str(row[0])):
@@ -833,9 +910,9 @@ class MLCGraph:
                     ?series_id dcterms:spatial ?o
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(i)
-            }
+            [
+                ('series_id', rdflib.URIRef(i))
+            ]
         )
         for row in r:
             for tgn_identifier in str(row[0]).split():
@@ -853,9 +930,9 @@ class MLCGraph:
                     ?series_id dcterms:date ?o
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(i)
-            }
+            [
+                ('series_id', rdflib.URIRef(i))
+            ]
         )
         for row in r:
             date_str = str(row[0])
@@ -899,9 +976,9 @@ class MLCGraph:
                     ?identifier dcterms:date ?date
                 }}
             '''.format(self.named_graph),
-            {
-                'identifier': rdflib.URIRef(i)
-            }
+            [
+                ('identifier', rdflib.URIRef(i))
+            ]
         ):
             for year in row[0].split('/'):
                 years.append(year)
@@ -936,9 +1013,9 @@ class MLCGraph:
                     ?identifier dc:identifier ?dbid
                 }}
             '''.format(self.named_graph),
-            {
-                'identifier': rdflib.URIRef(i)
-            }
+            [
+                ('identifier', rdflib.URIRef(i))
+            ]
         ):
             dbids.append(str(row[0]))
 
@@ -1006,10 +1083,10 @@ class MLCGraph:
                         ?series_id ?p ?value
                     }}
                 '''.format(self.named_graph),
-                {
-                    'p': rdflib.URIRef(p),
-                    'series_id': rdflib.URIRef(series_id)
-                }
+                [
+                    ('p', rdflib.URIRef(p)),
+                    ('series_id', rdflib.URIRef(series_id))
+                ]
             ):
                 values.add(' '.join(row[0].split()))
             data[label] = sorted(list(values))
@@ -1032,9 +1109,9 @@ class MLCGraph:
                     FILTER (lang(?value) = 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(series_id)
-            }
+            [
+                ('series_id', rdflib.URIRef(series_id))
+            ]
         ):
             locations.add(str(row[0]))
         data['location'] = list(locations)
@@ -1063,9 +1140,9 @@ class MLCGraph:
                     FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(series_id)
-            }
+            [
+                ('series_id', rdflib.URIRef(series_id))
+            ]
         ):
             primary_languages.add(str(row[0]))
 
@@ -1095,9 +1172,9 @@ class MLCGraph:
                     FILTER langMatches(lang(?label), 'en')
                 }}
             '''.format(self.named_graph),
-            {
-                'series_id': rdflib.URIRef(series_id)
-            }
+            [
+                ('series_id', rdflib.URIRef(series_id))
+            ]
         ):
             subject_languages.add(str(row[0]))
 
@@ -1152,22 +1229,13 @@ class MLCGraph:
         Returns:
             list: a list of item identifiers.
         """
-        search_terms = search_term.split()
-
-        cts_word_queries = []
-        for i in range(len(search_terms)):
-            cts_word_queries.append(
-                'cts:word-query(?search_term{}, (\'case-insensitive\', \'punctuation-insensitive\'))'.format(
-                    i + 1
-                )
-            )
-        cts_query = 'cts:and-query(({}))'.format(', '.join(cts_word_queries))
-
         q = '''PREFIX cts: <http://marklogic.com/cts#>
                PREFIX dc: <http://purl.org/dc/elements/1.1/>
                PREFIX dcterms: <http://purl.org/dc/terms/>
+               PREFIX edm: <http://www.europeana.eu/schemas/edm/>
                PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+               PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                
                SELECT DISTINCT ?item
                FROM <{0}>
@@ -1177,37 +1245,74 @@ class MLCGraph:
                  {{
                    {{
                      ?item ?_ ?value .
-                     FILTER cts:contains (?value, {1})
+                     FILTER cts:contains (
+                       ?value, 
+                       cts:word-query(
+                         ?search_term, 
+                         (
+                           'case-insensitive', 
+                           'diacritic-insensitive', 
+                           'punctuation-insensitive'
+                         )
+                       )
+                     )
                    }} UNION {{
                      ?item dc:language ?language_code . 
                      ?glottolog lexvo:iso639P3PCode ?language_code .
-                     ?glottolog rdfs:label ?language_string . 
-                     FILTER cts:contains(?language_string, {1})
+                     ?glottolog rdfs:label | skos:altLabel | skos:prefLabel ?language_string . 
+                     FILTER cts:contains(
+                       ?language_string, 
+                       cts:word-query(
+                         ?search_term, 
+                         (
+                           'case-insensitive', 
+                           'diacritic-insensitive', 
+                           'punctuation-insensitive'
+                         )
+                       )
+                     )
+                   }} UNION {{
+                     ?item dcterms:spatial ?tgn_number .
+                     BIND(
+                       IRI(
+                         CONCAT(
+                           'http://vocab.getty.edu/tgn/', 
+                           ?tgn_number
+                         )
+                       ) AS ?tgn_iri
+                     )
+                     ?tgn_iri rdfs:label | skos:altLabel | skos:prefLabel ?label .
+                     FILTER cts:contains (
+                       ?label,
+                       cts:word-query(
+                         ?search_term, 
+                         (
+                           'case-insensitive', 
+                           'diacritic-insensitive', 
+                           'punctuation-insensitive'
+                         )
+                       )
+                     )
                    }}
                  }}
-               }}'''.format(self.named_graph, cts_query)
+                 ?item dc:identifier ?identifier .
+                 ?aggregation edm:aggregatedCHO ?item .
+                 OPTIONAL {{
+                   ?aggregation edm:isShownBy ?panopto_link .
+                 }}
+                 OPTIONAL {{
+                   ?item dcterms:hasFormat ?format_item .
+                 }}
+               }}
+               ORDER BY DESC(bound(?panopto_link)) DESC(bound(?format_item)) ?identifier
+               '''.format(self.named_graph)
+
+        return [row[0] for row in self.query(
+            q,
+            [('search_term', search_term)],
+            True
+        )]
     
-        # replace whitespace with single space.
-        q = ' '.join(q.split())
-
-        params = [
-            ('query', q)
-        ]
-
-        for i, s in enumerate(search_terms):
-            params.append(('bind:search_term{}'.format(i + 1), s))
-
-        u = '{}/v1/graphs/sparql?{}'.format(
-            MARKLOGIC,
-            urllib.parse.urlencode(params)
-        )
-        results = requests.get(u).json()
-
-        identifiers = []
-        for binding in results['results']['bindings']:
-            identifiers.append(binding['item']['value'])
-        return identifiers
-
     def search_series(self, search_term, sort_type = 'rank'):
         """
         Get series matching a search. 
@@ -1220,17 +1325,6 @@ class MLCGraph:
         Returns:
             list: a list of series identifiers.
         """
-        search_terms = search_term.split()
-
-        cts_word_queries = []
-        for i in range(len(search_terms)):
-            cts_word_queries.append(
-                'cts:word-query(?search_term{}, (\'case-insensitive\', \'punctuation-insensitive\'))'.format(
-                    i + 1
-                )
-            )
-        cts_query = 'cts:and-query(({}))'.format(', '.join(cts_word_queries))
-
         q = '''PREFIX cts: <http://marklogic.com/cts#>
                PREFIX dc: <http://purl.org/dc/elements/1.1/>
                PREFIX dcterms: <http://purl.org/dc/terms/>
@@ -1239,57 +1333,99 @@ class MLCGraph:
                PREFIX lexvo: <https://www.iso.org/standard/39534.html>
                PREFIX olac: <http://www.language−archives.org/OLAC/metadata.html>
                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+               PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                
                SELECT DISTINCT ?series
                FROM <{0}>
                FROM <http://lib.uchicago.edu/glottolog>
+               FROM <http://vocab.getty.edu/tgn/>
                WHERE {{
+                 ?series dcterms:hasPart ?item .
                  {{
-                   ?series dcterms:hasPart ?item .
-                   {{
-                     ?item ?_ ?value .
-                     FILTER cts:contains (?value, {1})
-                   }} UNION {{
-                     ?item dc:language ?language_code . 
-                     ?glottolog lexvo:iso639P3PCode ?language_code .
-                     ?glottolog rdfs:label ?language_string . 
-                     FILTER cts:contains(?language_string, {1})
-                   }}
+                   ?item ?_ ?value .
+                   FILTER cts:contains (
+                     ?value, 
+                     cts:word-query(
+                       ?search_term, 
+                       (
+                         'case-insensitive', 
+                         'diacritic-insensitive', 
+                         'punctuation-insensitive'
+                       )
+                     )
+                   )
                  }} UNION {{
                    ?series ?_ ?value .
-                   FILTER cts:contains (?value, {1})
+                   FILTER cts:contains (
+                     ?value, 
+                     cts:word-query(
+                       ?search_term, 
+                       (
+                         'case-insensitive', 
+                         'diacritic-insensitive', 
+                         'punctuation-insensitive'
+                       )
+                     )
+                   )
                  }} UNION {{
                    ?aggregation edm:aggregatedCHO ?series .
                    ?aggregation fn:collection ?collection .
-                   FILTER cts:contains(?collection, {1})
+                   FILTER cts:contains (
+                     ?collection,
+                     cts:word-query(
+                       ?search_term, 
+                       (
+                         'case-insensitive', 
+                         'diacritic-insensitive', 
+                         'punctuation-insensitive'
+                       )
+                     )
+                   )
                  }} UNION {{
                    ?series dc:language ?language_code .
                    ?glottolog lexvo:iso639P3PCode ?language_code .
-                   ?glottolog rdfs:label ?language_string . 
-                   FILTER cts:contains(?language_string, {1})
+                   ?glottolog rdfs:label | skos:altLabel | skos:prefLabel ?language_string . 
+                   FILTER cts:contains (
+                     ?language_string,
+                     cts:word-query(
+                       ?search_term, 
+                       (
+                         'case-insensitive', 
+                         'diacritic-insensitive', 
+                         'punctuation-insensitive'
+                       )
+                     )
+                   )
+                 }} UNION {{
+                   ?series dcterms:spatial ?tgn_number .
+                   BIND(
+                     IRI(
+                       CONCAT(
+                         'http://vocab.getty.edu/tgn/', 
+                         ?tgn_number
+                       )
+                     ) AS ?tgn_iri
+                   )
+                   ?tgn_iri rdfs:label | skos:altLabel | skos:prefLabel ?label .
+                   FILTER cts:contains (
+                     ?label,
+                     cts:word-query(
+                       ?search_term, 
+                       (
+                         'case-insensitive', 
+                         'diacritic-insensitive', 
+                         'punctuation-insensitive'
+                       )
+                     )
+                   )
                  }}
-               }}'''.format(self.named_graph, cts_query)
-    
-        # replace whitespace with single space.
-        q = ' '.join(q.split())
-
-        params = [
-            ('query', q)
-        ]
-      
-        for i, s in enumerate(search_terms):
-            params.append(('bind:search_term{}'.format(i + 1), s))
-
-        u = '{}/v1/graphs/sparql?{}'.format(
-            MARKLOGIC,
-            urllib.parse.urlencode(params)
-        )
-        results = requests.get(u).json()
-
-        identifiers = []
-        for binding in results['results']['bindings']:
-            identifiers.append(binding['series']['value'])
-        return identifiers
+               }}'''.format(self.named_graph)
+   
+        return [row[0] for row in self.query(
+            q,
+            [('search_term', search_term)],
+            True
+        )]
 
     def search(self, search_term, facets=[], sort_type = 'rank'):
         """
@@ -1350,12 +1486,13 @@ class MLCGraph:
 
         return results
 
-    def query(self, s, b = {}):
+    def query(self, s, b = [] , log = False):
         """Query the triplestore. 
 
         Parameters:
             s (str): a SPARQL query.
-            b (dict): variable bindings for the query.
+            b (list): a list of tuples, variable bindings for the query.
+            log (bool): log the cache key.
 
         Returns:
             a list of tuples, like those returned by rdflib's graph.query().
@@ -1365,13 +1502,20 @@ class MLCGraph:
         
         # build a list of tuples to submit as GET request URL params.
         params = [('query', s)]
-        for k, v in b.items():
-            params.append(('bind:' + k, str(v)))
+        for i in b:
+            params.append(('bind:' + i[0], str(i[1])))
 
-        r = self.requests.get('{}/v1/graphs/sparql?{}'.format(
-            self.backend,
-            urllib.parse.urlencode(params)
-        ))
+        # JEJ
+        if log:
+            r = requests.get('{}/v1/graphs/sparql?{}'.format(
+                self.backend,
+                urllib.parse.urlencode(params)
+            ))
+        else:
+            r = self.requests.get('{}/v1/graphs/sparql?{}'.format(
+                self.backend,
+                urllib.parse.urlencode(params)
+            ))
         data = r.json()
 
         # handle errors.
@@ -1384,7 +1528,7 @@ class MLCGraph:
         for result in data['results']['bindings']:
             row = []
             for var in data['head']['vars']:
-                if result[var]['type'] in ('literal', 'uri'):
+                if result[var]['type'] in ('bnode', 'literal', 'uri'):
                     v = result[var]['value']
                 else:
                     raise NotImplementedError

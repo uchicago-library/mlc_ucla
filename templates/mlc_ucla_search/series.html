@@ -8,7 +8,14 @@
       </h1>
       <div class="title-id-badge">
         <!-- <span class="text-muted-extra"> {{ identifier.0 }}</span> -->
-        <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+        {% if access_rights == 'Public domain' %}
+          {% set class = 'success' %}
+          {% set label = 'Open' %}
+        {% else %}
+          {% set class = '' %}
+          {% set label = '' %}
+        {% endif %}
+        <span class="badge badge-{{ class }}">{% trans %}{{ label }}{% endtrans %}</span>
       </div>
     </div>
 
@@ -105,10 +112,13 @@
       <div class="items-listing">
         <div class="row">
           <ul class="no-style-list">
-          {% for item in item_list %}
-            {%  with %}
-              {%  include 'component-item-in-list.html' %}
-            {%  endwith %}
+          {% for item_id in item_list %}
+            {% with %}
+              {% cache None, "item-snippet", item_id %}
+              {% set item = get_item_info(item_id) %}
+              {% include 'component-item-in-list.html' %}
+              {% endcache %}
+            {% endwith %}
           {% endfor %}
           </ul>
         </div>

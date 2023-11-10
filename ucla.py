@@ -1,6 +1,8 @@
 from flask import Flask, request, session
 from flask_babel import Babel, lazy_gettext
+from flask_caching import Cache
 from flask_session import Session
+from local import CACHE_DEFAULT_TIMEOUT, CACHE_DIR, CACHE_THRESHOLD, CACHE_TYPE
 from mlc_ucla_search import get_locale, mlc_ucla_search
 
 
@@ -13,6 +15,14 @@ app.register_blueprint(mlc_ucla_search)
 Session(app)
 
 babel = Babel(app, default_locale='en', locale_selector=get_locale)
+
+cache = Cache(config={
+    'CACHE_DEFAULT_TIMEOUT': CACHE_DEFAULT_TIMEOUT,
+    'CACHE_DIR': CACHE_DIR,
+    'CACHE_THRESHOLD': CACHE_THRESHOLD,
+    'CACHE_TYPE': CACHE_TYPE
+})
+cache.init_app(app)
 
 
 @app.context_processor
