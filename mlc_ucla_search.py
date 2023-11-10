@@ -597,16 +597,6 @@ def series(noid):
     except (IndexError, KeyError):
         title_slug = ''
 
-    # details for request access button
-    # TODO: needs to check if user already has access
-    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
-    request_access_button = {
-        'show' : is_restricted and has_panopto,
-        'series_id' : series_data['identifier'][0],
-        'item_id' : item_id_with_panopto,
-        'item_title' : item_title_with_panopto
-    }
-
     return render_template(
         'series.html',
         **(series_data | {
