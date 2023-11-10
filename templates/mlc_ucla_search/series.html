@@ -107,7 +107,10 @@
       </dl>
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for medium, item_list in grouped_items.items() %}
+    
+    {% for medium in ["Sound", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "image", "Microform", "Record", "Wire", "Text"] %}
+    {% if medium in grouped_items %}
+    {% set item_list = grouped_items[medium] %}
       <h3>{{ medium }}</h3>
       <div class="items-listing">
         <div class="row">
@@ -123,6 +126,7 @@
           </ul>
         </div>
       </div>
+    {% endif %}
     {% endfor %}
 
     {# <pre>{{ grouped_items }}</pre>
