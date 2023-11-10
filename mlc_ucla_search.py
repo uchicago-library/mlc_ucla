@@ -179,8 +179,6 @@ def cli_fill_template_cache(clean):
         with current_app.app_context():
             cache.clear()
 
-    # JEJ need to request item and series pages to cache request form. 
-
     series_ids = mlc_g.get_series_identifiers()
     for i, series_id in enumerate(series_ids):
         print('caching template for series {} of {}.'.format(i + 1, len(series_ids)))
@@ -522,7 +520,6 @@ def browse():
         if browse_type == 'decade':
             sort_field = 'date'
 
-        # JEJ need sorting back.
         results = mlc_g.get_browse_terms(browse_type)[browse_term]
 
         results_with_label_ui_data = []
@@ -562,14 +559,7 @@ def search():
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
-    # JEJ
-    start = time.time()
-
     results = mlc_g.search(query, facets, sort_type)
-
-    # JEJ
-    print('query time {}'.format(time.time() - start))
-    start = time.time()
 
     if facets:
         title_slug = lazy_gettext(u'Search Results for') + ' ' + facets[0]
@@ -606,6 +596,16 @@ def series(noid):
         title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
+
+    # details for request access button
+    # TODO: needs to check if user already has access
+    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
+    request_access_button = {
+        'show' : is_restricted and has_panopto,
+        'series_id' : series_data['identifier'][0],
+        'item_id' : item_id_with_panopto,
+        'item_title' : item_title_with_panopto
+    }
 
     return render_template(
         'series.html',

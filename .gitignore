@@ -9,3 +9,5 @@ flask_session/
 *.pyc
 data_import/local_db/
 data_import/export*
+*.db
+glottolog_lookup.json
