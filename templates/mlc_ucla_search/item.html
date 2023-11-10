@@ -155,9 +155,10 @@
     <h2>{% trans %}Part of Series{% endtrans %}</h2>
     <ul>
     {% for serie in series %}
-      <li><a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-          <b>{{ serie.1.titles.0 }}</b>
-      </a>&nbsp;&nbsp;&nbsp;<span class="test-muted">{{ serie.1.identifier.0 }}</span></li>
+      {% set series_info = get_series_info(serie) %}
+      <li><a href="/series/{{ serie|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+          <b>{{ series_info.titles.0 }}</b>
+      </a>&nbsp;&nbsp;&nbsp;<span class="test-muted">{{ series_info.identifier.0 }}</span></li>
     {% endfor %}
     </ul>
     

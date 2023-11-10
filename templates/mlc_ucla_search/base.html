@@ -64,9 +64,10 @@
           <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
           <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
           <a href="/">{{ trans.collection_title }}</a> 
-          {% if breadcrumb or title_slug %}
-            &gt;
-            {{ breadcrumb|safe or title_slug}}
+          {% if object_type == 'item' %}
+            &gt; {{ get_item_breadcrumb(ark)|safe }}
+          {% elif title_slug %}
+            &gt; {{ title_slug }}
           {% endif %}
         </div> <!-- // Breadcrumbs -->
         <div class="col-xs-3 text-right">

@@ -179,6 +179,8 @@ def cli_fill_template_cache(clean):
         with current_app.app_context():
             cache.clear()
 
+    # JEJ need to request item and series pages to cache request form. 
+
     series_ids = mlc_g.get_series_identifiers()
     for i, series_id in enumerate(series_ids):
         print('caching template for series {} of {}.'.format(i + 1, len(series_ids)))
@@ -398,14 +400,54 @@ def submission_receipt():
 
 # WEB
 
-# JEJ
 @mlc_ucla_search.context_processor
 def utility_processor():
-    def get_item_request_access_button(identifier):
-        raise NotImplementedError
-    def get_series_request_access_button(identifier):
-        raise NotImplementedError
+    def get_item_breadcrumb(identifier):
+        item_info = mlc_g.get_item_info(identifier)
+        series_id = mlc_g.get_series_identifiers_for_item(identifier)[0]
+        series_info = mlc_g.get_series_info(series_id)
+        return '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
+            series_id.replace(BASE, ''),
+            series_info['titles'][0],
+            item_info['titles'][0]
+        )
+    def get_request_access_button(identifier):
+        is_restricted = True
+        has_panopto = False
+        item_id_with_panopto = ''
+        item_title_with_panopto = ''
+        if mlc_g.is_series(identifier):
+            series_ids = [identifier]
+            for item_id in mlc_g.get_item_identifiers_for_series(series_ids[0]):
+                item_info = mlc_g.get_item_info(item_id)
+                if item_info['panopto_identifiers'] and \
+                    len(item_info['panopto_identifiers']):
+                    has_panopto = True
+                    item_id_with_panopto = item_info['identifier'][0]
+                    item_title_with_panopto = item_info['titles'][0]
+            series_info = mlc_g.get_series_info(series_ids[0]) 
+            is_restricted = series_info['access_rights'][0].lower() == 'restricted'
+        else:
+            item_id = identifier
+            series_ids = mlc_g.get_series_identifiers_for_item(identifier)
+            item_info = mlc_g.get_item_info(item_id)
+            if item_info['panopto_identifiers'] and \
+                len(item_info['panopto_identifiers']):
+                has_panopto = True
+                item_id_with_panopto = item_info['identifier'][0]
+                item_title_with_panopto = item_info['titles'][0]
+            for series_id in series_ids:
+                series_info = mlc_g.get_series_info(series_id)
+                if series_info['access_rights'][0].lower() == 'restricted':
+                    is_restricted = True
+        return {
+            'show': is_restricted and has_panopto,
+            'series_id': ','.join(series_ids), # some items belong to multiple series
+            'item_id': item_id_with_panopto,
+            'item_title': item_title_with_panopto
+        }
     return {
+        'get_item_breadcrumb': get_item_breadcrumb,
         'get_item_info': lambda x: mlc_g.get_item_info(x),
         'get_series_info': lambda x: mlc_g.get_series_info(x),
         'get_request_access_button': get_request_access_button
@@ -560,58 +602,18 @@ def series(noid):
 
     grouped_items = mlc_g.get_grouped_item_identifiers_for_series(BASE + noid)
 
-    # JEJ
-    has_panopto = False
-    item_id_with_panopto = ''
-    item_title_with_panopto = ''
-    '''
-    items = []
-    for i in mlc_g.get_item_identifiers_for_series(BASE + noid):
-        items.append((
-            i,
-            mlc_g.get_item_info(i)
-        ))
-
-    has_panopto = False # to display the Request Access button
-    item_id_with_panopto = ''
-    item_title_with_panopto = ''
-    grouped_items = {}
-    for i in items:
-        try:
-            medium = i[1]['medium'][0]
-        except IndexError:
-            medium = []
-        if medium:
-            if medium not in grouped_items:
-                grouped_items[medium] = []        
-            grouped_items[medium].append(i[1])
-        if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
-            has_panopto = True
-            item_id_with_panopto = i[1]['identifier'][0]
-            item_title_with_panopto = i[1]['titles'][0]
-    '''
-
     try:
         title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
 
-    # details for request access button
-    # TODO: needs to check if user already has access
-    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
-    request_access_button = {
-        'show' : is_restricted and has_panopto,
-        'series_id' : series_data['identifier'][0],
-        'item_id' : item_id_with_panopto,
-        'item_title' : item_title_with_panopto
-    }
-
     return render_template(
         'series.html',
         **(series_data | {
             'grouped_items': grouped_items,
+            'ark': BASE + noid,
+            'object_type': 'series',
             'title_slug': title_slug,
-            'request_access_button' : request_access_button,
             'access_rights': series_data['access_rights']
         })
     )
@@ -633,52 +635,22 @@ def item(noid):
     else:
         panopto_identifier = ''
 
-    series = []
-    for s in mlc_g.get_series_identifiers_for_item(BASE + noid):
-        series.append((s, mlc_g.get_series_info(s)))
-
-    # details for request access button
-    # TODO: needs to check if user already has access
-    if item_data['access_rights'][0].lower() == 'restricted':
-        is_restricted = True
-    else:
-        is_restricted = False
-
-    if item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]:
-        has_panopto = True
-    else:
-        has_panopto = False
-
-    series_id = []
-    for s in series:
-        series_id.append(s[1]['identifier'][0])
-    request_access_button = {
-        'show' : is_restricted and has_panopto,
-        'series_id' : ','.join(series_id), #some items belong to multiple series
-        'item_id' : item_data['identifier'][0],
-        'item_title' : item_data['titles'][0] or 'Unknow item title',
-    }
+    series = mlc_g.get_series_identifiers_for_item(BASE + noid)
 
     try:
         title_slug = item_data['titles'][0]
     except (IndexError, KeyError):
         title_slug = ''
 
-    breadcrumb = '<a href=\'/series/{}\'>{}</a> &gt; {}'.format(
-        series[0][0].replace(BASE, ''),
-        series[0][1]['titles'][0],
-        item_data['titles'][0]
-    )
-    
     return render_template(
         'item.html',
         **(item_data | {
+            'ark': BASE + noid,
+            'object_type': 'item',
             'series': series,
             'title_slug': title_slug,
             'access_rights': item_data['access_rights'],
-            'request_access_button' : request_access_button,
-            'panopto_identifier': panopto_identifier,
-            'breadcrumb': breadcrumb
+            'panopto_identifier': panopto_identifier
         })
     )
 

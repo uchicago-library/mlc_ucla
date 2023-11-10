@@ -1218,6 +1218,27 @@ class MLCGraph:
             lookup[series_id] = sorted(list(lookup[series_id]))
         return lookup
 
+    def is_series(self, series_id):
+        """
+        Determine if the node is a series or item node.
+
+        Parameters: 
+            series_id (str): a series id.
+
+        Returns:
+            bool: True if the node is a series node.
+        """
+        q = '''PREFIX dcterms: <http://purl.org/dc/terms/>
+        
+               SELECT ?is_series
+               FROM <{}>
+               WHERE {{
+                   BIND( EXISTS {{ ?series_id dcterms:hasPart ?_ }} as ?is_series )
+               }}
+        '''.format(self.named_graph)
+
+        return self.query(q, [('series_id', series_id)])[0][0] == 'true'
+
     def search_items(self, search_term, sort_type = 'rank'):
         """
         Get items matching a search. 

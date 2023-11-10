@@ -47,9 +47,12 @@
               <a href="/Shibboleth.sso/Logout"><i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Log out{% endtrans %}</a><br>
             </li>
           {% endif %}
+          {% if ark and object_type %}
+          {% cache None, "request_access_button", object_type, ark %}
+          {% set request_access_button = get_request_access_button(ark) %}
           {% if request_access_button %}
             {% if request_access_button.show %}
-              {% if cnet_id%}
+              {% if cnet_id %}
                 <li>
                   <form action="/send-cgimail" method="POST">
                     <input type="hidden" name="msg_type" value="request_access">
@@ -66,6 +69,8 @@
                 </li>
               {% endif %}
             {% endif %}
+          {% endif %}
+          {% endcache %}
           {% endif %}
           <li>
             <a href="/access-terms">Terms of Access</a><br>
