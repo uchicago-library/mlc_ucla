@@ -210,7 +210,7 @@ cgimail_dic= {
     },
     'error': {
         'title': lazy_gettext('Error status'),
-        'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine it\'s nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library dldc-info@lib.uchicago.edu')
+        'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine it\'s nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu')
     },
     'request_account': {
         'rcpt': 'askscrc',
