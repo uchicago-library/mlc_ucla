@@ -584,3 +584,9 @@ def suggest_corrections():
         title_slug = lazy_gettext(u'Suggest Corrections'),
         hide_right_column = True
     )
+
+@mlc_ucla_search.route('/credits')
+def credits():
+    return render_template(
+        'credits.html'
+    )

@@ -1,7 +1,7 @@
 <div class="sidebar sidebar-right">
-  <h2>{% trans %}Search & Browse{% endtrans %}</h2>
   <div class="row">
     <div class="col-xs-6 col-sm-12">
+      <h2>{% trans %}Search & Browse{% endtrans %}</h2>
       <div class="collections">
         <div class="form-group">
           <form action="/search/" class="searchbox" method="GET">
@@ -86,61 +86,20 @@
       </div>
       <div class="collections feedback"> <!-- Feedback -->
         <h2>{% trans %}Feedback{% endtrans %}</h2>
-        <!-- <p>Report errors, omissions, or other issues in the description of this collection.</p> -->
-        {% set ts = "ittt=" ~ title_slug if title_slug else "" %}
-        {% if identifier %}
-          {% set ri = "rcid=" ~ identifier.0 %}
-        {% endif %}
-        {% set ru = "iurl=" ~ request.url | urlencode if request.url else "" %}
-        <p><a href="/suggest-corrections?{{ ts }}&{{ ri }}&{{ ru }}">{% trans %}Suggest Corrections{% endtrans %}</a></p>
-      </div>
-    </div>
-    <div class="col-xs-12">
-      <hr style="margin-top: 10px;margin-bottom: 10px">
-      <div class="collections credits"><!-- Credits -->
-        <h2>{% trans %}Credits{% endtrans %}</h2>
-        <p>{% trans %}The presentation of this material is based upon work supported by the National Science Foundation under Grant No. 1953104.{% endtrans %}</p>
-        <dl>
-          <dt>
-            {% trans %}Principal Investigators{% endtrans %}
-          </dt>
-          <dd>John Lucy, David Woken</dd>
-
-          <dt>
-            {% trans %}Project Manager{% endtrans %}
-          </dt>
-          <dd>Maria Victoria Fernandez</dd>
-
-          <dt>
-            {% trans %}Senior Personnel{% endtrans %}
-          </dt>
-          <dd>Charles Blair, Thomas Dousa</dd>
-
-          <dt>
-            {% trans %}Senior Developer{% endtrans %}
-          </dt>
-          <dd>John Jung</dd>
-
-          <dt>
-            {% trans %}Post-doctoral Fellow{% endtrans %}
-          </dt>
-          <dd>Carlos Javier Cisneros</dd>
-
-          <dt>
-            {% trans %}Graduate Student Fellow{% endtrans %}
-          </dt>
-          <dd>Hugo Novales Contreras</dd>
-
-          <dt>
-            {% trans %}User Experience and Digital Collections Design Intern, and Metcalf Odyssey Intern{% endtrans %}
-          </dt>
-          <dd>Wina Aaron</dd>
-
-          <dt>
-            {% trans %}Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern{% endtrans %}
-          </dt>
-          <dd>Phoebe Price</dd>
-        </dl>
+        <ul>
+          <li>
+            <!-- <p>Report errors, omissions, or other issues in the description of this collection.</p> -->
+            {% set ts = "ittt=" ~ title_slug if title_slug else "" %}
+            {% if identifier %}
+              {% set ri = "rcid=" ~ identifier.0 %}
+            {% endif %}
+            {% set ru = "iurl=" ~ request.url | urlencode if request.url else "" %}
+            <a href="/suggest-corrections?{{ ts }}&{{ ri }}&{{ ru }}">{% trans %}Suggest Corrections{% endtrans %}</a>
+          </li>
+          <li>
+            <a href="/credits">{% trans %}Credits{% endtrans %}</a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
