@@ -262,6 +262,8 @@ ul.no-style-list{
 	margin: 0;
 }
 
+
+
 .object-metadata .sr-link-in-row{
 	color: inherit;
 }
@@ -271,25 +273,44 @@ ul.no-style-list{
   margin: 0;
 }
 .object-metadata dt{
-	border-top: none;
-	border-bottom: 1px dashed #ddd;
+	border: none;
 	color: #757575;/* same as .text-muted */
-	padding: 0;
-}
-.object-metadata dl>*:nth-child(4n-1),
-.object-metadata dl>*:nth-child(4n){
-	background: #fafafa;
-}
-@media (min-width:992px){
-	.object-metadata dt{
-		max-width: 180px;
-	}
+	padding: .3rem .5rem 0 .5rem;
+	flex-basis: 100% !important;
 }
 .object-metadata dd{
 	border-top: none;
 	border-bottom: 1px dashed #ddd;
-	padding: 0 0 0 .5rem;
+	padding: 0 .5rem .3rem .5rem;
+	flex-basis: 100% !important;
 }
+
+@media (min-width:420px){
+	.object-metadata dt{
+		border-bottom: 1px dashed #ddd;
+		flex-basis: 30% !important;
+		padding-top: 0;
+	}
+	.object-metadata dd{
+		flex-basis: 70% !important;
+		padding-bottom: 0;
+	}
+}
+
+.object-metadata dl>*:nth-child(4n-1),
+.object-metadata dl>*:nth-child(4n){
+	background: #fafafa;
+}
+/* Metadata Description List */ 
+/* fix default behaviour */ 
+@media (min-width: 62em){
+	dl {
+		padding-left: 0;
+	}
+} 
+
+
+
 
 /* ITEMS */
 .items-listing{
@@ -429,22 +450,6 @@ ul.no-style-list{
   margin: 0 auto 1rem;
 }
 
-/* Metadata Description List */ 
-/* fix default behaviour */ 
-@media (min-width: 62em){
-	dl {
-		padding-left: 0;
-	    /*display: block;
-	    flex-flow: unset;*/
-	  }
-	}
-	dl dt{
-		flex-basis: 30%;
-	}
-	dl dd{
-		flex-basis: 70%;
-	}
-}
 
 
 /* =============== Suggestions */
