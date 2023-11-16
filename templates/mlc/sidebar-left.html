@@ -1,4 +1,4 @@
-<div id="sidebar" class="sidebar sidebar-left">
+<div id="sidebar" class="sidebar sidebar-left d-none">
     <nav role="navigation" class="navbar">
         <a type="button" class="btn sidebar-collapse-btn collapsed hidden-md hidden-lg" data-toggle="collapse" data-target="#left-sidebar" aria-expanded="false">
             {% trans %}Project navigation{% endtrans %}
@@ -7,12 +7,12 @@
         </a>
         <div id="left-sidebar" class="collapse">
             <ul class="nav navbar-nav">
-                <li><a href="#">{% trans %}About the Project{% endtrans %}</a></li>
-                <li><a href="#">{% trans %}About the Collections{% endtrans %}</a></li>
-                <li><a href="#">{% trans %}Terms of Access{% endtrans %}</a></li>
-                <li><a href="#">{% trans %}How to Deposit Materials{% endtrans %}</a></li>
-                <li><a href="#">{% trans %}Related Collections at UChicago{% endtrans %}</a></li>
-                <li><a href="#">{% trans %}Additional Resources{% endtrans %}</a></li>
+                <li><a href="/about-the-project">{% trans %}About the Project{% endtrans %}</a></li>
+                <li><a href="/about-the-collection">{% trans %}About the Collections{% endtrans %}</a></li>
+                <li><a href="/access-terms">{% trans %}Terms of Access{% endtrans %}</a></li>
+                <li><a href="/how-to-deposit-materials">{% trans %}How to Deposit Materials{% endtrans %}</a></li>
+                <li><a href="/related-collections">{% trans %}Related Collections at UChicago{% endtrans %}</a></li>
+                <li><a href="/additional-resources">{% trans %}Additional Resources{% endtrans %}</a></li>
             </ul>
         </div>
     </nav>
