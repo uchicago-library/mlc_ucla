@@ -209,7 +209,7 @@ cgimail_dic= {
         'from' : 'MLC Website <vitorg@uchicago.edu>'
     },
     'error': {
-        'title': lazy_gettext('Error status'),
+        'title': lazy_gettext('Error'),
         'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine its nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu')
     },
     'request_account': {
@@ -272,7 +272,7 @@ def send_cgimail():
 
 @mlc_ucla_search.route('/submission-receipt')
 def submission_receipt():
-    title_slug = lazy_gettext('Receipt status for Request')
+    title_slug = lazy_gettext('Request Receipt')
 
     view = 'error'
     if request.args.get('status') == 'success' and request.args.get('view') in cgimail_dic:
