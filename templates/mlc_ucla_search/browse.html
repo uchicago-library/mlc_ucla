@@ -8,11 +8,11 @@
   <div class="title-wrapper">
     <h1>{{ title_slug }}</h1>
     {% if not request.args.sort == 'count' %}
-      <a class="btn btn-link btn-xs" aria-label="sort by numerical descending order" href="{{request.path}}?type={{request.args.type}}&sort=count">
+      <a class="btn btn-link btn-xs" aria-label="sort by numerical descending order" title="sort by numerical descending order" href="{{request.path}}?type={{request.args.type}}&sort=count">
       <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
         </a>
     {% else %} 
-      <a class="btn btn-link btn-xs" aria-label="sort by alphabetical order" href="{{request.path}}?type={{request.args.type}}">
+      <a class="btn btn-link btn-xs" aria-label="sort by alphabetical order" title="sort by alphabetical order" href="{{request.path}}?type={{request.args.type}}">
       <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
         </a>
     {% endif %} 
