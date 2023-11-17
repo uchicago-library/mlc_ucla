@@ -25,9 +25,9 @@
           {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
         </span>
         <div class="search-results-series-title-badge">
-          <h3><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+          <h2><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
             {{ result.1.titles.0 }}
-          </a></h3>
+          </a></h2>
           <div class="title-id-badge">
             {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
             <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
