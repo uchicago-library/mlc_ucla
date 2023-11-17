@@ -210,7 +210,7 @@ cgimail_dic= {
     },
     'error': {
         'title': lazy_gettext('Error status'),
-        'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine it\'s nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library dldc-info@lib.uchicago.edu')
+        'text': lazy_gettext('There was a technical issue sending your request, and we can\'t determine its nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu')
     },
     'request_account': {
         'rcpt': 'askscrc',
@@ -583,4 +583,21 @@ def suggest_corrections():
         item_url = request.args.get('iurl'),
         title_slug = lazy_gettext(u'Suggest Corrections'),
         hide_right_column = True
+    )
+
+@mlc_ucla_search.route('/credits')
+def credits():
+    return render_template(
+        'credits.html'
+    )
+
+@mlc_ucla_search.route('/about-the-project')
+@mlc_ucla_search.route('/about-the-collection')
+@mlc_ucla_search.route('/access-terms')
+@mlc_ucla_search.route('/how-to-deposit-materials')
+@mlc_ucla_search.route('/related-collections')
+@mlc_ucla_search.route('/additional-resources')
+def wip():
+    return render_template(
+        'wip.html'
     )
