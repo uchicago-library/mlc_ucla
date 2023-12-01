@@ -207,26 +207,12 @@ class MLCGraph:
             for date_str, identifier in qres:
                 if str(date_str) == '(:unav)':
                     continue
-                dates = []
-                for year in date_str.split('/'):
-                    match = re.search('([0-9]{4})', year)
-                    if match:
-                        dates.append(int(match.group(0)))
-                if len(dates) == 1:
-                    dates.append(dates[0])
-                if len(dates) > 2:
-                    dates = dates[:2]
-                try:
-                    year = dates[0]
-                except IndexError:
-                    print(date_str)
-                    sys.exit()
-                while year <= dates[1]:
-                    decade = str(year)[:3] + '0s'
+                match = re.search('([0-9]{4})', date_str)
+                if match:
+                    decade = str(match.group(0))[:3] + '0s'
                     if decade not in browse_dict:
                         browse_dict[decade] = set()
                     browse_dict[decade].add(str(identifier))
-                    year += 1
         elif browse_type == 'language':
             qres = self.graph.query(
                 prepareQuery('''
