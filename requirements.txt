@@ -4,6 +4,7 @@ openpyxl
 pytz
 rdflib
 regex
+requests
 sqlite_dump
 flask_babel
 flask_session
