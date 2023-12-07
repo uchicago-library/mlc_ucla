@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-lg-3">
+      {% include 'component-sidebar-left.html' %}
+  </div>
+  <div class="col-xs-12 col-md-8" id="content" role="main">
+    <div class="title-wrapper">
+      <h1>{{ title_slug }}</h1>
+    </div>
+    <form action="" method="POST">
+      {# <form class="gray-surface" action="/send-cgimail" method="POST"> #}
+        {# <input type="hidden" name="msg_type" value="feedback"> #}
+      <p>The DMA welcomes contributions that meet its <a href="/aquisitions-policy">acquisitions policy</a> and <a href="aquisitions-guidelines">acquisitions guidelines</a>. To make a request to contribute your material, please answer the following questions:</p>
+      <div class="row">
+        <div class="col-xs-12 col-lg-6">
+        
+          {# FIRST NAME #}
+          <div class="form-group">
+            <label for="firstName">{% trans %}First Name{% endtrans %}*</label>
+            <input type="text" class="form-control required" id="firstName" name="First Name" required>
+          </div>
+        </div>
+        <div class="col-xs-12 col-lg-6">
+
+          {# LAST NAME #}
+          <div class="form-group">
+            <label for="lastName">{% trans %}Last Name{% endtrans %}*</label>
+            <input type="text" class="form-control required" id="lastName" name="Last Name" required>
+          </div>
+        </div>
+      </div>
+      {# EMAIL #}
+      <div class="form-group">
+        <label for="email">{% trans %}Email address{% endtrans %}*</label>
+        <input type="email" class="form-control required" id="email" name="Email" required>
+      </div>
+
+      {# DESCRIPTION #}
+      <div class="form-group">
+        <label for="description">{% trans %}Please describe the research materials you wish to contribute {% endtrans %}*</label>
+        <textarea class="form-control required" rows="3" id="description" name="Materials Description" required></textarea>
+      </div>
+
+      {# LANGUAGES #}
+      <div class="form-group">
+        <label for="languages">{% trans %}What languages are represented in your collection?{% endtrans %}*</label>
+        <input type="text" class="form-control required" id="languages" name="Languages" required>
+      </div>
+
+      {# GEOGRAPHICAL #}
+      <div class="form-group">
+        <label for="geographical">{% trans %}From what geographical locations does your collection derive?{% endtrans %}*</label>
+        <input type="text" class="form-control required" id="geographical" name="Geographical" required>
+      </div>
+
+      {# FORMAT & QUANTITY #}
+      <div class="form-group">
+        <label for="formatQuantity">{% trans %}Please describe the format and quantity of your research materials{% endtrans %}*</label>
+        <textarea class="form-control required" rows="3" id="formatQuantity" name="Format and Quantity" required></textarea>
+      </div>
+
+      {# AFFILIATION #}
+      <div class="form-group">
+        <label for="affiliation">{% trans %}What is your institutional affiliation?{% endtrans %}*</label>
+        <select class="form-control form-select required" id="affiliation" size="4"  name="Affiliation" multiple required>
+          <option value="college_student">
+            {% trans %}College student{% endtrans %}
+          </option>
+          <option value="grad_student">
+            {% trans %}Graduate student{% endtrans %}
+          </option>
+          <option value="faculty">
+            {% trans %}University faculty{% endtrans %}
+          </option>
+          <option value="staff">
+            {% trans %}University staff{% endtrans %}
+          </option>
+          <option value="associate">
+            {% trans %}Research associate{% endtrans %}
+          </option>
+          <option value="other">
+            {% trans %}Other{% endtrans %}
+          </option>
+        </select>
+      </div>
+
+      {# RESTRICTIONS #}
+      <div class="form-group">
+        <label for="restrictions">{% trans %}Does your collection have any specific usage or access restrictions? If so, please describe.{% endtrans %}*</label>
+        <textarea class="form-control required" rows="3" id="restrictions" name="Usage or access restrictions" required></textarea>
+      </div>
+
+      {# COMMENTS #}
+      <div class="form-group">
+        <label for="restrictions">{% trans %}Any additional comments{% endtrans %}</label>
+        <textarea class="form-control" rows="3" id="restrictions" name="Usage or access restrictions"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

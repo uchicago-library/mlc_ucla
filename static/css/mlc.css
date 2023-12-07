@@ -70,11 +70,16 @@ h1{
 .sidebar ul{
 	padding: 0;
 	list-style-type: none;
+	width: 100%;
 }
 .sidebar ul li{
 	padding-bottom: 1rem;
 	padding-bottom: 0;
 	float: unset;
+	width: 100%;
+}
+.sidebar ul li.active{
+  background-color: #eee;
 }
 
 .mlc-banner{
@@ -456,7 +461,7 @@ ul.no-style-list{
 
 
 
-/* =============== Suggestions */
+/* =============== Suggestions 
 .suggest-corrections-main{
 	padding: 1rem;
-}
+}*/

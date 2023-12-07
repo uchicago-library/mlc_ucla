@@ -3,13 +3,23 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-12 col-md-4 col-lg-3">
-        {% include 'sidebar-left.html' %}
+        {% include 'component-sidebar-left.html' %}
     </div>
     <div class="col-xs-12 col-md-8">
         <h1>{% trans %}University of Chicago Language Archive{% endtrans %}</h1>
         <!-- locale is:{{ locale }} -->
 
-        <p>Coming soon.</p>
+        <p>
+        The Digital Media Archive at the University of Chicago holds some 2,100 language collections across 270 languages. This digital project makes many of these collections freely available for research use and tracks many others that can be made available for use by arrangement.
+        </p>
+ 
+        <p>
+        Whether you are a linguist, anthropologist, a scholar looking for a global corpus of language in use, a student, language learner, a speaker of an endangered language, or a member of the general public, we hope you will find something here to investigate.
+        </p>
+         
+        <p>
+        You might want to start by browsing the <a href="/browse/?type=language">languages</a> and <a href="/browse/?type=location">locations</a> in the archive. If you want access to one of the non-public collections you can <a href="/access-terms">make an access request</a>, or you can read more about the project’s <a href="/history">history</a> and its supporters.
+        </p>
 
         {% include 'elements-browse-bar.html' %}
     </div>

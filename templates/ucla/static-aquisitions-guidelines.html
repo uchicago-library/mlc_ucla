@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-lg-3">
+      {% include 'component-sidebar-left.html' %}
+  </div>
+  <div class="col-xs-12 col-md-8" id="content" role="main">
+    <div class="title-wrapper">
+        <h1>{{ title_slug }}</h1>
+    </div>
+    <p>If you have material (audio/video recordings, documents, databases/spreadsheets, and/or images) that you would like to deposit into the University of Chicago Digital Media Archive, the guidelines below are designed to help you determine whether your file formats and other documentation are in alignment with our standards.</p>
+    <p>If you would like to deposit material that is in an analog format (e.g., tape or other non-digital recordings, paper documents or image prints, etc.) or has unknown technical specifications, please contact us so that we may discuss whether or not we can accept it: <a href="/contribute-material">Contribute Material</a>.</p>
+    <p>The DMA requires depositors to provide as much supplementary information as is available when adding materials to the Archive. These include, but are not limited to:</p>
+    <ul>
+        <li>Metadata in accordance with the minimum OLAC standards (ideally in xml or csv; see below)</li>
+        <li>Any Human Subjects Review Board/Institutional Review Board forms associated with the recordings or the circumstances in which they were created</li>
+        <li>Documents related to the copyright status and/or provenance of the material</li>
+        <li>Transcripts, field notes, or other documentation
+            <ul>
+                <li>Ideally these will be provided as metadata, but a detailed account of the location, dates, and context of recordings may also be accepted.</li>
+            </ul>
+        </li>
+    </ul>
+    <p>Recordings that lack the above-mentioned documentation will be evaluated by the DMA Director in consultation with the DMA Steering Committee and accepted into the Archive on a case-by-case basis.</p>
+    <p>The DMA accepts digitized materials in the following formats:</p>
+    <ul>
+        <li>Audio recordings
+            <ul>
+                <li>Lossless wav files are preferred, ideally at a sample rate of 48kHz/24-bit or better; mp3s are also acceptable.</li>
+            </ul>
+        </li>
+        <li>Video recordings
+            <ul>
+                <li>Archival mpeg2 files are preferred; other formats acceptable, including mp4, avi, mov, and wmv, are also acceptable.</li>
+            </ul>
+        </li>
+        <li>Documents, including permissions forms and transcripts
+            <ul>
+                <li>These must be submitted as pdfs, ideally with text-recognition activated in the case of non-handwritten materials.</li>
+            </ul>
+        </li>
+        <li>Databases, spreadsheets, and similar
+            <ul>
+                <li>We accept these in xml or csv—provided they are accompanied by clear instructions as to how to reconstruct, display, or access the data therein—or PDF if the material is better presented as a static document.</li>
+            </ul>
+        </li>
+        <li>Images
+            <ul>
+                <li>High-quality tiff files are preferred; jpgs or gifs are also acceptable.</li>
+            </ul>
+        </li>
+    </ul>
+
+    </div>
+</div>
+{% endblock %}

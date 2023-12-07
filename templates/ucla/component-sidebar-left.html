@@ -1,0 +1,31 @@
+<div id="sidebar" class="sidebar sidebar-left">
+    <nav role="navigation" class="navbar">
+        <a type="button" class="btn sidebar-collapse-btn collapsed hidden-md hidden-lg" data-toggle="collapse" data-target="#left-sidebar" aria-expanded="false">
+            {% trans %}Project navigation{% endtrans %}
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            <i class="fa fa-minus" aria-hidden="true"></i>
+        </a>
+        <div id="left-sidebar" class="collapse">
+            <ul class="nav navbar-nav">
+                <li class="{{ "active" if request.path == "/history" }}">
+                    <a href="/history">History</a>
+                </li>
+                <li class="{{ "active" if request.path == "/about-contributors" }}">
+                    <a href="/about-contributors">About the Contributors</a>
+                </li>
+                <li class="{{ "active" if request.path == "/aquisitions-guidelines" }}">
+                    <a href="/aquisitions-guidelines">Aquisitions Guidelines</a>
+                </li>
+                <li class="{{ "active" if request.path == "/aquisitions-policy" }}">
+                    <a href="/aquisitions-policy">Aquisitions Policy</a>
+                </li>
+                <li class="{{ "active" if request.path == "/contribute-material" }}">
+                    <a href="/contribute-material">Contribute your Material</a>
+                </li>
+                <li class="{{ "active" if request.path == "/access-terms" }}">
+                    <a href="/access-terms">Access Terms</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
