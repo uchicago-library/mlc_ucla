@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-lg-3">
+      {% include 'component-sidebar-left.html' %}
+  </div>
+  <div class="col-xs-12 col-md-8" id="content" role="main">
+    <div class="title-wrapper">
+    <h1>{{ title_slug }}</h1>
+    </div>
+    <h2>Individuals</h2>
+    <ul>
+      <li>Anonymous</li>
+      <li>University of Chicago Library</li>
+    </ul>
+    <h2>Granting Agencies</h2>
+    <ul>
+      <li>2008-2010 Center for Latin American Studies<br>
+        Digital Maya Project (John Lucy)</li>
+      <li>2009 Consortium for Language Learning and Teaching<br>
+        Digitization of Pashto materials for preparation as pedagogical tools (Elena Bashir)</li>
+      <li>2005-2008 National Endowment for the Humanities: Grants for Preservation and Access<br>
+        Digital Preservation of Mesoamerican Linguistic Archives (John Goldsmith and John Lucy, Principle Investigators)</li>
+      <li>2008 Consortium for Language Learning and Teaching<br>
+        Creation of integrated pedagogical materials for Urdu (Elena Bashir)</li>
+      <li>2008<br>
+        Linguistic Interviews (John Goldsmith)</li>
+      <li>2008 Consortium for Language Learning and Teaching<br>
+        Creation of pedagogical tools for Georgian (Tami Wysocki)</li>
+      <li>2007 Women's Board, The University of Chicago<br>
+        Grant to digitize the Archives' most at-risk materials</li>
+    </ul>
+    <h2>Prior Years</h2>
+    <ul>
+      <li>Grants for Language Pedagogy</li>
+      <li>Department of Education</li>
+      <li>Ford Foundation</li>
+      <li>Pew Trust</li>
+      <li>Peace Corps</li>
+      <li>Carnegie Foundation</li>
+    </ul>
+    
+  </div>
+</div>
+{% endblock %}

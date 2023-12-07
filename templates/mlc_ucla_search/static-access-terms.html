@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-md-4 col-lg-3">
+      {% include 'component-sidebar-left.html' %}
+  </div>
+  <div class="col-xs-12 col-md-8" id="content" role="main">
+    <div class="title-wrapper">
+      <h1>{{ title_slug }}</h1>
+    </div>
+    <p>This digital project makes many of these collections freely available for research use and tracks many others that can be made available for use by arrangement. If you want access to one of the non-public collections you can make an access request. Items that require specific access will offer an easy request function on the sidebar.</p>
+  </div>
+</div>
+{% endblock %}
