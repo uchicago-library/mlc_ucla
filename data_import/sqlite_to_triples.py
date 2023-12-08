@@ -575,8 +575,7 @@ if __name__ == '__main__':
         if options['--mesoamerican'] and \
         bool(mesoamerican_language_codes & set(collection_language_codes[cid])):
             output = True
-        if options['--ucla'] and \
-        not(bool(mesoamerican_language_codes & set(collection_language_codes[cid]))):
+        if options['--ucla']:
             output = True
         if not output:
             continue
