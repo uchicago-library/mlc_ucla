@@ -438,7 +438,7 @@ def search():
         for i in db_series[1]:
             info = mlc_db.get_item(i)
             series_data['sub_items'].append(info)
-        series_data['sub_items'].sort(key=sortListOfItems)
+        series_data['sub_items'].sort(key=sortListOfItemsByID)
         processed_results.append((db_series[0], series_data))
 
     if facets:
@@ -491,8 +491,6 @@ def series(noid):
             has_panopto = True
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
-    # for medium, items in grouped_items.items():
-    #     items.sort(key=sortListOfItemsByID)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -553,6 +551,19 @@ def item(noid):
         'item_id' : item_data['identifier'][0],
         'item_title' : item_data['titles'][0] or 'Unknow item title',
     }
+    for medium, converted_items in item_data['has_format'].items():
+        converted_items.sort(key=sortListOfItemsByID)
+        # recursive items
+        for conv_ind in range(len(converted_items)):
+            converted_item = converted_items[conv_ind]
+            for hf_medium, rec_item_links in converted_item['has_format'].items():
+                for rec_ind in range(len(rec_item_links)):
+                    rec_item_link = rec_item_links[rec_ind]
+                    if isinstance(rec_item_link,str) and rec_item_link.find("ark:61001/"):
+                        nid = rec_item_link.split("ark:61001/",1)[1]
+                        item_data['has_format'][medium][conv_ind]['has_format'][hf_medium][rec_ind] = mlc_db.get_item(BASE + nid, True)
+    for medium, items in item_data['is_format_of'].items():
+        items.sort(key=sortListOfItemsByID)
 
     try:
         title_slug = item_data['titles'][0]

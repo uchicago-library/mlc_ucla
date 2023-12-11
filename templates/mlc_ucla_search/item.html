@@ -160,15 +160,67 @@
       {% for medium, item_list in has_format.items() %}
         <h3>{{ medium }}</h3>
         <div class="items-listing">
-          <div class="row">
             <ul class="no-style-list">
             {% for item in item_list %}
-              {%  with %}
-                {%  include 'component-item-in-list.html' %}
-              {%  endwith %}
+              <li title="{{item.titles[0]}}">
+
+                <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
+                  <div class="item-card-title-row">
+                    <span class="item-card-title">
+                      {% for title in item.titles %}
+                        {{ title }}
+                      {% endfor %}
+                    </span>
+                    {% if item.panopto_links|length > 0 %}
+                      <span title="item has digital content"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
+                    {% endif %}
+                  </div>
+                  <div class="item-card-content-row">
+                    <span title="Type of Media">
+                    {% for medium in item.medium %}
+                      {{ medium }}
+                    {% endfor %}
+                    </span>
+                    {% if item.has_format|length > 0 %}
+                      <span title="Item is converted to other formats">+<i class="fa fa-files-o" aria-hidden="true"></i></span>
+                    {% endif %}
+                  </div>
+                  <div class="item-card-content-row">
+                      <span title="Subject language">
+                      {% if item.subject_language %}
+                        <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
+                        {% for lan in item.subject_language %}
+                          {{ lan }}{{ ", " if not loop.last else "" }}
+                        {% endfor %}
+                      {%  endif %}
+                    </span>
+                    <span class="text-muted-extra">{{ item.identifier.0 }}</span>
+                  </div>
+                </a>
+
+                {% if item.has_format|length>0 %}
+                  <h4>Further converted to</h4>
+                  <div style="padding-left:1rem">
+                  {% for rec_medium, rec_item_list in item.has_format.items() %}
+                    <h5>{{ rec_medium }}</h5>
+                    <div class="items-listing">
+                      <div class="row">
+                        <ul class="no-style-list">
+                        {% for rec_item in rec_item_list %}
+                          {% with %}
+                            {% include 'component-item-in-list.html' %}
+                          {% endwith %}
+                        {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                  {% endfor %}
+                  </div>
+                {% endif %}
+              </li>
+
             {% endfor %}
             </ul>
-          </div>
         </div>
       {% endfor %}
     {% endif %}
