@@ -106,9 +106,9 @@
         <div class="row">
           <ul class="no-style-list">
           {% for item in item_list %}
-            {%  with %}
-              {%  include 'component-item-in-list.html' %}
-            {%  endwith %}
+            {% if item.is_format_of|length == 0 %}
+              {% include 'component-item-in-list.html' %}
+            {% endif %}
           {% endfor %}
           </ul>
         </div>

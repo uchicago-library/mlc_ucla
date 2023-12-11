@@ -312,6 +312,11 @@ def sortListOfItems(item):
     else:
         return 2
 
+def sortListOfItemsByID(item):
+    if isinstance(item, tuple):
+        item = item[1]
+    return int(item['identifier'][0])
+
 def get_access_label_obj(item):
     # list of results
     #   tuple for item
@@ -471,7 +476,7 @@ def series(noid):
             i,
             mlc_db.get_item(i)
         ))
-    items.sort(key=sortListOfItems)
+    items.sort(key=sortListOfItemsByID)
 
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
@@ -486,6 +491,8 @@ def series(noid):
             has_panopto = True
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
+    # for medium, items in grouped_items.items():
+    #     items.sort(key=sortListOfItemsByID)
 
     try:
         title_slug = ' '.join(series_data['titles'])

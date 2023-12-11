@@ -117,10 +117,12 @@
         <div class="row">
         <ul class="no-style-list">
         {% for item_o in result.1.sub_items %}
-          {%  with %}
-            {%  set item = item_o %}
-            {%  include 'component-item-in-list.html' %}
-          {%  endwith %}
+          {% with %}
+            {% if item_o.is_format_of|length == 0 %}
+              {% set item = item_o %}
+              {% include 'component-item-in-list.html' %}
+            {% endif %}
+          {% endwith %}
         {% endfor %}
         </ul>
         </div>
