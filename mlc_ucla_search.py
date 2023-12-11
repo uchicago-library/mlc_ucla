@@ -551,12 +551,16 @@ def item(noid):
         'item_id' : item_data['identifier'][0],
         'item_title' : item_data['titles'][0] or 'Unknow item title',
     }
+    # Converted Mediums
     for medium, converted_items in item_data['has_format'].items():
         converted_items.sort(key=sortListOfItemsByID)
         # recursive items
+        # Converted Items
         for conv_ind in range(len(converted_items)):
             converted_item = converted_items[conv_ind]
+            # Recursive Converted Mediums
             for hf_medium, rec_item_links in converted_item['has_format'].items():
+                # Recursive Converted items
                 for rec_ind in range(len(rec_item_links)):
                     rec_item_link = rec_item_links[rec_ind]
                     if isinstance(rec_item_link,str) and rec_item_link.find("ark:61001/"):

@@ -208,6 +208,7 @@
                         <ul class="no-style-list">
                         {% for rec_item in rec_item_list %}
                           {% with %}
+                            {% set item = rec_item %}
                             {% include 'component-item-in-list.html' %}
                           {% endwith %}
                         {% endfor %}
