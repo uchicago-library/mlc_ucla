@@ -199,23 +199,23 @@
                 </a>
 
                 {% if item.has_format|length>0 %}
-                  <h4>Further converted to</h4>
-                  <div style="padding-left:1rem">
-                  {% for rec_medium, rec_item_list in item.has_format.items() %}
-                    <h5>{{ rec_medium }}</h5>
-                    <div class="items-listing">
-                      <div class="row">
-                        <ul class="no-style-list">
-                        {% for rec_item in rec_item_list %}
-                          {% with %}
-                            {% set item = rec_item %}
-                            {% include 'component-item-in-list.html' %}
-                          {% endwith %}
-                        {% endfor %}
-                        </ul>
+                  <div style="margin-left: .2rem;border-left: 1px solid #eee;padding-left:.8rem; margin-bottom: 1rem; border-bottom-left-radius: 8px;">
+                    <h4 style="margin-top:0">Further converted to</h4>
+                    {% for rec_medium, rec_item_list in item.has_format.items() %}
+                      <h5>{{ rec_medium }}</h5>
+                      <div class="items-listing">
+                        <div class="row">
+                          <ul class="no-style-list">
+                          {% for rec_item in rec_item_list %}
+                            {% with %}
+                              {% set item = rec_item %}
+                              {% include 'component-item-in-list.html' %}
+                            {% endwith %}
+                          {% endfor %}
+                          </ul>
+                        </div>
                       </div>
-                    </div>
-                  {% endfor %}
+                    {% endfor %}
                   </div>
                 {% endif %}
               </li>
