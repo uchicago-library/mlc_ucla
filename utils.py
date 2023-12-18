@@ -1594,11 +1594,11 @@ class MLCDB:
                   Each of those sub-dicts is organized by mediums, and each
                   medium contains a list of items.
         """
-        def append_dict_of_lists(a, b):
-            assert type(a) == dict
-            assert type(b) == dict
+        def append_dict_of_lists(formats_in_level, item_has_formats):
+            assert type(formats_in_level) == dict
+            assert type(item_has_formats) == dict
             out = {}
-            for d in (a, b):
+            for d in (formats_in_level, item_has_formats):
                 for k, lst in d.items():
                     if not k in out:
                         out[k] = set()
@@ -1659,13 +1659,23 @@ class MLCDB:
         info = copy.deepcopy(self._item_info[identifier])
 
         # load item hasFormat / isFormatOf relationships
+        # if get_format_relationships:
+        #     for p in ('has_format', 'is_format_of'):
+        #         if p in info:
+        #             for m in info[p].keys():
+        #                 for i in range(len(info[p][m])):
+        #                     url = info[p][m][i]
+        #                     info[p][m][i] = self._item_info[url]
+
+        # load descendants
         if get_format_relationships:
-            for p in ('has_format', 'is_format_of'):
-                if p in info:
-                    for m in info[p].keys():
-                        for i in range(len(info[p][m])):
-                            url = info[p][m][i]
-                            info[p][m][i] = self._item_info[url]
+            info['descendants'] = self.get_formats_by_level(identifier)
+            if 'is_format_of' in info:
+                for medium in info['is_format_of'].keys():
+                    for parent_item in range(len(info['is_format_of'][medium])):
+                        url = info['is_format_of'][medium][parent_item]
+                        info['is_format_of'][medium][parent_item] = self._item_info[url]
+
         return info
 
     def get_item_list(self):

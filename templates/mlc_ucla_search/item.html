@@ -16,7 +16,7 @@
     {% endif %}
     <span class="hidden">
       {% if panopto_links %}
-        <dt>{% trans %}Panopto Links{% endtrans %}:</dt>
+        <dt>Panopto Links:</dt>
         <dd>
          {% for i in panopto_links %}
           <a href="{{ i }}">{{ i }}</a><br>
@@ -153,11 +153,36 @@
       </a>&nbsp;&nbsp;&nbsp;<span class="test-muted">{{ serie.1.identifier.0 }}</span></li>
     {% endfor %}
     </ul>
-    
-    {% if has_format %}
-      <hr>
+
+    {% if descendants|length >0 %}
       <h2>{% trans %}Has been converted to{% endtrans %}</h2>
-      {% for medium, item_list in has_format.items() %}
+      <div class="items-listing" >
+        {% for level, formats in descendants.items() %} 
+          {% if level > 1 %}
+            <div class="items-listing" style="padding-left:.5rem; border-left: 1px solid #eee;">
+          {% endif %}
+           <span class="text-muted">Gen: {{ level }}</span>
+            <div class="row">
+              <ul class="no-style-list">
+              {% for format, item_list in formats.items() %}
+                  {% for descendant in item_list %}
+                    {#
+                    <pre>{{ item }}</pre>
+                    {% set item = item_o[1] %}
+                    #}
+
+                    {% set item = descendant %}
+                    {% include 'component-item-in-list.html' %}
+                  {% endfor %}
+              {% endfor %}
+              </ul>
+            </div>
+        {% endfor %}
+        {% for level, formats in descendants.items() %}
+          </div>
+        {% endfor %}
+      {#
+       {% for medium, item_list in has_format.items() %}
         <h3>{{ medium }}</h3>
         <div class="items-listing">
             <ul class="no-style-list">
@@ -203,9 +228,9 @@
             </ul>
 
         </div>
-      {% endfor %}
-      <h4 style="margin-top:0">Further converted to</h4>
-      <div style="margin-left: .2rem;border-left: 1px solid #eee;padding-left:.8rem; margin-bottom: 1rem; border-bottom-left-radius: 8px;">
+       {% endfor %}
+       <h4 style="margin-top:0">Further converted to</h4>
+       <div style="margin-left: .2rem;border-left: 1px solid #eee;padding-left:.8rem; margin-bottom: 1rem; border-bottom-left-radius: 8px;">
         {% for medium, item_list in has_format.items() %}
         {% for item in item_list %}
           {% if item.has_format|length>0 %}
@@ -227,11 +252,11 @@
           {% endif %}
         {% endfor %}
         {% endfor %}
-      </div>
-    {% endif %}
+       </div> #}
+    {% endif %}  {# if descendants #}
 
     
-    {# {% if is_format_of %}
+     {% if is_format_of|length >0 %}
       <hr>
       <h2>{% trans %}Converted from{% endtrans %}</h2>
       {% for medium, item_list in is_format_of.items() %}
@@ -248,7 +273,7 @@
           </div>
         </div>
       {% endfor %}
-    {% endif %} #}
+    {% endif %} 
 
   </div> <!-- // .main -->
 {% endblock %}

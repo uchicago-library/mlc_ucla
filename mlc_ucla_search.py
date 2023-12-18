@@ -537,37 +537,20 @@ def item(noid):
     series = []
     for s in mlc_db.get_series_for_item(BASE + noid):
         series.append((s, mlc_db.get_series_info(s)))
-
-    # details for request access button
-    # TODO: needs to check if user already has access
-    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
-    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
+
+    # details for request access button
+    # TODO: better to check if user already has access. not possible atm
+    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
+    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     request_access_button = {
         'show' : is_restricted and has_panopto,
         'series_id' : ','.join(series_id), #some items belong to multiple series
         'item_id' : item_data['identifier'][0],
         'item_title' : item_data['titles'][0] or 'Unknow item title',
     }
-    # Converted Mediums
-    for medium, converted_items in item_data['has_format'].items():
-        converted_items.sort(key=sortListOfItemsByID)
-        # recursive items
-        # Converted Items
-        for conv_ind in range(len(converted_items)):
-            converted_item = converted_items[conv_ind]
-            # Recursive Converted Mediums
-            for hf_medium, rec_item_links in converted_item['has_format'].items():
-                # Recursive Converted items
-                for rec_ind in range(len(rec_item_links)):
-                    rec_item_link = rec_item_links[rec_ind]
-                    if isinstance(rec_item_link,str) and rec_item_link.find("ark:61001/"):
-                        nid = rec_item_link.split("ark:61001/",1)[1]
-                        item_data['has_format'][medium][conv_ind]['has_format'][hf_medium][rec_ind] = mlc_db.get_item(BASE + nid, True)
-    for medium, items in item_data['is_format_of'].items():
-        items.sort(key=sortListOfItemsByID)
 
     try:
         title_slug = item_data['titles'][0]
@@ -579,7 +562,33 @@ def item(noid):
         series[0][1]['titles'][0],
         item_data['titles'][0]
     )
-    
+
+    # Converted Mediums
+    # for medium, converted_items in item_data['has_format'].items():
+    #     converted_items.sort(key=sortListOfItemsByID)
+    #     # recursive items
+    #     # Converted Items
+    #     for conv_ind in range(len(converted_items)):
+    #         converted_item = converted_items[conv_ind]
+    #         # Recursive Converted Mediums
+    #         for hf_medium, rec_item_links in converted_item['has_format'].items():
+    #             # Recursive Converted items
+    #             for rec_ind in range(len(rec_item_links)):
+    #                 rec_item_link = rec_item_links[rec_ind]
+    #                 if isinstance(rec_item_link,str) and rec_item_link.find("ark:61001/"):
+    #                     nid = rec_item_link.split("ark:61001/",1)[1]
+    #                     item_data['has_format'][medium][conv_ind]['has_format'][hf_medium][rec_ind] = mlc_db.get_item(BASE + nid, True)
+    # for medium, items in item_data['is_format_of'].items():
+    #     items.sort(key=sortListOfItemsByID)
+
+    # Descendats
+    if len(item_data['descendants'])>0:
+        for level, formats in item_data['descendants'].items():
+            for medium, item_list in formats.items():
+                for k, item in enumerate(item_list):
+                    item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
+
+
     return render_template(
         'item.html',
         **(item_data | {'series': series,
