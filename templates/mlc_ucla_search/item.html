@@ -167,11 +167,13 @@
            {# <span class="text-muted">Gen: {{ level }}</span> #}
             <div class="row">
               <ul class="no-style-list">
-              {% for format, item_list in formats.items() %}
-                  {% for descendant in item_list %}
+              {% for medium in order_of_formats %}
+                {% if medium in formats %}
+                  {% for descendant in formats[medium] %}
                     {% set item = descendant %}
                     {% include 'component-item-in-list.html' %}
                   {% endfor %}
+                {% endif %}
               {% endfor %}
               </ul>
             </div>

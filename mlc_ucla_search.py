@@ -483,14 +483,15 @@ def series(noid):
     item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
-        medium = i[1]['medium'][0]
-        if medium not in grouped_items:
-            grouped_items[medium] = []        
-        grouped_items[medium].append(i[1])
-        if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
-            has_panopto = True
-            item_id_with_panopto = i[1]['identifier'][0]
-            item_title_with_panopto = i[1]['titles'][0]
+        if not i[1]['is_format_of']:
+            medium = i[1]['medium'][0]
+            if medium not in grouped_items:
+                grouped_items[medium] = []        
+            grouped_items[medium].append(i[1])
+            if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
+                has_panopto = True
+                item_id_with_panopto = i[1]['identifier'][0]
+                item_title_with_panopto = i[1]['titles'][0]
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -512,6 +513,7 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
@@ -563,24 +565,6 @@ def item(noid):
         item_data['titles'][0]
     )
 
-    # Converted Mediums
-    # for medium, converted_items in item_data['has_format'].items():
-    #     converted_items.sort(key=sortListOfItemsByID)
-    #     # recursive items
-    #     # Converted Items
-    #     for conv_ind in range(len(converted_items)):
-    #         converted_item = converted_items[conv_ind]
-    #         # Recursive Converted Mediums
-    #         for hf_medium, rec_item_links in converted_item['has_format'].items():
-    #             # Recursive Converted items
-    #             for rec_ind in range(len(rec_item_links)):
-    #                 rec_item_link = rec_item_links[rec_ind]
-    #                 if isinstance(rec_item_link,str) and rec_item_link.find("ark:61001/"):
-    #                     nid = rec_item_link.split("ark:61001/",1)[1]
-    #                     item_data['has_format'][medium][conv_ind]['has_format'][hf_medium][rec_ind] = mlc_db.get_item(BASE + nid, True)
-    # for medium, items in item_data['is_format_of'].items():
-    #     items.sort(key=sortListOfItemsByID)
-
     # Descendats
     if len(item_data['descendants'])>0:
         for level, formats in item_data['descendants'].items():
@@ -596,6 +580,7 @@ def item(noid):
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
+            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'breadcrumb': breadcrumb})
     )
 
