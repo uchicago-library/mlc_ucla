@@ -155,22 +155,20 @@
     </ul>
 
     {% if descendants|length >0 %}
-      <h2>{% trans %}Has been converted to{% endtrans %}</h2>
+      <h2>{% trans %}This item has been converted to the following items:{% endtrans %}</h2>
       <div class="items-listing" >
-        {% for level, formats in descendants.items() %} 
-          {% if level > 1 %}
-            <div class="items-listing" style="padding-left:.5rem; border-left: 1px solid #eee;">
+        {% for level, formats in descendants.items() %}
+          {% if level == 2 %}
+            <h2>{% trans %}And further converted:{% endtrans %}</h2>
+            <div class="items-listing">
+          {% elif level > 2 %}
+            <div class="items-listing" style="padding-left:.5rem; border-left: 1px solid #a6a6a6; border-bottom-left-radius: 8px;">
           {% endif %}
-           <span class="text-muted">Gen: {{ level }}</span>
+           {# <span class="text-muted">Gen: {{ level }}</span> #}
             <div class="row">
               <ul class="no-style-list">
               {% for format, item_list in formats.items() %}
                   {% for descendant in item_list %}
-                    {#
-                    <pre>{{ item }}</pre>
-                    {% set item = item_o[1] %}
-                    #}
-
                     {% set item = descendant %}
                     {% include 'component-item-in-list.html' %}
                   {% endfor %}
@@ -178,101 +176,28 @@
               </ul>
             </div>
         {% endfor %}
-        {% for level, formats in descendants.items() %}
+        {% for l in descendants %}
           </div>
         {% endfor %}
-      {#
-       {% for medium, item_list in has_format.items() %}
-        <h3>{{ medium }}</h3>
-        <div class="items-listing">
-            <ul class="no-style-list">
-            {% for item in item_list %}
-              <li title="{{item.titles[0]}}">
-
-                <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-                  <div class="item-card-title-row">
-                    <span class="item-card-title">
-                      {% for title in item.titles %}
-                        {{ title }}
-                      {% endfor %}
-                    </span>
-                    {% if item.panopto_links|length > 0 %}
-                      <span title="item has digital content"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
-                    {% endif %}
-                  </div>
-                  <div class="item-card-content-row">
-                    <span title="Type of Media">
-                    {% for medium in item.medium %}
-                      {{ medium }}
-                    {% endfor %}
-                    </span>
-                    {% if item.has_format|length > 0 %}
-                      <span title="Item is converted to other formats">+<i class="fa fa-files-o" aria-hidden="true"></i></span>
-                    {% endif %}
-                  </div>
-                  <div class="item-card-content-row">
-                      <span title="Subject language">
-                      {% if item.subject_language %}
-                        <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
-                        {% for lan in item.subject_language %}
-                          {{ lan }}{{ ", " if not loop.last else "" }}
-                        {% endfor %}
-                      {%  endif %}
-                    </span>
-                    <span class="text-muted-extra">{{ item.identifier.0 }}</span>
-                  </div>
-                </a>
-
-              </li>
-            {% endfor %}
-            </ul>
-
-        </div>
-       {% endfor %}
-       <h4 style="margin-top:0">Further converted to</h4>
-       <div style="margin-left: .2rem;border-left: 1px solid #eee;padding-left:.8rem; margin-bottom: 1rem; border-bottom-left-radius: 8px;">
-        {% for medium, item_list in has_format.items() %}
-        {% for item in item_list %}
-          {% if item.has_format|length>0 %}
-            {% for rec_medium, rec_item_list in item.has_format.items() %}
-              <h5>{{ item.identifier.0 }} -> {{ rec_medium }}</h5>
-              <div class="items-listing">
-                <div class="row">
-                  <ul class="no-style-list">
-                  {% for rec_item in rec_item_list %}
-                    {% with %}
-                      {% set item = rec_item %}
-                      {% include 'component-item-in-list.html' %}
-                    {% endwith %}
-                  {% endfor %}
-                  </ul>
-                </div>
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-        {% endfor %}
-       </div> #}
-    {% endif %}  {# if descendants #}
+    {% endif %}  
 
     
-     {% if is_format_of|length >0 %}
+    {% if is_format_of|length >0 %}
       <hr>
-      <h2>{% trans %}Converted from{% endtrans %}</h2>
-      {% for medium, item_list in is_format_of.items() %}
-        <h3>{{ medium }}</h3>
-        <div class="items-listing">
-          <div class="row">
-            <ul class="no-style-list">
-            {% for item in item_list %}
-              {%  with %}
-                {%  include 'component-item-in-list.html' %}
-              {%  endwith %}
+      <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
+      <div class="items-listing">
+        <div class="row">
+          <ul class="no-style-list">
+            {% for medium, item_list in is_format_of.items() %}
+              {% for item in item_list %}
+                {% with %}
+                  {% include 'component-item-in-list.html' %}
+                {% endwith %}
+              {% endfor %}
             {% endfor %}
             </ul>
           </div>
         </div>
-      {% endfor %}
     {% endif %} 
 
   </div> <!-- // .main -->
