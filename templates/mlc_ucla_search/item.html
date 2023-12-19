@@ -153,10 +153,6 @@
       </a>&nbsp;&nbsp;&nbsp;<span class="test-muted">{{ serie.1.identifier.0 }}</span></li>
     {% endfor %}
     </ul>
-    <h2>descendants</h2>
-    <pre>{{ descendants }}</pre>
-    <h2>ancestors</h2>
-    <pre>{{ is_format_of }}</pre>
 
     {% if descendants|length >0 %}
       <h2>{% trans %}This item has been converted to the following items:{% endtrans %}</h2>
@@ -187,8 +183,6 @@
         {% endfor %}
     {% endif %}  
     
-
-    
     {% if is_format_of|length >0 %}
       <hr>
       <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
@@ -206,7 +200,6 @@
           </div>
         </div>
     {% endif %} 
-    
 
   </div> <!-- // .main -->
 {% endblock %}

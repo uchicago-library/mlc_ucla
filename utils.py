@@ -1679,6 +1679,10 @@ class MLCDB:
                             info['is_format_of'][medium][parent_item_index] = self._item_info[url]
                         else:
                             info['is_format_of'][medium].pop(parent_item_index)
+                for medium in list(info['is_format_of'].keys()):
+                    if len(info['is_format_of'][medium]) == 0:
+                        info['is_format_of'].pop(medium, None)
+
 
         return info
 
