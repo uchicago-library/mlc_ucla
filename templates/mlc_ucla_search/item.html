@@ -169,7 +169,7 @@
               <ul class="no-style-list">
               {% for medium in order_of_formats %}
                 {% if medium in formats %}
-                  {% for descendant in formats[medium] %}
+                  {% for descendant in formats[medium]|sort(attribute="identifier") %}
                     {% set item = descendant %}
                     {% include 'component-item-in-list.html' %}
                   {% endfor %}
@@ -190,7 +190,7 @@
         <div class="row">
           <ul class="no-style-list">
             {% for medium, item_list in is_format_of.items() %}
-              {% for item in item_list %}
+              {% for item in item_list|sort(attribute="identifier") %}
                 {% with %}
                   {% include 'component-item-in-list.html' %}
                 {% endwith %}
