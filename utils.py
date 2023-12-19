@@ -1598,14 +1598,14 @@ class MLCDB:
             assert type(formats_in_level) == dict
             assert type(item_has_formats) == dict
             out = {}
-            for d in (formats_in_level, item_has_formats):
-                for k, lst in d.items():
-                    if not k in out:
-                        out[k] = set()
-                    for v in lst:
-                        out[k].add(v)
-            for k in out.keys():
-                out[k] = list(out[k])
+            for format_dict in (formats_in_level, item_has_formats):
+                for format_name, lst in format_dict.items():
+                    if not format_name in out:
+                        out[format_name] = set()
+                    for item in lst:
+                        out[format_name].add(item)
+            for out_format_name in out.keys():
+                out[out_format_name] = list(out[out_format_name])
             return out
     
         def get_has_format(i):
@@ -1672,9 +1672,13 @@ class MLCDB:
             info['descendants'] = self.get_formats_by_level(identifier)
             if 'is_format_of' in info:
                 for medium in info['is_format_of'].keys():
-                    for parent_item in range(len(info['is_format_of'][medium])):
-                        url = info['is_format_of'][medium][parent_item]
-                        info['is_format_of'][medium][parent_item] = self._item_info[url]
+                    for parent_item_index in range(len(info['is_format_of'][medium])):
+                        # identifier format: https://ark.lib.uchicago.edu/ark:61001/b29r8d35893d
+                        url = info['is_format_of'][medium][parent_item_index]
+                        if url != identifier:
+                            info['is_format_of'][medium][parent_item_index] = self._item_info[url]
+                        else:
+                            info['is_format_of'][medium].pop(parent_item_index)
 
         return info
 

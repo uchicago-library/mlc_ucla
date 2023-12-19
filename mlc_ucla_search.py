@@ -570,8 +570,11 @@ def item(noid):
         for level, formats in item_data['descendants'].items():
             for medium, item_list in formats.items():
                 for k, item in enumerate(item_list):
-                    item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
-
+                    fetched_item = mlc_db.get_item(item)
+                    if item_data['identifier'][0] != fetched_item['identifier'][0]:
+                        item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
+                    else:
+                        item_data['descendants'][level][medium].pop(k)
 
     return render_template(
         'item.html',
