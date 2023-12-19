@@ -1594,18 +1594,18 @@ class MLCDB:
                   Each of those sub-dicts is organized by mediums, and each
                   medium contains a list of items.
         """
-        def append_dict_of_lists(formats_in_level, item_has_formats):
-            assert type(formats_in_level) == dict
-            assert type(item_has_formats) == dict
+        def append_dict_of_lists(a, b):
+            assert type(a) == dict
+            assert type(b) == dict
             out = {}
-            for format_dict in (formats_in_level, item_has_formats):
-                for format_name, lst in format_dict.items():
-                    if not format_name in out:
-                        out[format_name] = set()
-                    for item in lst:
-                        out[format_name].add(item)
-            for out_format_name in out.keys():
-                out[out_format_name] = list(out[out_format_name])
+            for d in (a, b):
+                for k, lst in d.items():
+                    if not k in out:
+                        out[k] = set()
+                    for v in lst:
+                        out[k].add(v)
+            for k in out.keys():
+                out[k] = list(out[k])
             return out
     
         def get_has_format(i):
