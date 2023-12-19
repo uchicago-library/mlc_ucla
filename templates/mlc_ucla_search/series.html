@@ -106,7 +106,7 @@
         <div class="items-listing">
           <div class="row">
             <ul class="no-style-list">
-            {% for item in grouped_items[medium]|sort(attribute="identifier") %}
+            {% for item in grouped_items[medium] %}
               {% include 'component-item-in-list.html' %}
             {% endfor %}
             </ul>

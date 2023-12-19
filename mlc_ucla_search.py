@@ -476,7 +476,6 @@ def series(noid):
             i,
             mlc_db.get_item(i)
         ))
-    items.sort(key=sortListOfItemsByID)
 
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
@@ -492,6 +491,8 @@ def series(noid):
                 has_panopto = True
                 item_id_with_panopto = i[1]['identifier'][0]
                 item_title_with_panopto = i[1]['titles'][0]
+    for medium, item_list in grouped_items.items():
+        grouped_items[medium].sort(key=sortListOfItemsByID)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -575,6 +576,9 @@ def item(noid):
                         item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
                     else:
                         item_data['descendants'][level][medium].pop(k)
+        for level, formats in item_data['descendants'].items():
+            for medium, item_list in formats.items():
+                item_data['descendants'][level][medium].sort(key=sortListOfItemsByID)
 
     return render_template(
         'item.html',
