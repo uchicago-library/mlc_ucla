@@ -573,7 +573,7 @@ def item(noid):
                 for k, item in reversed(list(enumerate(item_list))):
                     fetched_item = mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
-                        item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
+                        item_data['descendants'][level][medium][k] = fetched_item
                     else:
                         item_data['descendants'][level][medium].pop(k)
         for level, formats in item_data['descendants'].items():
