@@ -100,35 +100,19 @@
       </dl>
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for medium, item_list in grouped_items.items() %}
-      <h3>{{ medium }}</h3>
-      <div class="items-listing">
-        <div class="row">
-          <ul class="no-style-list">
-          {% for item in item_list %}
-            {%  with %}
-              {%  include 'component-item-in-list.html' %}
-            {%  endwith %}
-          {% endfor %}
-          </ul>
+    {% for medium in order_of_formats %}
+      {% if medium in grouped_items %}
+        <h3>{{ medium }}</h3>
+        <div class="items-listing">
+          <div class="row">
+            <ul class="no-style-list">
+            {% for item in grouped_items[medium] %}
+              {% include 'component-item-in-list.html' %}
+            {% endfor %}
+            </ul>
+          </div>
         </div>
-      </div>
+      {% endif %}
     {% endfor %}
-
-    {# <pre>{{ grouped_items }}</pre>
-
-    <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    <div class="items-listing">
-      <div class="row">
-        <ul class="no-style-list">
-        {% for i in items %}
-          {%  with %}
-            {%  set item = i.1 %}
-            {%  include 'component-item-in-list.html' %}
-          {%  endwith %}
-        {% endfor %}
-        </ul>
-      </div>
-    </div> #}
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

@@ -1659,13 +1659,31 @@ class MLCDB:
         info = copy.deepcopy(self._item_info[identifier])
 
         # load item hasFormat / isFormatOf relationships
+        # if get_format_relationships:
+        #     for p in ('has_format', 'is_format_of'):
+        #         if p in info:
+        #             for m in info[p].keys():
+        #                 for i in range(len(info[p][m])):
+        #                     url = info[p][m][i]
+        #                     info[p][m][i] = self._item_info[url]
+
+        # load descendants
         if get_format_relationships:
-            for p in ('has_format', 'is_format_of'):
-                if p in info:
-                    for m in info[p].keys():
-                        for i in range(len(info[p][m])):
-                            url = info[p][m][i]
-                            info[p][m][i] = self._item_info[url]
+            info['descendants'] = self.get_formats_by_level(identifier)
+            if 'is_format_of' in info:
+                for medium in info['is_format_of'].keys():
+                    for parent_item_index in range(len(info['is_format_of'][medium])):
+                        # identifier format: https://ark.lib.uchicago.edu/ark:61001/b29r8d35893d
+                        url = info['is_format_of'][medium][parent_item_index]
+                        if url != identifier:
+                            info['is_format_of'][medium][parent_item_index] = self._item_info[url]
+                        else:
+                            info['is_format_of'][medium].pop(parent_item_index)
+                for medium in list(info['is_format_of'].keys()):
+                    if len(info['is_format_of'][medium]) == 0:
+                        info['is_format_of'].pop(medium, None)
+
+
         return info
 
     def get_item_list(self):

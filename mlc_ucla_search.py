@@ -312,6 +312,11 @@ def sortListOfItems(item):
     else:
         return 2
 
+def sortListOfItemsByID(item):
+    if isinstance(item, tuple):
+        item = item[1]
+    return int(item['identifier'][0])
+
 def get_access_label_obj(item):
     # list of results
     #   tuple for item
@@ -433,7 +438,7 @@ def search():
         for i in db_series[1]:
             info = mlc_db.get_item(i)
             series_data['sub_items'].append(info)
-        series_data['sub_items'].sort(key=sortListOfItems)
+        series_data['sub_items'].sort(key=sortListOfItemsByID)
         processed_results.append((db_series[0], series_data))
 
     if facets:
@@ -471,21 +476,23 @@ def series(noid):
             i,
             mlc_db.get_item(i)
         ))
-    items.sort(key=sortListOfItems)
 
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
     item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
-        medium = i[1]['medium'][0]
-        if medium not in grouped_items:
-            grouped_items[medium] = []        
-        grouped_items[medium].append(i[1])
-        if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
-            has_panopto = True
-            item_id_with_panopto = i[1]['identifier'][0]
-            item_title_with_panopto = i[1]['titles'][0]
+        if not i[1]['is_format_of']:
+            medium = i[1]['medium'][0]
+            if medium not in grouped_items:
+                grouped_items[medium] = []        
+            grouped_items[medium].append(i[1])
+            if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
+                has_panopto = True
+                item_id_with_panopto = i[1]['identifier'][0]
+                item_title_with_panopto = i[1]['titles'][0]
+    for medium, item_list in grouped_items.items():
+        grouped_items[medium].sort(key=sortListOfItemsByID)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -507,6 +514,7 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
@@ -532,14 +540,14 @@ def item(noid):
     series = []
     for s in mlc_db.get_series_for_item(BASE + noid):
         series.append((s, mlc_db.get_series_info(s)))
-
-    # details for request access button
-    # TODO: needs to check if user already has access
-    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
-    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
+
+    # details for request access button
+    # TODO: better to check if user already has access. not possible atm
+    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
+    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     request_access_button = {
         'show' : is_restricted and has_panopto,
         'series_id' : ','.join(series_id), #some items belong to multiple series
@@ -557,7 +565,21 @@ def item(noid):
         series[0][1]['titles'][0],
         item_data['titles'][0]
     )
-    
+
+    # Descendats
+    if len(item_data['descendants'])>0:
+        for level, formats in item_data['descendants'].items():
+            for medium, item_list in formats.items():
+                for k, item in enumerate(item_list):
+                    fetched_item = mlc_db.get_item(item)
+                    if item_data['identifier'][0] != fetched_item['identifier'][0]:
+                        item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
+                    else:
+                        item_data['descendants'][level][medium].pop(k)
+        for level, formats in item_data['descendants'].items():
+            for medium, item_list in formats.items():
+                item_data['descendants'][level][medium].sort(key=sortListOfItemsByID)
+
     return render_template(
         'item.html',
         **(item_data | {'series': series,
@@ -565,6 +587,7 @@ def item(noid):
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
+            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'breadcrumb': breadcrumb})
     )
 
