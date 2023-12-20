@@ -289,10 +289,17 @@ def submission_receipt():
 # WEB
 
 # removed restricted label due to issue https://github.com/uchicago-library/ucla/issues/84
+# ['Restricted'], 
+# ['Public domain'], 
+# ['Campus'], 
 access_key = {
     'restricted': {
-        'trans': '',
+        'trans': lazy_gettext(u'By Request'),
         'class': ''
+    },
+    'campus': {
+        'trans': lazy_gettext(u'Account Required'),
+        'class': 'warning'
     },
     'public domain':  {
         'trans': lazy_gettext(u'Open'),
@@ -423,11 +430,21 @@ def browse():
 
 @mlc_ucla_search.route('/search/')
 def search():
+
     facets = request.args.getlist('facet')
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
     db_results = mlc_db.get_search(query, facets, sort_type)
+
+    # TESTING
+    test_access = []
+    for db_series in db_results:
+        series_data = mlc_db.get_series(db_series[0])
+        test_access.append(series_data['access_rights'])
+    print('target')
+    print(test_access)
+    # END TESTING
 
     processed_results = []
     for db_series in db_results:

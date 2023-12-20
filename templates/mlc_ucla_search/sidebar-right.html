@@ -44,7 +44,7 @@
             </li>
           {% else %}
             <li>
-              <a href="/Shibboleth.sso/Logout"><i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Log out{% endtrans %}</a><br>
+              <i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Logged in as{% endtrans %} {{ cnet_id }}<br>
             </li>
           {% endif %}
           {% if request_access_button and request_access_button.show %}
