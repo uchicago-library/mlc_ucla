@@ -477,20 +477,25 @@ def series(noid):
             mlc_db.get_item(i)
         ))
 
+    # Check if series has one item with a panopto file
+    # Get details about one item with panopto file 
+    #  to help locate series in panopto
+    # Group items by medium/format
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
     item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
+        medium = i[1]['medium'][0]
+        if medium not in grouped_items:
+            grouped_items[medium] = []
+        # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
-            medium = i[1]['medium'][0]
-            if medium not in grouped_items:
-                grouped_items[medium] = []        
             grouped_items[medium].append(i[1])
-            if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
-                has_panopto = True
-                item_id_with_panopto = i[1]['identifier'][0]
-                item_title_with_panopto = i[1]['titles'][0]
+        if i[1]['panopto_identifiers']:
+            has_panopto = True
+            item_id_with_panopto = i[1]['identifier'][0]
+            item_title_with_panopto = i[1]['titles'][0]
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
 
@@ -500,7 +505,7 @@ def series(noid):
         title_slug = ''
 
     # details for request access button
-    # TODO: needs to check if user already has access
+    # TODO: better to check if user already has access. not possible atm
     is_restricted = series_data['access_rights'][0].lower() == 'restricted'
     request_access_button = {
         'show' : is_restricted and has_panopto,
@@ -546,6 +551,7 @@ def item(noid):
 
     # details for request access button
     # TODO: better to check if user already has access. not possible atm
+    # TODO: better to check if any item in the series has a panopto link
     is_restricted = item_data['access_rights'][0].lower() == 'restricted'
     has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     request_access_button = {
@@ -594,13 +600,18 @@ def item(noid):
 @mlc_ucla_search.route('/request-account')
 def request_account():
     return render_template(
-        'request-account.html'
+        'form-request-account.html'
+    )
+@mlc_ucla_search.route('/request-access')
+def request_access():
+    return render_template(
+        'form-request-access.html'
     )
 
 @mlc_ucla_search.route('/suggest-corrections/')
 def suggest_corrections():
     return render_template(
-        'suggest-corrections.html',
+        'form-suggest-corrections.html',
         item_title = request.args.get('ittt'),
         rec_id = request.args.get('rcid'),
         item_url = request.args.get('iurl'),

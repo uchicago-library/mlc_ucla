@@ -47,25 +47,10 @@
               <a href="/Shibboleth.sso/Logout"><i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Log out{% endtrans %}</a><br>
             </li>
           {% endif %}
-          {% if request_access_button %}
-            {% if request_access_button.show %}
-              {% if cnet_id%}
-                <li>
-                  <form action="/send-cgimail" method="POST">
-                    <input type="hidden" name="msg_type" value="request_access">
-                    <input type="hidden" name="CNET ID" value="{{ cnet_id }}" required>
-                    <input type="hidden" name="Series ID" value="{{ request_access_button.series_id }}" required>
-                    <input type="hidden" name="Item ID" value="{{ request_access_button.item_id }}" required>
-                    <input type="hidden" name="Item Title" value="{{ request_access_button.item_title }}" required>
-                    <button type="submit">{% trans %}Request Access to this Series{% endtrans %}</button><br>
-                  </form>
-                </li>
-              {% else %}
-                <li>
-                  <button onclick="alert('{% trans %}Request an account before requesting access.{% endtrans %}')">{% trans %}Request Access to this Series{% endtrans %}</button>
-                </li>
-              {% endif %}
-            {% endif %}
+          {% if request_access_button and request_access_button.show %}
+            <li>
+              <a href="/request-access?series_id={{request_access_button.series_id}}&item_id={{request_access_button.item_id}}&item_title={{request_access_button.item_title}}">{% trans %}Request Access to this Series{% endtrans %}</a><br>
+            </li>
           {% endif %}
           <li>
             <a href="/access-terms">Terms of Access</a><br>
