@@ -5,7 +5,7 @@
   <div class="title-wrapper">
     <h1>{% trans %}Request Access to Series{% endtrans %}</h1>
   </div>
-  {% if not cnet_id %}
+  {% if  cnet_id %}
     <div class="alert alert-warning" style="text-align:left !important" role="alert">{% trans %}An account is neccessary to request access to a restricted series. For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and try again to request access to the selected series. Account requests are reviewed individually and typically processed within five business days.{% endtrans %}</div>
   {% else %}
     <form class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
