@@ -632,11 +632,12 @@ def access_terms():
         title_slug = lazy_gettext(u'Access Terms'),
     )
 
-@mlc_ucla_search.route('/about-the-project')
-@mlc_ucla_search.route('/about-the-collection')
-@mlc_ucla_search.route('/how-to-deposit-materials')
-@mlc_ucla_search.route('/related-collections')
-@mlc_ucla_search.route('/additional-resources')
+# @mlc_ucla_search.route('/about-the-project')
+# @mlc_ucla_search.route('/about-the-collection')
+# @mlc_ucla_search.route('/how-to-deposit-materials')
+# @mlc_ucla_search.route('/related-collections')
+# @mlc_ucla_search.route('/additional-resources')
+@mlc_ucla_search.route('/page-under-development')
 def wip():
     return render_template(
         'wip.html'
