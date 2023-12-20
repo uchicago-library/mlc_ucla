@@ -636,6 +636,10 @@ def suggest_corrections():
         hide_right_column = True
     )
 
+@mlc_ucla_search.route('/login')
+def login():
+    return redirect('/Shibboleth.sso/Login?target='+str(request.referrer))
+
 @mlc_ucla_search.route('/credits')
 def credits():
     return render_template(
