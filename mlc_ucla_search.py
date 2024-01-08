@@ -6,7 +6,10 @@ from flask import abort, Blueprint, current_app, render_template, request, sessi
 from utils import GlottologLookup, MLCDB
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
-
+# Importa pandas library for inmporting CSV
+import pandas as pd 
+# Imports the Translator
+from deep_translator import GoogleTranslator
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
 
@@ -197,6 +200,50 @@ def cli_search(term, facet):
         ))
         print('')
 
+# AUTO GOOGLE TRANSLATE
+@mlc_ucla_search.cli.command(
+    'auto-google-translate',
+    short_help='Use google services to auto translate translations-csv\\messages-to-translate.csv'
+)
+def auto_google_translate():
+
+    #Translating the text to specified target language
+    def translate(word):
+        # Target language
+        target_language = 'es' #Add here the target language that you want to translate to
+
+        # Use any translator you like, in this example GoogleTranslator
+        translated = GoogleTranslator(source='auto', target=target_language).translate(word)
+
+        return (translated)
+
+    #Import data from CSV
+    def importCSV():
+        data = pd.read_csv('translations-csv\\messages-to-translate.csv')
+        countRows = (len(data))
+
+        #Create a dictionary with translated words
+        #"location","source","target"
+        translatedCSV = { "location":[], "source":[], "target":[]} #Change the column names accordingly to your coumns names
+     
+        #Translated word one by one from the CSV file and save them to the dictionary
+        for index, row in data.iterrows():
+            # the package limits at 5k characters
+            if not len(row["source"]) > 4999:
+                translatedCSV["target"].append(translate(row["source"]))
+            else:
+                translatedCSV["target"].append(row["source"])
+
+        print('translated ==========================')
+        #Create a Dataframe from Dictionary 
+        #Save the DataFrame to a CSV file
+        df = pd.DataFrame.from_dict(translatedCSV)
+        print('Create a Dataframe from Dictionary ==========================')
+        df.to_csv("translations-csv\\messages-translated.csv", sep=',')
+        
+
+    #Call the function
+    importCSV()
 
 # CGIMAIL
 # this dictionary and the following two functions

@@ -10,3 +10,5 @@ flask_babel
 flask_session
 sqlite_dump
 translate-toolkit
+pandas
+deep-translator
