@@ -72,7 +72,7 @@
         {% endif %}
 
         {% if location %}
-          <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
+          <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
               <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a><br>
