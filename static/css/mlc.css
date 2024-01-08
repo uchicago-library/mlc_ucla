@@ -249,7 +249,7 @@ ul.no-style-list{
 	margin-right: 0.5rem
 }
 .search-results-page .search-results-series-title .series-result-series-label{
-	font-size: 1.1em;
+	font-size: 1.2em;
   color: #525252;
   font-weight: 600;
   line-height: 1.4em;
@@ -359,7 +359,6 @@ ul.no-style-list{
 	height: 4.6rem;
 	margin:0;
   padding-top: 5px;
-  padding-right: 3px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -467,10 +466,3 @@ ul.no-style-list{
 	max-width: 100%;
   margin: 0 auto 1rem;
 }
-
-
-
-/* =============== Suggestions 
-.suggest-corrections-main{
-	padding: 1rem;
-}*/

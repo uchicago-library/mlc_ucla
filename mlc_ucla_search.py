@@ -289,10 +289,17 @@ def submission_receipt():
 # WEB
 
 # removed restricted label due to issue https://github.com/uchicago-library/ucla/issues/84
+# ['Restricted'], 
+# ['Public domain'], 
+# ['Campus'], 
 access_key = {
     'restricted': {
-        'trans': '',
+        'trans': lazy_gettext(u'By Request'),
         'class': ''
+    },
+    'campus': {
+        'trans': lazy_gettext(u'Account Required'),
+        'class': 'warning'
     },
     'public domain':  {
         'trans': lazy_gettext(u'Open'),
@@ -423,11 +430,21 @@ def browse():
 
 @mlc_ucla_search.route('/search/')
 def search():
+
     facets = request.args.getlist('facet')
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
     db_results = mlc_db.get_search(query, facets, sort_type)
+
+    # TESTING
+    test_access = []
+    for db_series in db_results:
+        series_data = mlc_db.get_series(db_series[0])
+        test_access.append(series_data['access_rights'])
+    print('target')
+    print(test_access)
+    # END TESTING
 
     processed_results = []
     for db_series in db_results:
@@ -477,20 +494,25 @@ def series(noid):
             mlc_db.get_item(i)
         ))
 
+    # Check if series has one item with a panopto file
+    # Get details about one item with panopto file 
+    #  to help locate series in panopto
+    # Group items by medium/format
     has_panopto = False # to display the Request Access button
     item_id_with_panopto = ''
     item_title_with_panopto = ''
     grouped_items = {}
     for i in items:
+        medium = i[1]['medium'][0]
+        if medium not in grouped_items:
+            grouped_items[medium] = []
+        # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
-            medium = i[1]['medium'][0]
-            if medium not in grouped_items:
-                grouped_items[medium] = []        
             grouped_items[medium].append(i[1])
-            if i[1]['panopto_identifiers'] and i[1]['panopto_identifiers']:
-                has_panopto = True
-                item_id_with_panopto = i[1]['identifier'][0]
-                item_title_with_panopto = i[1]['titles'][0]
+        if i[1]['panopto_identifiers']:
+            has_panopto = True
+            item_id_with_panopto = i[1]['identifier'][0]
+            item_title_with_panopto = i[1]['titles'][0]
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
 
@@ -500,7 +522,7 @@ def series(noid):
         title_slug = ''
 
     # details for request access button
-    # TODO: needs to check if user already has access
+    # TODO: better to check if user already has access. not possible atm
     is_restricted = series_data['access_rights'][0].lower() == 'restricted'
     request_access_button = {
         'show' : is_restricted and has_panopto,
@@ -546,6 +568,7 @@ def item(noid):
 
     # details for request access button
     # TODO: better to check if user already has access. not possible atm
+    # TODO: better to check if any item in the series has a panopto link
     is_restricted = item_data['access_rights'][0].lower() == 'restricted'
     has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
     request_access_button = {
@@ -570,10 +593,10 @@ def item(noid):
     if len(item_data['descendants'])>0:
         for level, formats in item_data['descendants'].items():
             for medium, item_list in formats.items():
-                for k, item in enumerate(item_list):
+                for k, item in reversed(list(enumerate(item_list))):
                     fetched_item = mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
-                        item_data['descendants'][level][medium][k] = mlc_db.get_item(item)
+                        item_data['descendants'][level][medium][k] = fetched_item
                     else:
                         item_data['descendants'][level][medium].pop(k)
         for level, formats in item_data['descendants'].items():
@@ -594,19 +617,28 @@ def item(noid):
 @mlc_ucla_search.route('/request-account')
 def request_account():
     return render_template(
-        'request-account.html'
+        'form-request-account.html'
+    )
+@mlc_ucla_search.route('/request-access')
+def request_access():
+    return render_template(
+        'form-request-access.html'
     )
 
 @mlc_ucla_search.route('/suggest-corrections/')
 def suggest_corrections():
     return render_template(
-        'suggest-corrections.html',
+        'form-suggest-corrections.html',
         item_title = request.args.get('ittt'),
         rec_id = request.args.get('rcid'),
         item_url = request.args.get('iurl'),
         title_slug = lazy_gettext(u'Suggest Corrections'),
         hide_right_column = True
     )
+
+@mlc_ucla_search.route('/login')
+def login():
+    return redirect('/Shibboleth.sso/Login?target='+str(request.referrer))
 
 @mlc_ucla_search.route('/credits')
 def credits():
@@ -621,11 +653,12 @@ def access_terms():
         title_slug = lazy_gettext(u'Access Terms'),
     )
 
-@mlc_ucla_search.route('/about-the-project')
-@mlc_ucla_search.route('/about-the-collection')
-@mlc_ucla_search.route('/how-to-deposit-materials')
-@mlc_ucla_search.route('/related-collections')
-@mlc_ucla_search.route('/additional-resources')
+# @mlc_ucla_search.route('/about-the-project')
+# @mlc_ucla_search.route('/about-the-collection')
+# @mlc_ucla_search.route('/how-to-deposit-materials')
+# @mlc_ucla_search.route('/related-collections')
+# @mlc_ucla_search.route('/additional-resources')
+@mlc_ucla_search.route('/page-under-development')
 def wip():
     return render_template(
         'wip.html'

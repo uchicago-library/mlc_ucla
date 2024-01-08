@@ -1,14 +1,15 @@
 <li class="col-xs-12 col-md-6 col-lg-4" title="{{item.titles[0]}}">
   <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
     <div class="item-card-title-row">
+      {% if item.panopto_links|length > 0 %}
+        <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
+          &nbsp;
+      {% endif %}
       <h3 class="item-card-title">
         {% for title in item.titles %}
           {{ title }}
         {% endfor %}
       </h3>
-      {% if item.panopto_links|length > 0 %}
-        <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
-      {% endif %}
     </div>
     <div class="item-card-content-row">
       <span title="{% trans %}Type of Media{% endtrans %}">
@@ -16,7 +17,7 @@
           {{ medium }}
         {% endfor %}
         {% if item.has_format|length > 0 %}
-          <span title="{% trans %}Item has further conversions{% endtrans %}">(+)</span>
+          <i title="{% trans %}Item has further conversions{% endtrans %}" class="fa fa-files-o" aria-hidden="true"></i>
         {% endif %}
           &nbsp;
       </span>

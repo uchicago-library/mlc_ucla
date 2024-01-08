@@ -9,10 +9,12 @@
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </div>
     {% if panopto_identifier %}
-      <div>
-          <!-- {{ panopto_identifier }} -->
+      {% if access_rights[0]|lower != 'open' or cnet_id %}
+        <!-- {{ panopto_identifier }} -->
         <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646;" allowfullscreen allow="autoplay"></iframe>
-      </div>
+      {% else %}
+        <div class="alert alert-warning" style="max-width: 600px; margin: 0 auto 1rem; text-align:left !important" role="alert">{% trans %}This item has a streamable file but requires an account to access it. Please <a href="/login">login</a> for access. For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and try again. Account requests are reviewed individually and typically processed within five business days.{% endtrans %}</div>
+      {% endif %}
     {% endif %}
     <span class="hidden">
       {% if panopto_links %}

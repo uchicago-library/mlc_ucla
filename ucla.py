@@ -70,3 +70,10 @@ def aquisitions_policy():
         'static-aquisitions-policy.html',
         title_slug = lazy_gettext(u'Aquisitions Policy'),
     )
+
+@app.route('/access-terms')
+def access_terms_ucla():
+    return render_template(
+        'static-access-terms.html',
+        title_slug = lazy_gettext(u'Access Terms'),
+    )

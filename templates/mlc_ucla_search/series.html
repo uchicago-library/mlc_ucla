@@ -101,7 +101,7 @@
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
     {% for medium in order_of_formats %}
-      {% if medium in grouped_items %}
+      {% if medium in grouped_items and grouped_items[medium]|length > 0%}
         <h3>{{ medium }}</h3>
         <div class="items-listing">
           <div class="row">
