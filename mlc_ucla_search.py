@@ -201,6 +201,8 @@ def cli_search(term, facet):
         print('')
 
 # AUTO GOOGLE TRANSLATE
+# https://github.com/andrikosrikos/Google-Cloud-Support/blob/master/Google%20Translate%20API/translate_csv_python.py
+# and https://pypi.org/project/deep-translator
 @mlc_ucla_search.cli.command(
     'auto-google-translate',
     short_help='Use google services to auto translate translations-csv\\messages-to-translate.csv'
