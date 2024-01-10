@@ -271,13 +271,13 @@ ul.no-style-list{
 
 
 /* =============== METADATA LINKS */
-.object-metadata .a{
+.object-metadata a{
 	text-decoration: underline;
 }
-.object-metadata .a:not(:last-child){
+.object-metadata a:not(:last-child){
 	padding-right: 1rem;
 }
-.search-result .object-metadata .a{
+.search-result .object-metadata a{
 	color: inherit;
 }
 
