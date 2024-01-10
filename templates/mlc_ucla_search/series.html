@@ -97,6 +97,18 @@
             {% endfor %}
           </dd>
         {% endif %}
+
+        {% if description %}
+          <dt>{% trans %}Fromats{% endtrans %}:</dt>
+          <dd>
+            
+          {% for medium in order_of_formats %}
+            {% if medium in grouped_items and grouped_items[medium]|length > 0%}
+              <a>{{ medium }}</a>
+            {% endif %}
+          {% endfor %}
+          </dd>
+        {% endif %}
       </dl>
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
@@ -105,7 +117,7 @@
         <h3>{{ medium }}</h3>
         <div class="items-listing">
           <div class="row">
-            <ul class="no-style-list">
+            <ul class="item-masonry-grid">
             {% for item in grouped_items[medium] %}
               {% include 'component-item-in-list.html' %}
             {% endfor %}

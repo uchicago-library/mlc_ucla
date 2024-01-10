@@ -115,7 +115,7 @@
         <div class="items-listing">{# well well-sm  #}
         <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
         <div class="row">
-        <ul class="no-style-list">
+        <ul class="item-masonry-grid">
         {% for item_o in result.1.sub_items %}
           {% with %}
             {% if item_o.is_format_of|length == 0 %}
