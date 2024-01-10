@@ -306,7 +306,7 @@ ul.no-style-list{
 @media (min-width:420px){
 	.object-metadata dt{
 		border-bottom: 1px dashed #ddd;
-		flex-basis: 30% !important;
+		flex-basis: 20% !important;
 		padding-top: 0;
 	}
 	.object-metadata dd{
@@ -331,6 +331,13 @@ ul.no-style-list{
 
 
 /* ITEMS */
+
+.item-page .series-result-series-label{
+  color: #525252;
+  font-weight: 600;
+  line-height: 1.4em;
+}
+
 .items-listing{
 	margin: 0;
 }
