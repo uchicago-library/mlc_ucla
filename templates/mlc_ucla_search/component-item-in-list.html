@@ -21,14 +21,6 @@
         {% endif %}
           &nbsp;
       </span>
-      {% if item.subject_language %}
-        <span title="{% trans %}Subject Language{% endtrans %}">
-            <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
-            {% for lan in item.subject_language %}
-              {{ lan }}{{ ", " if not loop.last else "" }}
-            {% endfor %}
-        </span>
-      {% endif %}
       <span title="{% trans %}Record Identifier{% endtrans %}" class="text-muted-extra">{{ item.identifier.0 }}</span>
     </div>
   </a>
