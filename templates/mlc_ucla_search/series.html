@@ -39,7 +39,7 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -48,7 +48,7 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -57,7 +57,7 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -66,7 +66,7 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -75,7 +75,7 @@
           <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -84,7 +84,7 @@
           <dt>{% trans %}Date{% endtrans %}:</dt>
           <dd>
             {% for i in date %}
-              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}

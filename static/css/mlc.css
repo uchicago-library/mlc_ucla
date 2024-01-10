@@ -270,9 +270,18 @@ ul.no-style-list{
 
 
 
-.object-metadata .sr-link-in-row{
+/* =============== METADATA LINKS */
+.object-metadata .a{
+	text-decoration: underline;
+}
+.object-metadata .a:not(:last-child){
+	padding-right: 1rem;
+}
+.search-result .object-metadata .a{
 	color: inherit;
 }
+
+/* =============== METADATA */	
 .object-metadata dl{
 	display: flex;
   flex-wrap: wrap;
@@ -397,9 +406,6 @@ ul.no-style-list{
 	}
 }
 
-.sr-link-in-row:not(:last-child){
-	padding-right: .8rem;
-}
 /* =============== BROWSE */
 .browse-list-wrapper ul li{
   padding: 0;
