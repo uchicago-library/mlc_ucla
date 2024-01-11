@@ -1,35 +1,40 @@
-<li class="col-xs-12 col-md-6 col-lg-4" title="{{item.titles[0]}}">
-  <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-    <div class="item-card-title-row">
-      {% if item.panopto_links|length > 0 %}
-        <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
-          &nbsp;
-      {% endif %}
-      <h3 class="item-card-title">
-        {% for title in item.titles %}
-          {{ title }}
-        {% endfor %}
-      </h3>
-    </div>
-    <div class="item-card-content-row">
-      <span title="{% trans %}Type of Media{% endtrans %}">
-        {% for medium in item.medium %}
-          {{ medium }}
-        {% endfor %}
-        {% if item.has_format|length > 0 %}
-          <i title="{% trans %}Item has further conversions{% endtrans %}" class="fa fa-files-o" aria-hidden="true"></i>
+<li class="item-card-wrapper" title="{{item.titles[0]}}">
+  <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/" >
+    <div class="item-car-sub-wrapper">
+      <div class="item-card-icon-large">
+        {% if item.panopto_links|length > 0 %}
+          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-headphones" aria-hidden="true"></i></span>
+          {# 
+          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-music" aria-hidden="true"></i></span>
+          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span> 
+          #}
+            &nbsp;
         {% endif %}
-          &nbsp;
-      </span>
-      {% if item.subject_language %}
-        <span title="{% trans %}Subject Language{% endtrans %}">
-            <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
-            {% for lan in item.subject_language %}
-              {{ lan }}{{ ", " if not loop.last else "" }}
+      </div>
+
+      <div class="item-card-details">
+        <h4 class="item-card-title">
+          {% for title in item.titles %}
+            {{ title }}
+          {% endfor %}
+        </h4>
+        {% if item.has_format|length > 0 %}
+        <div class="item-card-content-row" title="{% trans %}Type of Media{% endtrans %}">
+            <span><i class="fa fa-files-o" aria-hidden="true"></i> {%trans%}has conversions{%endtrans%}</span>
+            <span></span>
+        </div>
+        {% endif %}
+        <div class="item-card-content-row">
+          <span title="{% trans %}Type of Media{% endtrans %}">
+            {% for medium in item.medium %}
+              {{ medium }}
             {% endfor %}
-        </span>
-      {% endif %}
-      <span title="{% trans %}Record Identifier{% endtrans %}" class="text-muted-extra">{{ item.identifier.0 }}</span>
+            &nbsp;
+          </span>
+          <span title="{% trans %}Record Identifier{% endtrans %}" class="text-muted-extra">{{ item.identifier.0 }}</span>
+        </div>
+      </div>
     </div>
+
   </a>
 </li>

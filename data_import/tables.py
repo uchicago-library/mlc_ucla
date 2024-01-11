@@ -1,6 +1,6 @@
 import sqlite3, sys
 
-'''List UCLA database tables and fields. -v for verbose output.'''
+'''List UCLA(OLA) database tables and fields. -v for verbose output.'''
 
 if __name__ == '__main__':
     con = sqlite3.connect('ucla.db')

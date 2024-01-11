@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="" id="content" role="main">
+  <div class="item-page" id="content" role="main">
     <div class="title-wrapper">
       <h1>
         {{ title_slug }}
@@ -29,6 +29,16 @@
     <div class="object-metadata">
       <dl>
         {% if titles %}
+          <dt>{% trans %}Series{% endtrans %}:</dt>
+          <dd>
+            {% for serie in series %}
+              <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+                {{ serie.1.titles.0 }}
+              </a><br>
+            {% endfor %}
+          </dd>
+        {% endif %}
+        {% if titles %}
           <dt>{% trans %}Item Title{% endtrans %}:</dt>
           <dd>
             {% for i in titles %}
@@ -50,7 +60,7 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -59,7 +69,7 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -68,7 +78,7 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -77,7 +87,7 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -86,7 +96,7 @@
           <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -145,16 +155,18 @@
           </dd>
         {% endif %}
 
+        {% if all_formats and all_formats|length >0 %}
+          <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
+          <dd>
+          {% for medium in order_of_formats %}
+              {% if medium in all_formats %}
+                <span>{{ medium }}</span>
+              {% endif %}
+          {% endfor %}
+          </dd>
+        {% endif %}
       </dl>
     </div>
-    <h2>{% trans %}Part of Series{% endtrans %}</h2>
-    <ul>
-    {% for serie in series %}
-      <li><a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-          <b>{{ serie.1.titles.0 }}</b>
-      </a>&nbsp;&nbsp;&nbsp;<span class="test-muted">{{ serie.1.identifier.0 }}</span></li>
-    {% endfor %}
-    </ul>
 
     {% if descendants|length >0 %}
       <h2>{% trans %}This item has been converted to the following items:{% endtrans %}</h2>
@@ -168,7 +180,7 @@
           {% endif %}
            <!-- <span class="text-muted">Gen: {{ level }}</span> -->
             <div class="row">
-              <ul class="no-style-list">
+              <ul class="item-masonry-grid">
               {% for medium in order_of_formats %}
                 {% if medium in formats %}
                   {% for descendant in formats[medium] %}
@@ -190,7 +202,7 @@
       <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
       <div class="items-listing">
         <div class="row">
-          <ul class="no-style-list">
+          <ul class="item-masonry-grid">
             {% for medium, item_list in is_format_of.items() %}
               {% for item in item_list %}
                 {% with %}
