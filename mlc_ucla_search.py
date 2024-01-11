@@ -491,7 +491,7 @@ def series(noid):
     for i in mlc_db.get_items_for_series(BASE + noid):
         items.append((
             i,
-            mlc_db.get_item(i, False, True)
+            mlc_db.get_item(i)
         ))
 
     # Iterate through all items to regroup and extract information
