@@ -542,6 +542,7 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'has_panopto':has_panopto,
             'all_formats': all_formats,
             'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
