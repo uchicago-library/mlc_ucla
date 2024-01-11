@@ -98,13 +98,12 @@
           </dd>
         {% endif %}
 
-        {% if description %}
-          <dt>{% trans %}Fromats{% endtrans %}:</dt>
+        {% if all_formats and all_formats|length > 0 %}
+          <dt>{% trans %}Formats{% endtrans %}:</dt>
           <dd>
-            
           {% for medium in order_of_formats %}
-            {% if medium in grouped_items and grouped_items[medium]|length > 0%}
-              <a>{{ medium }}</a>
+            {% if medium in all_formats %}
+              <span>{{ medium }}</span>
             {% endif %}
           {% endfor %}
           </dd>
@@ -113,7 +112,7 @@
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
     {% for medium in order_of_formats %}
-      {% if medium in grouped_items and grouped_items[medium]|length > 0%}
+      {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
         <h3>{{ medium }}</h3>
         <div class="items-listing">
           <div class="row">

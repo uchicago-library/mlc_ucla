@@ -155,6 +155,16 @@
           </dd>
         {% endif %}
 
+        {% if all_formats and all_formats|length >0 %}
+          <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
+          <dd>
+          {% for medium in order_of_formats %}
+              {% if medium in all_formats %}
+                <span>{{ medium }}</span>
+              {% endif %}
+          {% endfor %}
+          </dd>
+        {% endif %}
       </dl>
     </div>
 

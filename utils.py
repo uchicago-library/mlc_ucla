@@ -1642,7 +1642,7 @@ class MLCDB:
     
         return formats
 
-    def get_item(self, identifier, get_format_relationships=False):
+    def get_item(self, identifier, get_format_relationships=False, get_panopto=False):
         """
         Get item metadata.
 
@@ -1668,8 +1668,20 @@ class MLCDB:
         #                     info[p][m][i] = self._item_info[url]
 
         # load descendants
+        if get_format_relationships or get_panopto:
+            descendants = self.get_formats_by_level(identifier)
+            if get_format_relationships:
+                info['descendants'] = descendants
+            if get_panopto:
+                if len(descendants) > 0:
+                    for level, formats in descendants.items():
+                        for medium, item_list in formats.items():
+                            for k, item_url in reversed(list(enumerate(item_list))):
+                                fetched_item = self.get_item(item_url)
+                                if fetched_item["panopto_identifiers"]:
+                                    info["has_descendant_with_panopto"] = True
+        # Load ancestors
         if get_format_relationships:
-            info['descendants'] = self.get_formats_by_level(identifier)
             if 'is_format_of' in info:
                 for medium in info['is_format_of'].keys():
                     for parent_item_index in range(len(info['is_format_of'][medium])):

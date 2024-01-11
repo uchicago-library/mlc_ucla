@@ -491,28 +491,34 @@ def series(noid):
     for i in mlc_db.get_items_for_series(BASE + noid):
         items.append((
             i,
-            mlc_db.get_item(i)
+            mlc_db.get_item(i, False, True)
         ))
 
-    # Check if series has one item with a panopto file
-    # Get details about one item with panopto file 
-    #  to help locate series in panopto
-    # Group items by medium/format
-    has_panopto = False # to display the Request Access button
+    # Iterate through all items to regroup and extract information
+    has_panopto = False 
     item_id_with_panopto = ''
     item_title_with_panopto = ''
     grouped_items = {}
+    all_formats = []
     for i in items:
         medium = i[1]['medium'][0]
-        if medium not in grouped_items:
-            grouped_items[medium] = []
+        # Get all formats available to display in Series metadata table
+        if medium not in all_formats:
+            all_formats.append(medium)
         # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
+            # Group items by medium/format
+            if medium not in grouped_items:
+                grouped_items[medium] = []
             grouped_items[medium].append(i[1])
+        # Check if series has one item with a panopto file
+        # Get details about one item with panopto file 
+        #  to help locate series in panopto
         if i[1]['panopto_identifiers']:
-            has_panopto = True
+            has_panopto = True # to display the Request Access button
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
+    # Sort Items by ID
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
 
@@ -536,6 +542,7 @@ def series(noid):
         **(series_data | {
             'grouped_items': grouped_items,
             'title_slug': title_slug,
+            'all_formats': all_formats,
             'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
@@ -590,6 +597,7 @@ def item(noid):
     )
 
     # Descendats
+    all_formats = []
     if len(item_data['descendants'])>0:
         for level, formats in item_data['descendants'].items():
             for medium, item_list in formats.items():
@@ -597,6 +605,7 @@ def item(noid):
                     fetched_item = mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
                         item_data['descendants'][level][medium][k] = fetched_item
+                        all_formats.append(medium)
                     else:
                         item_data['descendants'][level][medium].pop(k)
         for level, formats in item_data['descendants'].items():
@@ -610,6 +619,7 @@ def item(noid):
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
+            'all_formats': all_formats,
             'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'breadcrumb': breadcrumb})
     )
