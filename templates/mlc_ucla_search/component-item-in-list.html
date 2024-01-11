@@ -18,19 +18,6 @@
             {{ title }}
           {% endfor %}
         </h4>
-                {% if item.has_descendant_with_panopto %}
-          <div class="item-card-content-row" title="{% trans %}Type of Media{% endtrans %}">
-            {#
-            {% if item.has_format|length > 0 %}
-              <span><i class="fa fa-files-o" aria-hidden="true"></i> Other formats available</span>
-            {% endif %}
-            #}
-              <span class="text-muted">
-                  <i class="fa fa-music" aria-hidden="true"></i> streamable file available
-              </span>
-              <span></span>
-          </div>
-                {% endif %}
         <div class="item-card-content-row">
           <span title="{% trans %}Type of Media{% endtrans %}">
             {% for medium in item.medium %}
