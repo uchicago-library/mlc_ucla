@@ -18,6 +18,12 @@
             {{ title }}
           {% endfor %}
         </h4>
+        {% if item.has_format|length > 0 %}
+        <div class="item-card-content-row" title="{% trans %}Type of Media{% endtrans %}">
+            <span><i class="fa fa-files-o" aria-hidden="true"></i> Other formats available</span>
+            <span></span>
+        </div>
+        {% endif %}
         <div class="item-card-content-row">
           <span title="{% trans %}Type of Media{% endtrans %}">
             {% for medium in item.medium %}
