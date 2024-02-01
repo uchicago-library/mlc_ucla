@@ -198,8 +198,18 @@ h1{
 }
 
 /* =============== SEARCH */
+.search-result h2{
+	color: inherit;
+	margin-bottom: 0;
+}
 .search-results-facet{
 	padding-right: .8rem;
+}
+.search-result .items-listing{
+	padding-left:.5rem;
+}
+.search-result .items-listing ul{
+	padding-left:1.5rem;
 }
 /* =============== BROWSE */
 .browse-bar{
