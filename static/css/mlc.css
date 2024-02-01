@@ -500,6 +500,10 @@ ul.no-style-list{
 .browse-list-wrapper ul li a .browse-item-count{
 }
 /* =============== ITEM */
+#panopto-help{
+	padding: .2rem;
+	    margin-top: -20px;
+}
 /* Title Element */
 /* easy fix */
 /* 
