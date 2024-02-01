@@ -9,9 +9,6 @@
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </div>
     {% if panopto_identifier %}
-      <pre>access_rights[0]: {{ access_rights[0] }}</pre>
-      <pre>cnet_id: {{ cnet_id }}</pre>
-      <pre>request_access_button: {{ request_access_button }}</pre>
         <!-- {{ panopto_identifier }} -->
         <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
       {% if access_rights[0]|lower == 'campus' %}
