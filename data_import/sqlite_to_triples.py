@@ -336,7 +336,7 @@ def filter_mappings_data_for_classes(mappings, tables = [], fields = [], predica
         # in a string like: 
         # bf:identifiedBy [ a bf:Local ; rdf:value xs:string ]
         # extract bf:identifiedBy and bf:Local
-        m = re.search('^([^[ ]+)\s*\[\s*a\s*([^[; ]+)', record[1][0])
+        m = re.search(r'^([^[ ]+)\s*\[\s*a\s*([^[; ]+)', record[1][0])
         if not m:
             continue
         
