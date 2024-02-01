@@ -6,7 +6,7 @@
     <h1>{% trans %}Request Access to Series{% endtrans %}</h1>
   </div>
   <p>{% trans %}Users with a UChicago ID may request access to the restricted content of this collection using this form. For more information read the <a href="/access-terms">Terms of Access</a>.{% endtrans %}</p>
-  {% if cnet_id %}
+  {% if not cnet_id %}
     <div class="alert alert-warning" style="text-align:left !important" role="alert">{% trans %}An account is neccessary to request access to a restricted series. For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and try again to request access to the selected series. Account requests are reviewed individually and typically processed within five business days.{% endtrans %}</div>
   {% else %}
     {% if request.args.get('series_id') == None or request.args.get('item_title') == None %}
@@ -14,7 +14,7 @@
         {% trans %}There was an issue loading your request. Request for access to a restricted series should be started from the series page or from one of its items. 
       {% endtrans %}
       </div>
-    {%  else %}
+    {% else %}
       <form class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
         <input type="hidden" name="msg_type" value="request_access">
         <div class="form-group">
