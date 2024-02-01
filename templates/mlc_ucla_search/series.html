@@ -114,19 +114,15 @@
       </dl>
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for medium in order_of_formats %}
-      {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
-        <h3>{{ medium }}</h3>
-        <div class="items-listing">
-          <div class="row">
-            <ul class="item-masonry-grid">
-            {% for item in grouped_items[medium] %}
-              {% include 'component-item-in-list.html' %}
-            {% endfor %}
-            </ul>
-          </div>
-        </div>
-      {% endif %}
-    {% endfor %}
+    <div class="item-list-faux-table">
+      {% include 'component-item-in-list-header.html' %}
+      {% for medium in order_of_formats %}
+        {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
+          {% for item in grouped_items[medium] %}
+            {% include 'component-item-in-list.html' %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

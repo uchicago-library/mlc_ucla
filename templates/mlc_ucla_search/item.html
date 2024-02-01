@@ -24,8 +24,8 @@
       {% if access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted' %}
         <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i></button>
       {% endif %}
-        <!-- {{ panopto_identifier }} -->
-        <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
+      <!-- {{ panopto_identifier }} -->
+      <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
     {% endif %}
     <span class="hidden">
       {% if panopto_links %}
@@ -178,53 +178,31 @@
         {% endif %}
       </dl>
     </div>
-
     {% if descendants|length >0 %}
-      <h2>{% trans %}This item has been converted to the following items:{% endtrans %}</h2>
-      <div class="items-listing" >
-        {% for level, formats in descendants.items() %}
-          {% if level == 2 %}
+      <div class="item-list-faux-table">
+        {% for level, formats in descendants.items()  %}
+          {% if level == 1 %}
+            <h2>{% trans %}This item has been converted to the following items:{% endtrans %}</h2>
+            {% include 'component-item-in-list-header.html' %}
+          {% elif level == 2 %}
             <h2>{% trans %}And further converted:{% endtrans %}</h2>
-            <div class="items-listing">
-          {% elif level > 2 %}
-            <div class="items-listing" style="padding:.5rem 0 0 .5rem; border-left: 1px solid #a6a6a6; border-bottom-left-radius: 8px;">
+            {% include 'component-item-in-list-header.html' %}
           {% endif %}
-           <!-- <span class="text-muted">Gen: {{ level }}</span> -->
-            <div class="row">
-              <ul class="item-masonry-grid">
-              {% for medium in order_of_formats %}
-                {% if medium in formats %}
-                  {% for descendant in formats[medium] %}
-                    {% set item = descendant %}
-                    {% include 'component-item-in-list.html' %}
-                  {% endfor %}
-                {% endif %}
+          {% if level >= 2 %}
+            {% set showlevel = level-1 %}
+          {% endif %}
+          <h3 class="sr-only">Generation {{ level }}</h3>
+          {% for medium in order_of_formats %}
+            {% if medium in formats %}
+              {% for descendant in formats[medium] %}
+                {% set item = descendant %}
+                {% include 'component-item-in-list.html' %}
               {% endfor %}
-              </ul>
-            </div>
+            {% endif %}
+          {% endfor %}
+          <hr style="margin: 0; border-color: #aaa">
         {% endfor %}
-        {% for l in descendants %}
-          </div>
-        {% endfor %}
-    {% endif %}  
-    
-    {% if is_format_of|length >0 %}
-      <hr>
-      <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
-      <div class="items-listing">
-        <div class="row">
-          <ul class="item-masonry-grid">
-            {% for medium, item_list in is_format_of.items() %}
-              {% for item in item_list %}
-                {% with %}
-                  {% include 'component-item-in-list.html' %}
-                {% endwith %}
-              {% endfor %}
-            {% endfor %}
-            </ul>
-          </div>
-        </div>
-    {% endif %} 
-
-  </div> <!-- // .main -->
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

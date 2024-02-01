@@ -1,3 +1,16 @@
+/* Table of Contents */
+/* ======= UTILS */
+/* ======= SIDEBAR LEFT */
+/* ======= SIDEBAR RIGHT */
+/* =============== SEARCH */
+/* =============== BROWSE */
+/* =============== METADATA inline items */
+/* =============== METADATA */	
+/* =============== ITEMS */
+/* =============== BROWSE */
+/* =============== ITEM */
+/* =============== Panopto */
+
 /* Just removed the body-container class, 
 doesn't seem necessary. */
 /*.digitalobjectpage .body-container{
@@ -335,100 +348,57 @@ h1{
 
 
 
-/* ITEMS */
-.alert-dismissable, .alert-dismissible {
-    padding-right: 35px !important;
+/* =============== ITEMS */
+/* item list style: table */
+.item-list-faux-table-header,
+.item-list-faux-table-row,
+.item-list-faux-table-format,
+.item-list-faux-table-name,
+.item-list-faux-table-conversions{
+	display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
 }
-
-.items-listing{
-	margin: 0;
-}
-.item-masonry-grid{
-	columns: 1;
-  column-gap: 15px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-.item-masonry-grid li{
-	list-style-type: none;
-	break-inside: avoid-column;
-}
-
-.items-listing li{
-	margin-bottom: 18px;
-}
-.item-card{
-	border: 1px solid #aaa;
-	display: block;
-	border-radius: .5rem;
+.item-list-faux-table-header,
+.item-list-faux-table-row{
 	padding: .3rem .5rem;
-	background: white;
-	transition: all .2s ease-in-out;
 }
-.item-car-sub-wrapper{
-	display: flex;
+.item-list-faux-table-row:nth-child(even){
+	background-color: #fafafa;
 }
-
-.item-card-icon-large {
-	font-size: 2.2rem;
+.item-list-faux-table-header{
+/*	background: #eee;*/
 }
-.item-card-icon-large span{
-	color: inherit !important;
+.item-list-faux-table-format{
+	padding-right: .3rem;
+	text-wrap: nowrap;
 }
-.item-card-details{
-	display: flex;
-	flex-direction: column;
-  flex-grow: 1;
+.item-list-faux-table-name{
+	flex-grow: 1;
+	overflow-x: hidden;
+	text-wrap: nowrap;
+	white-space: nowrap;
+/*	overflow: hidden;*/
 }
-
-
-.item-card span:not(.item-card-title){
-	color: black;
-	text-decoration: none !important;
+.item-list-faux-table-name-name{
+	padding-right: .3rem;
+	font-weight: 700;
+	flex-shrink: 0;
+/*	flex-grow: 1;*/
+	text-overflow: ellipsis;
+	overflow-x: hidden;
 }
-.item-card:active,
-.item-card:focus,
-.item-card:hover{
-	box-shadow: 1px 2px 4px #d9d9d9;
-	text-decoration: none !important;
+.item-list-faux-table-name-identifier{
+	color: #777;
+	display: none;
 }
-
-.item-card .item-card-title{
-	width: 100%;
-	font-style: normal;
-	color: inherit;
-	margin:0;
-  padding-top: 5px;
-  flex-grow: 1;
+.item-list-faux-table-name-description{
+	text-overflow: ellipsis;
+	overflow-x: hidden;
+	color: #777; 
 }
-.item-card:active .item-card-title,
-.item-card:focus .item-card-title,
-.item-card:hover .item-card-title{
-	text-decoration: underline;
-}
-
-.item-card .item-card-content-row {
-	display: flex;
-	flex-wrap: wrap
-}
-.item-card .item-card-content-row>*:last-child {
-  flex-grow: 1;
-  text-align: right;
-}
-
-
-.text-muted-extra{
-	color: #757575 !important;
-}
-@media (min-width:420px){
-	.item-masonry-grid{
-		column-count: 2;
-	}
-}
-@media (min-width:1200px){
-	.item-masonry-grid{
-		column-count: 3;
-	}
+.item-list-faux-table-conversions{
+	padding-left: .5rem;
 }
 
 /* =============== BROWSE */
@@ -529,9 +499,12 @@ ul.no-style-list{
   justify-content: flex-start;
   flex-wrap: nowrap;
 }
+.alert-dismissable, .alert-dismissible {
+    padding-right: 35px !important;
+}
 
 
-/* Panopto */
+/* =============== Panopto */
 .panopto-iframe{
 	display: block;
 	max-width: 100%;
