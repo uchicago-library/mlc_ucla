@@ -231,12 +231,6 @@ h1{
 	margin-right: .5rem;
 }
 
-.browse-list-wrapper ul,  
-ul.no-style-list{
-	list-style-type: none;
-	padding: 0;
-}
-
 .search-results-page .page-title {
 	padding: 0;
 	border: none;
@@ -438,14 +432,37 @@ ul.no-style-list{
 }
 
 /* =============== BROWSE */
+.browse-list-wrapper ul,  
+ul.no-style-list{
+	list-style-type: none;
+	padding: 0;
+}
+.browse-list-wrapper ul{
+	columns: 2;
+}
 .browse-list-wrapper ul li{
   padding: 0;
   margin: 0 !important;
   height: 42px;
 }
-@media (min-width:500px) and (max-width:992px){
-	.browse-list-wrapper ul li{
-  	width: 33.33%;
+@media (min-width:600px){
+	.browse-list-wrapper ul{
+		columns: 3;
+	}
+}
+@media (min-width:768px){
+	.browse-list-wrapper ul{
+		columns: 2;
+	}
+}
+@media (min-width:992px){
+	.browse-list-wrapper ul{
+		columns: 3;
+	}
+}
+@media (min-width:1200px){
+	.browse-list-wrapper ul{
+		columns: 4;
 	}
 }
 .browse-list-wrapper ul li a{
