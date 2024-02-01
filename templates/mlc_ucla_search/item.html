@@ -9,11 +9,21 @@
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </div>
     {% if panopto_identifier %}
-      {% if access_rights[0]|lower != 'open' or cnet_id %}
+      <pre>access_rights[0]: {{ access_rights[0] }}</pre>
+      <pre>cnet_id: {{ cnet_id }}</pre>
+      <pre>request_access_button: {{ request_access_button }}</pre>
         <!-- {{ panopto_identifier }} -->
         <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
-      {% else %}
-        <div class="alert alert-warning" style="max-width: 600px; margin: 0 auto 1rem; text-align:left !important" role="alert">{% trans %}This item has a streamable file but requires an account to access it. Please <a href="/login">login</a> for access. For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and try again. Account requests are reviewed individually and typically processed within five business days.{% endtrans %}</div>
+      {% if access_rights[0]|lower == 'campus' %}
+        <div id="alert-campus" class="alert alert-warning alert-dismissible fade in" style="600px; margin: 0 auto 1rem; text-align:left !important" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {% trans %}This item is a streamable file but has an ‘Account Required’ label. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
+        </div>
+      {% elif access_rights[0]|lower == 'restricted' %}
+        <div id="alert-restricted" class="alert alert-warning alert-dismissible fade in" style="max-width: 600px; margin: 0 auto 1rem; text-align:left !important" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}This item is a streamable file but has a ‘By Request’ label. <a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
+        </div>
       {% endif %}
     {% endif %}
     <span class="hidden">

@@ -332,6 +332,9 @@ ul.no-style-list{
 
 
 /* ITEMS */
+.alert-dismissable, .alert-dismissible {
+    padding-right: 35px !important;
+}
 
 .items-listing{
 	margin: 0;
