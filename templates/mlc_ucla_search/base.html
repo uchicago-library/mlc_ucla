@@ -47,7 +47,7 @@
   <div>
     {% include "header.html" %}
     <div class="mlc-banner">
-      <div class="container-fluid w-100">
+      <div class="container">
         <div class="row">
           <div class="col-xs-12">
             <p class="w-100">{{ trans.collection_title }}</p>
@@ -89,7 +89,7 @@
 
               {% if ( not hide_right_column ) %}
                 <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                  {% include 'sidebar-right.html' %}
+                  {% include 'component-sidebar-right.html' %}
                 </div>
               {% endif %}
             </div>
@@ -103,6 +103,10 @@
       <!-- Scripts -->
       <!-- Placed at the end of the document so the pages load faster -->
       <script src="https://uchicago-library.github.io/LibPattern/js/jquery.min.js"></script>
+      {% set page = request.path.split('/') %}
+      {% if page[1] == "item" %}
+        <script src="/static/js/dismiss-alert-messages.js"></script>
+      {% endif %} 
       <script src="https://uchicago-library.github.io/LibPattern/js/bootstrap.min.js"></script>
       <script src="https://uchicago-library.github.io/LibPattern/js/lib-main.min.js"></script>
       <!-- // Scripts -->

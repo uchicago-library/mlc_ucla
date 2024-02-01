@@ -1,3 +1,16 @@
+/* Table of Contents */
+/* ======= UTILS */
+/* ======= SIDEBAR LEFT */
+/* ======= SIDEBAR RIGHT */
+/* =============== SEARCH */
+/* =============== BROWSE */
+/* =============== METADATA inline items */
+/* =============== METADATA */	
+/* =============== ITEMS */
+/* =============== BROWSE */
+/* =============== ITEM */
+/* =============== Panopto */
+
 /* Just removed the body-container class, 
 doesn't seem necessary. */
 /*.digitalobjectpage .body-container{
@@ -198,8 +211,18 @@ h1{
 }
 
 /* =============== SEARCH */
+.search-result h2{
+	color: inherit;
+	margin-bottom: 0;
+}
 .search-results-facet{
 	padding-right: .8rem;
+}
+.search-result .items-listing{
+	padding-left:.5rem;
+}
+.search-result .items-listing ul{
+	padding-left:1.5rem;
 }
 /* =============== BROWSE */
 .browse-bar{
@@ -219,12 +242,6 @@ h1{
 }
 .browse-bar .btn:not(:last-child){	
 	margin-right: .5rem;
-}
-
-.browse-list-wrapper ul,  
-ul.no-style-list{
-	list-style-type: none;
-	padding: 0;
 }
 
 .search-results-page .page-title {
@@ -249,7 +266,7 @@ ul.no-style-list{
 	margin-right: 0.5rem
 }
 .search-results-page .search-results-series-title .series-result-series-label{
-	font-size: 1.1em;
+	font-size: 1.2em;
   color: #525252;
   font-weight: 600;
   line-height: 1.4em;
@@ -270,9 +287,19 @@ ul.no-style-list{
 
 
 
-.object-metadata .sr-link-in-row{
+/* =============== METADATA inline items */
+.object-metadata dd a{
+	text-decoration: underline;
+}
+.object-metadata dd a:not(:last-child),
+.object-metadata dd span:not(:last-child){
+	padding-right: 1rem;
+}
+.search-result .object-metadata dd a{
 	color: inherit;
 }
+
+/* =============== METADATA */	
 .object-metadata dl{
 	display: flex;
   flex-wrap: wrap;
@@ -297,7 +324,7 @@ ul.no-style-list{
 @media (min-width:420px){
 	.object-metadata dt{
 		border-bottom: 1px dashed #ddd;
-		flex-basis: 30% !important;
+		flex-basis: 20% !important;
 		padding-top: 0;
 	}
 	.object-metadata dd{
@@ -321,90 +348,104 @@ ul.no-style-list{
 
 
 
-/* ITEMS */
-.items-listing{
-	margin: 0;
-}
-.items-listing .item-card{
-	display: block;
-	margin-bottom: .3rem;
-	margin-bottom: .5rem;
-	border: 1px solid #eee;
-	border-radius: .5rem;
-	padding: .3rem .5rem;
-	background: white;
-}
-.items-listing .item-card span:not(.item-card-title){
-	color: black;
-	text-decoration: none !important;
-}
-.text-muted-extra{
-	color: #757575 !important;
-}
-.items-listing .item-card span.item-card-title{
-	max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-top: 5px;
-  padding-right: 3px;
-}
-.items-listing .item-card:active span.item-card-title,
-.items-listing .item-card:focus span.item-card-title,
-.items-listing .item-card:hover span.item-card-title{
-	text-decoration: underline;
-}
-.items-listing .item-card:active,
-.items-listing .item-card:focus,
-.items-listing .item-card:hover{
-	box-shadow: 1px 2px 4px #d9d9d9;
-	text-decoration: none !important;
-}
-.items-listing .item-card .item-card-title-row,
-.items-listing .item-card .item-card-content-row{
+/* =============== ITEMS */
+/* item list style: table */
+.item-list-faux-table-header,
+.item-list-faux-table-row,
+.item-list-faux-table-format,
+.item-list-faux-table-name,
+.item-list-faux-table-conversions{
 	display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
 }
-.items-listing .item-card .item-card-content-row{
-	align-items: flex-end;
+.item-list-faux-table-header,
+.item-list-faux-table-row{
+	padding: .3rem .5rem;
 }
-.items-listing .item-card .item-card-title-row>*:first-child,
-.items-listing .item-card .item-card-content-row>*:first-child {
-  flex-grow: 1;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 1rem;
+.item-list-faux-table-row:nth-child(odd){
+	background-color: #fafafa;
 }
-.items-listing .item-card .item-card-content-row p{
-  margin: 0;
+.item-list-faux-table-header{
+	background: #f0f0f0;
 }
-.items-listing .item-card .item-card-title-row .item-icon{
-  top: .3rem;
-  position: relative;
+.item-list-faux-table-format{
+	padding-right: .3rem;
+	text-wrap: nowrap;
 }
-@media (min-width:500px) and (max-width:992px){
-	.items-listing li{
-  	width: 50%;
-	}
+.item-list-faux-table-name{
+	flex-grow: 1;
+	overflow-x: hidden;
+	text-wrap: nowrap;
+	white-space: nowrap;
+/*	overflow: hidden;*/
+}
+.item-list-faux-table-name-name{
+	padding-right: .3rem;
+	font-weight: 700;
+	flex-shrink: 0;
+/*	flex-grow: 1;*/
+	text-overflow: ellipsis;
+	overflow-x: hidden;
+}
+.item-list-faux-table-name-identifier{
+	color: #777;
+	display: none;
+}
+.item-list-faux-table-name-description{
+	text-overflow: ellipsis;
+	overflow-x: hidden;
+	color: #777; 
+}
+.item-list-faux-table-conversions{
+	padding-left: .5rem;
+}
+.item-list-faux-table-conversions i{
+	margin-top: .3rem;
 }
 
-.sr-link-in-row:not(:last-child){
-	padding-right: .8rem;
-}
 /* =============== BROWSE */
+.browse-list-wrapper ul,  
+ul.no-style-list{
+	list-style-type: none;
+	padding: 0;
+}
+.browse-list-wrapper ul{
+	columns: 2;
+	column-gap: 2rem;
+}
 .browse-list-wrapper ul li{
   padding: 0;
   margin: 0 !important;
   height: 42px;
 }
-@media (min-width:500px) and (max-width:992px){
-	.browse-list-wrapper ul li{
-  	width: 33.33%;
+@media (min-width:500px){
+	.browse-list-wrapper ul{
+		columns: 3;
+	}
+}
+@media (min-width:768px){
+	.browse-list-wrapper ul{
+		columns: 2;
+	}
+}
+@media (min-width:992px){
+	.browse-list-wrapper ul{
+		columns: 3;
+	}
+}
+@media (min-width:1200px){
+	.browse-list-wrapper ul{
+		columns: 5;
+	}
+}
+@media (min-width:1400px){
+	.browse-list-wrapper ul{
+		columns: 6;
 	}
 }
 .browse-list-wrapper ul li a{
-	display: inline-block;
+	display: flex;
 	width: 100%;
 	height: 100%;
   padding: 0.2rem .4rem;
@@ -424,7 +465,18 @@ ul.no-style-list{
   border-radius: 4px;
   overflow: hidden;
 }
+.browse-list-wrapper ul li a .browse-item-name{
+	flex-grow: 1;
+	padding-right: .5rem;
+	overflow: hidden;
+}
+.browse-list-wrapper ul li a .browse-item-count{
+}
 /* =============== ITEM */
+#panopto-help{
+	padding: .2rem;
+	    margin-top: -20px;
+}
 /* Title Element */
 /* easy fix */
 /* 
@@ -450,18 +502,14 @@ ul.no-style-list{
   justify-content: flex-start;
   flex-wrap: nowrap;
 }
+.alert-dismissable, .alert-dismissible {
+    padding-right: 35px !important;
+}
 
 
-/* Panopto */
+/* =============== Panopto */
 .panopto-iframe{
 	display: block;
 	max-width: 100%;
   margin: 0 auto 1rem;
 }
-
-
-
-/* =============== Suggestions 
-.suggest-corrections-main{
-	padding: 1rem;
-}*/

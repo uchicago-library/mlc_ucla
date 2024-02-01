@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="suggest-corrections-main" id="content" role="main">
+<div id="content" role="main">
   <div class="title-wrapper">
     <h1>{% trans %}Request Account for Access{% endtrans %}</h1>
   </div>
@@ -24,12 +24,22 @@
           <input type="email" class="form-control" id="Email" name="User's Email" placeholder="{% trans %}Enter your email address{% endtrans %}" required onchange="document.getElementById('cgimailfrom').value =(this.value)">
         </div>
         <div class="form-group">
-          <label for="birthday">{% trans %}Birthday{% endtrans %}*</label>
+          <label for="birthdate">{% trans %}Birthdate{% endtrans %}*</label>
           <input type="date" class="form-control" id="birthday" name="User's Birthday" value="2005-01-01" required>
         </div>
         <div class="form-group">
-          <label for="projectDescription">{% trans %}Please describe your research project{% endtrans %}</label>
-          <textarea class="form-control" rows="3" id="projectDescription" name="Project Description" value="{% trans %}Provide a description of your project.{% endtrans %}"></textarea>
+          <label for="requestReason">{% trans %}Reason for Request{% endtrans %}*</label>
+          <select name="Reason for Request" id="requestReason" class="form-control" required onchange="showIfOther()">
+            <option value="" disabled selected>Select an option</option>
+            <option value="student">I am a student doing research in this field</option>
+            <option value="academic">I am an academic doing research in this field</option>
+            <option value="community">I am a member of a language community represented in the collection</option>
+            <option value="other">Other. Please describe your interest (followed by text box)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="requestReasonOther" style="display:none">{% trans %}Name{% endtrans %}</label>
+          <input type="text" class="form-control" id="requestReasonOther" name="Other Request Reason" placeholder="{% trans %}Please specify{% endtrans %}" style="display:none">
         </div>
         <div class="checkbox">
           <label>
@@ -39,6 +49,18 @@
         <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
       </div>
     </div>
+    <script type="text/javascript">
+      function showIfOther() {
+        let el = document.getElementById("requestReasonOther");
+        if (document.getElementById("requestReason").value == "other") {
+            el.style.display = "block";
+            el.required = true;
+        } else {
+            el.style.display = "none";
+            el.required = false;
+        }
+      }
+    </script>
   </form>
 </div>
 {% endblock %}

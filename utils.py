@@ -1582,6 +1582,66 @@ class MLCDB:
             results.append((row[0], json.loads(row[1]), row[2]))
         return results
 
+    def get_formats_by_level(self, identifier):
+        """
+        Get a list of descendant formats organized by level and medium.
+
+        Parameters:
+            identifier (str): an item identifier.
+
+        Returns:
+            dict: A dictionary of levels, where each level contains a sub-dict.
+                  Each of those sub-dicts is organized by mediums, and each
+                  medium contains a list of items.
+        """
+        def append_dict_of_lists(a, b):
+            assert type(a) == dict
+            assert type(b) == dict
+            out = {}
+            for d in (a, b):
+                for k, lst in d.items():
+                    if not k in out:
+                        out[k] = set()
+                    for v in lst:
+                        out[k].add(v)
+            for k in out.keys():
+                out[k] = list(out[k])
+            return out
+    
+        def get_has_format(i):
+            for row in self.cur.execute('SELECT info FROM item WHERE id = ?', (i,)):
+                info = json.loads(row[0])
+                return info['has_format']
+    
+        items_to_check = set((identifier,))
+        items_to_check_next = set()
+        items_checked = set()
+    
+        formats = {}
+        level = 1
+        while True:
+            if len(items_to_check) == 0:
+                break
+            formats[level] = {}
+            while len(items_to_check) > 0:
+                i = list(items_to_check)[0]
+                items_to_check.remove(i)
+                items_checked.add(i)
+                formats[level] = append_dict_of_lists(formats[level], get_has_format(i))
+                for lst in formats[level].values():
+                    for v in lst:
+                        if v != i and v not in items_checked:
+                            items_to_check_next.add(v)
+            items_to_check = items_to_check_next.copy()
+            items_to_check_next = set()
+            level += 1
+    
+        for k in list(formats.keys()):
+            if formats[k] == {}:
+                del formats[k]
+    
+        return formats
+
     def get_item(self, identifier, get_format_relationships=False):
         """
         Get item metadata.
@@ -1599,13 +1659,31 @@ class MLCDB:
         info = copy.deepcopy(self._item_info[identifier])
 
         # load item hasFormat / isFormatOf relationships
+        # if get_format_relationships:
+        #     for p in ('has_format', 'is_format_of'):
+        #         if p in info:
+        #             for m in info[p].keys():
+        #                 for i in range(len(info[p][m])):
+        #                     url = info[p][m][i]
+        #                     info[p][m][i] = self._item_info[url]
+
+        # load descendants
         if get_format_relationships:
-            for p in ('has_format', 'is_format_of'):
-                if p in info:
-                    for m in info[p].keys():
-                        for i in range(len(info[p][m])):
-                            url = info[p][m][i]
-                            info[p][m][i] = self._item_info[url]
+            info['descendants'] = self.get_formats_by_level(identifier)
+            if 'is_format_of' in info:
+                for medium in info['is_format_of'].keys():
+                    for parent_item_index in range(len(info['is_format_of'][medium])):
+                        # identifier format: https://ark.lib.uchicago.edu/ark:61001/b29r8d35893d
+                        url = info['is_format_of'][medium][parent_item_index]
+                        if url != identifier:
+                            info['is_format_of'][medium][parent_item_index] = self._item_info[url]
+                        else:
+                            info['is_format_of'][medium].pop(parent_item_index)
+                for medium in list(info['is_format_of'].keys()):
+                    if len(info['is_format_of'][medium]) == 0:
+                        info['is_format_of'].pop(medium, None)
+
+
         return info
 
     def get_item_list(self):

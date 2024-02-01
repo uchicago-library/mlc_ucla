@@ -39,7 +39,7 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -48,7 +48,7 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -57,7 +57,7 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -66,16 +66,16 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
 
         {% if location %}
-          <dt>{% trans %}Location Where Indigenous Language Is Spoken{% endtrans %}:</dt>
+          <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -84,7 +84,7 @@
           <dt>{% trans %}Date{% endtrans %}:</dt>
           <dd>
             {% for i in date %}
-              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a><br>
+              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
@@ -97,38 +97,32 @@
             {% endfor %}
           </dd>
         {% endif %}
+
+        {% if all_formats and all_formats|length > 0 %}
+          <dt>{% trans %}Formats{% endtrans %}:</dt>
+          <dd>
+          {% for medium in order_of_formats %}
+            {% if medium in all_formats %}
+              <span>
+                {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
+                {{ medium }}
+              </span>
+            {% endif %}
+          {% endfor %}
+          </dd>
+        {% endif %}
       </dl>
     </div>
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    {% for medium, item_list in grouped_items.items() %}
-      <h3>{{ medium }}</h3>
-      <div class="items-listing">
-        <div class="row">
-          <ul class="no-style-list">
-          {% for item in item_list %}
-            {%  with %}
-              {%  include 'component-item-in-list.html' %}
-            {%  endwith %}
+    <div class="item-list-faux-table">
+      {% include 'component-item-in-list-header.html' %}
+      {% for medium in order_of_formats %}
+        {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
+          {% for item in grouped_items[medium] %}
+            {% include 'component-item-in-list.html' %}
           {% endfor %}
-          </ul>
-        </div>
-      </div>
-    {% endfor %}
-
-    {# <pre>{{ grouped_items }}</pre>
-
-    <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    <div class="items-listing">
-      <div class="row">
-        <ul class="no-style-list">
-        {% for i in items %}
-          {%  with %}
-            {%  set item = i.1 %}
-            {%  include 'component-item-in-list.html' %}
-          {%  endwith %}
-        {% endfor %}
-        </ul>
-      </div>
-    </div> #}
+        {% endif %}
+      {% endfor %}
+    </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

@@ -25,9 +25,9 @@
           {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
         </span>
         <div class="search-results-series-title-badge">
-          <h2><a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+          <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}"><h2>
             {{ result.1.titles.0 }}
-          </a></h2>
+          </h2></a>
           <div class="title-id-badge">
             {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
             <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
@@ -41,7 +41,7 @@
             <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
             <dd>
             {% for language in result.1.subject_language %}
-              <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
+              <a href="/browse/?type=language&term={{ language|urlencode }}">{{ language }}</a>
             {% endfor %}
             </dd>
           {% endif %}
@@ -49,7 +49,7 @@
             <dt>{% trans %}Language(s){% endtrans %}: </dt>
             <dd>
             {% for language in result.1.primary_language %}
-              <a href="/browse/?type=language&term={{ language|urlencode }}" class="sr-link-in-row">{{ language }}</a>
+              <a href="/browse/?type=language&term={{ language|urlencode }}">{{ language }}</a>
             {% endfor %}
             </dd>
           {% endif %}
@@ -57,7 +57,7 @@
             <dt>{% trans %}Location{% endtrans %}:</dt>
             <dd>
             {% for location in result.1.location %}
-              <a href="/browse/?type=location&term={{ location|urlencode }}" class="sr-link-in-row">{{ location }}</a>
+              <a href="/browse/?type=location&term={{ location|urlencode }}">{{ location }}</a>
             {% endfor %}
             </dd>
           {% endif %}
@@ -65,7 +65,7 @@
             <dt>{% trans %}Date{% endtrans %}:</dt>
             <dd>
             {% for date in result.1.date %}
-              <a href="/browse/?type=date&term={{ date|urlencode }}" class="sr-link-in-row">{{ date }}</a>
+              <a href="/browse/?type=date&term={{ date|urlencode }}">{{ date }}</a>
             {% endfor %}
             </dd>
           {% endif %}
@@ -74,12 +74,12 @@
             <dd>
             {% if result.1.creator|length > 3 %}
               {% for creator in result.1.creator[:3] %}
-                <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+                <a href="/browse/?type=creator&term={{ creator|urlencode }}">{{ creator }}</a>
               {% endfor %}
               (+{{ result.1.creator|length -3 }})
             {% else %}
               {% for creator in result.1.creator %}
-                <a href="/browse/?type=creator&term={{ creator|urlencode }}" class="sr-link-in-row">{{ creator }};</a>
+                <a href="/browse/?type=creator&term={{ creator|urlencode }}">{{ creator }}</a>
               {% endfor %}
             {% endif %}
             </dd>
@@ -89,12 +89,12 @@
             <dd>
             {% if result.1.contributor|length > 3 %}
               {% for contributor in result.1.contributor[:3] %}
-                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}">{{ contributor }}</a>
               {% endfor %}
               (+{{ result.1.contributor|length -3 }})
             {% else %}
               {% for contributor in result.1.contributor %}
-                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}" class="sr-link-in-row">{{ contributor }};</a>
+                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}">{{ contributor }}</a>
               {% endfor %}
             {% endif %}
             </dd>
@@ -113,17 +113,19 @@
       {# ITEMS #}
       {% if result.1.sub_items|length > 0 %}
         <div class="items-listing">{# well well-sm  #}
-        <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
-        <div class="row">
-        <ul class="no-style-list">
-        {% for item_o in result.1.sub_items %}
-          {%  with %}
-            {%  set item = item_o %}
-            {%  include 'component-item-in-list.html' %}
-          {%  endwith %}
-        {% endfor %}
-        </ul>
-        </div>
+          <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
+          <div class="row">
+          <ul class="item-masonry-grid">
+          {% for item_o in result.1.sub_items %}
+            {% with %}
+              {% if item_o.is_format_of|length == 0 %}
+                {% set item = item_o %}
+                {% include 'component-item-in-list.html' %}
+              {% endif %}
+            {% endwith %}
+          {% endfor %}
+          </ul>
+          </div>
         </div>
       {% endif %}
       </li>

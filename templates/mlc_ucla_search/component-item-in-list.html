@@ -1,35 +1,33 @@
-<li class="col-xs-12 col-md-6 col-lg-4" title="{{item.titles[0]}}">
-  <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
-    <div class="item-card-title-row">
-      <span class="item-card-title">
-        {% for title in item.titles %}
-          {{ title }}
-        {% endfor %}
-      </span>
-      {% if item.panopto_links|length > 0 %}
-        <span title="item has digital content"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span>
-      {% endif %}
-    </div>
-    <div class="item-card-content-row">
-      <span title="Type of Media">
-      {% for medium in item.medium %}
-        {{ medium }}
-      {% endfor %}
-      </span>
-      {% if item.has_format|length > 0 %}
-        <span title="Item is converted to other formats">+<i class="fa fa-files-o" aria-hidden="true"></i></span>
-      {% endif %}
-    </div>
-    <div class="item-card-content-row">
-        <span title="Subject language">
-        {% if item.subject_language %}
-          <i class="fa fa-language text-muted-extra" aria-hidden="true"></i>
-          {% for lan in item.subject_language %}
-            {{ lan }}{{ ", " if not loop.last else "" }}
-          {% endfor %}
-        {%  endif %}
-      </span>
-      <span class="text-muted-extra">{{ item.identifier.0 }}</span>
-    </div>
-  </a>
-</li>
+<a class="item-list-faux-table-row" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
+  {# Format #}
+  <span class="item-list-faux-table-format">
+    <span class="text-muted">{% if showlevel %}{{ showlevel }}&nbsp;{% endif %}</span>
+    {% if item.panopto_links|length > 0 %}
+      <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-headphones" aria-hidden="true"></i></span>
+        &nbsp;
+    {% else %}
+      <span style="width: 20px;"></span>
+    {% endif %}
+    <span title="{% trans %}Type of Media{% endtrans %}">
+      {{item.medium[0]}}:
+    </span>
+  </span>
+
+  {# Name and Description #}
+  <span class="item-list-faux-table-name">
+    <span class="item-list-faux-table-name-name">{% for title in item.titles %}
+      {{ title }}
+    {% endfor %}</span>
+    <span class="item-list-faux-table-name-identifier hidden">{{ item.identifier.0 }}</span>
+    <span class="item-list-faux-table-name-description">
+      {{ item.description[0] }}
+    </span>
+  </span>
+
+  {# Has Conversions #}
+  <span class="item-list-faux-table-conversions">
+    {% if item.has_format|length > 0 %}
+      <i class="fa fa-check" aria-hidden="true"></i>
+    {% endif %}
+  </span>
+</a>
