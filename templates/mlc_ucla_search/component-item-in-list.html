@@ -5,6 +5,8 @@
     {% if item.panopto_links|length > 0 %}
       <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-headphones" aria-hidden="true"></i></span>
         &nbsp;
+    {% else %}
+      <span style="width: 20px;"></span>
     {% endif %}
     <span title="{% trans %}Type of Media{% endtrans %}">
       {{item.medium[0]}}:
@@ -25,7 +27,7 @@
   {# Has Conversions #}
   <span class="item-list-faux-table-conversions">
     {% if item.has_format|length > 0 %}
-      <span><i class="fa fa-files-o" aria-hidden="true"></i></span>
+      <i class="fa fa-check" aria-hidden="true"></i>
     {% endif %}
   </span>
 </a>

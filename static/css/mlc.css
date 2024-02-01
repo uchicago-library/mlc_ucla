@@ -363,11 +363,11 @@ h1{
 .item-list-faux-table-row{
 	padding: .3rem .5rem;
 }
-.item-list-faux-table-row:nth-child(even){
+.item-list-faux-table-row:nth-child(odd){
 	background-color: #fafafa;
 }
 .item-list-faux-table-header{
-/*	background: #eee;*/
+	background: #f0f0f0;
 }
 .item-list-faux-table-format{
 	padding-right: .3rem;
@@ -399,6 +399,9 @@ h1{
 }
 .item-list-faux-table-conversions{
 	padding-left: .5rem;
+}
+.item-list-faux-table-conversions i{
+	margin-top: .3rem;
 }
 
 /* =============== BROWSE */
