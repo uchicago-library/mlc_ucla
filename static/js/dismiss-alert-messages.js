@@ -20,7 +20,7 @@ $(document).ready(function(){
 			}
 
 		}else if(pdata.rights == 'restricted'){
-			var user_closed_r = parseInt(window.localStorage.getItem('timestamp_closed_campus_message'));
+			var user_closed_r = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 			var enough_r_time = user_closed_r && current>(user_closed_r+enough_time);
 
 			if( user_closed_r && !enough_r_time){
