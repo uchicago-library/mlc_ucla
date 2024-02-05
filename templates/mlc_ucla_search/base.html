@@ -103,6 +103,10 @@
       <!-- Scripts -->
       <!-- Placed at the end of the document so the pages load faster -->
       <script src="https://uchicago-library.github.io/LibPattern/js/jquery.min.js"></script>
+      {% set page = request.path.split('/') %}
+      {% if page[1] == "item" %}
+        <script src="/static/js/dismiss-alert-messages.js"></script>
+      {% endif %} 
       <script src="https://uchicago-library.github.io/LibPattern/js/bootstrap.min.js"></script>
       <script src="https://uchicago-library.github.io/LibPattern/js/lib-main.min.js"></script>
       <!-- // Scripts -->

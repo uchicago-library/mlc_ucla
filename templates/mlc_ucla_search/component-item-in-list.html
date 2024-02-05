@@ -1,40 +1,33 @@
-<li class="item-card-wrapper" title="{{item.titles[0]}}">
-  <a class="item-card" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/" >
-    <div class="item-car-sub-wrapper">
-      <div class="item-card-icon-large">
-        {% if item.panopto_links|length > 0 %}
-          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-headphones" aria-hidden="true"></i></span>
-          {# 
-          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-music" aria-hidden="true"></i></span>
-          <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-file-audio-o" aria-hidden="true"></i></span> 
-          #}
-            &nbsp;
-        {% endif %}
-      </div>
+<a class="item-list-faux-table-row" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
+  {# Format #}
+  <span class="item-list-faux-table-format">
+    <span class="text-muted">{% if showlevel %}{{ showlevel }}&nbsp;{% endif %}</span>
+    {% if item.panopto_links|length > 0 %}
+      <span title="{% trans %}item has digital content{% endtrans %}"><i class="item-icon fa fa-lg fa-headphones" aria-hidden="true"></i></span>
+        &nbsp;
+    {% else %}
+      <span style="width: 20px;"></span>
+    {% endif %}
+    <span title="{% trans %}Type of Media{% endtrans %}">
+      {{item.medium[0]}}:
+    </span>
+  </span>
 
-      <div class="item-card-details">
-        <h4 class="item-card-title">
-          {% for title in item.titles %}
-            {{ title }}
-          {% endfor %}
-        </h4>
-        {% if item.has_format|length > 0 %}
-        <div class="item-card-content-row" title="{% trans %}Type of Media{% endtrans %}">
-            <span><i class="fa fa-files-o" aria-hidden="true"></i> {%trans%}has conversions{%endtrans%}</span>
-            <span></span>
-        </div>
-        {% endif %}
-        <div class="item-card-content-row">
-          <span title="{% trans %}Type of Media{% endtrans %}">
-            {% for medium in item.medium %}
-              {{ medium }}
-            {% endfor %}
-            &nbsp;
-          </span>
-          <span title="{% trans %}Record Identifier{% endtrans %}" class="text-muted-extra">{{ item.identifier.0 }}</span>
-        </div>
-      </div>
-    </div>
+  {# Name and Description #}
+  <span class="item-list-faux-table-name">
+    <span class="item-list-faux-table-name-name">{% for title in item.titles %}
+      {{ title }}
+    {% endfor %}</span>
+    <span class="item-list-faux-table-name-identifier hidden">{{ item.identifier.0 }}</span>
+    <span class="item-list-faux-table-name-description">
+      {{ item.description[0] }}
+    </span>
+  </span>
 
-  </a>
-</li>
+  {# Has Conversions #}
+  <span class="item-list-faux-table-conversions">
+    {% if item.has_format|length > 0 %}
+      <i class="fa fa-check" aria-hidden="true"></i>
+    {% endif %}
+  </span>
+</a>
