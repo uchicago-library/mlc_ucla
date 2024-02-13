@@ -360,7 +360,7 @@ h1{
 .item-list-faux-table-row{
 	padding: .3rem .5rem;
 }
-.item-list-faux-table-row:nth-child(odd){
+.item-list-faux-table-wrapper:nth-child(odd){
 	background-color: #fafafa;
 }
 .item-list-faux-table-header{
