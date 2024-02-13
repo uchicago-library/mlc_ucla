@@ -44,6 +44,7 @@
           <dd>
             {% for serie in series %}
               <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+                <i class="fa fa-folder-open-o" aria-hidden="true"></i>
                 {{ serie.1.titles.0 }}
               </a><br>
             {% endfor %}

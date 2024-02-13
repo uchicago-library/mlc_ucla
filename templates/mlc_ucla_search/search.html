@@ -21,8 +21,9 @@
       {# SERIES #}
       <div class="search-results-series-title">
         <span class="series-result-series-label">
+          <i class="fa fa-folder-open-o" aria-hidden="true"></i>
           {% trans %}Series{% endtrans %}
-          {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
+          <span class="hidden">{% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}</span>: 
         </span>
         <div class="search-results-series-title-badge">
           <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}"><h2>
