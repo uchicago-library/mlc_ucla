@@ -135,6 +135,9 @@ h1{
 .w-100{
 	width: 100%;
 }
+.o-80{
+	opacity: .8;
+}
 
 /* ======= SIDEBAR LEFT */
 
@@ -409,6 +412,7 @@ h1{
 ul.no-style-list{
 	list-style-type: none;
 	padding: 0;
+	margin: 0;
 }
 .browse-list-wrapper ul{
 	columns: 2;

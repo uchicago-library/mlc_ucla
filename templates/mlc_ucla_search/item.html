@@ -192,6 +192,7 @@
             {% set showlevel = level-1 %}
           {% endif %}
           <h3 class="sr-only">Generation {{ level }}</h3>
+          <ul class="no-style-list">
           {% for medium in order_of_formats %}
             {% if medium in formats %}
               {% for descendant in formats[medium] %}
@@ -200,9 +201,21 @@
               {% endfor %}
             {% endif %}
           {% endfor %}
+          </ul>
           <hr style="margin: 0; border-color: #aaa">
         {% endfor %}
       </div>
     {% endif %}
+
+    {% if is_format_of|length >0 %}
+      <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
+      {% include 'component-item-in-list-header.html' %}
+      {% for medium, item_list in is_format_of.items() %}
+        {% for item in item_list %}
+          {% include 'component-item-in-list.html' %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+
   </div>
 {% endblock %}
