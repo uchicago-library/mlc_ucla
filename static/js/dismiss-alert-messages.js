@@ -1,46 +1,55 @@
 $(document).ready(function(){
 	var pdata = $('#panopto-data').data();
-	var enough_time = 7889400000;
+	var enough_time = 31540000000; // one year in milisecnods
 	var current = new Date().getTime();
-	if(pdata.identifier){
 
-		if(pdata.rights == 'campus'){
-			var user_closed_c = parseInt(window.localStorage.getItem('timestamp_closed_campus_message'));
-			var enough_c_time = user_closed_c && current>(user_closed_c+enough_time);
-
-			if( user_closed_c && !enough_c_time){
-				$('#panopto-help').removeClass('hidden');
-			}
-			if( (user_closed_c && enough_c_time) || !user_closed_c ){
-				$('#alert-campus').removeClass('hidden')
-				.on('closed.bs.alert', function () {
-					window.localStorage.setItem('timestamp_closed_campus_message', new Date().getTime());
-				});
-				window.localStorage.removeItem('timestamp_closed_campus_message');
-			}
-
-		}else if(pdata.rights == 'restricted'){
-			var user_closed_r = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
-			var enough_r_time = user_closed_r && current>(user_closed_r+enough_time);
-
-			if( user_closed_r && !enough_r_time){
-				$('#panopto-help').removeClass('hidden');
-			}
-			if( (user_closed_r && enough_r_time) || !user_closed_r ){
-				$('#alert-restricted').removeClass('hidden')
-				.on('closed.bs.alert', function () {
-					window.localStorage.setItem('timestamp_closed_restricted_message', new Date().getTime());
-				});
-				window.localStorage.removeItem('timestamp_closed_restricted_message');
-			}
-
-		}
-		$('#panopto-help').on('click', function (){
-			window.localStorage.removeItem('timestamp_closed_campus_message');
-			window.localStorage.removeItem('timestamp_closed_restricted_message');
-			$('#alert-campus').removeClass('hidden');
-			$('#alert-restricted').removeClass('hidden');
+	function show_help(){
+		$('#panopto-help').removeClass('hidden')
+		.on('click', function (){
+			show_alert();
 			$('#panopto-help').addClass('hidden');
 		});
+	}
+
+	function show_alert(){
+		if(pdata.rights == 'campus'){
+			$('#alert-campus').removeClass('hidden')
+			.on('closed.bs.alert', function () {
+				$('#panopto-help').removeClass('hidden');
+				bind_help();
+				window.localStorage.setItem('timestamp_closed_campus_message', new Date().getTime());
+			});
+			window.localStorage.removeItem('timestamp_closed_campus_message');
+		}else if(pdata.rights == 'restricted'){
+			$('#alert-restricted').removeClass('hidden')
+			.on('closed.bs.alert', function () {
+				$('#panopto-help').removeClass('hidden');
+				bind_help();
+				window.localStorage.setItem('timestamp_closed_restricted_message', new Date().getTime());
+			});
+			window.localStorage.removeItem('timestamp_closed_restricted_message');
+
+		}
+	}
+
+	if(pdata.identifier){
+		var user_closed;
+		var enough_time;
+		if(pdata.rights == 'campus'){
+			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_campus_message'));
+		}else if(pdata.rights == 'restricted'){
+			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
+		}
+		enough_time = user_closed_r && current>(user_closed+enough_time);
+		// user has closed the message before
+		if( user_closed && !enough_time){
+			show_help();
+		}
+		// user has closed the message before, but enough time has ellapsed
+		// OR user did not close dismiss the message before
+		if( (user_closed && enough_time) || !user_closed ){
+			show_alert();
+		}
+
 	}
 });
