@@ -210,11 +210,13 @@
     {% if is_format_of|length >0 %}
       <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
       {% include 'component-item-in-list-header.html' %}
+      <ul class="no-style-list">
       {% for medium, item_list in is_format_of.items() %}
         {% for item in item_list %}
           {% include 'component-item-in-list.html' %}
         {% endfor %}
       {% endfor %}
+      </ul>
     {% endif %}
 
   </div>

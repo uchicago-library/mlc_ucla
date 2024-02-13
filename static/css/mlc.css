@@ -221,12 +221,6 @@ h1{
 .search-results-facet{
 	padding-right: .8rem;
 }
-.search-result .items-listing{
-	padding-left:.5rem;
-}
-.search-result .items-listing ul{
-	padding-left:1.5rem;
-}
 /* =============== BROWSE */
 .browse-bar{
 	margin-bottom: 2rem;
