@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	var pdata = $('#panopto-data').data();
-	var enough_time = 31540000000; // one year in millisecnods
+	var enough_time = 31536000000; // one year in millisecnods - 365*24*60*60*1000
 	var current = new Date().getTime();
 
 	function show_help(){
@@ -34,20 +34,20 @@ $(document).ready(function(){
 
 	if(pdata.identifier){
 		var user_closed;
-		var enough_time;
+		var is_enough_time;
 		if(pdata.rights == 'campus'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_campus_message'));
 		}else if(pdata.rights == 'restricted'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 		}
-		enough_time = user_closed_r && current>(user_closed+enough_time);
+		is_enough_time = user_closed && current>(user_closed+enough_time);
 		// user has closed the message before
-		if( user_closed && !enough_time){
+		if( user_closed && !is_enough_time){
 			show_help();
 		}
 		// user has closed the message before, but enough time has ellapsed
 		// OR user did not close dismiss the message before
-		if( (user_closed && enough_time) || !user_closed ){
+		if( (user_closed && is_enough_time) || !user_closed ){
 			show_alert();
 		}
 
