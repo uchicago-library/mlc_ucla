@@ -16,16 +16,16 @@ $(document).ready(function(){
 			$('#alert-campus').removeClass('hidden')
 			.on('closed.bs.alert', function () {
 				$('#panopto-help').removeClass('hidden');
-				bind_help();
 				window.localStorage.setItem('timestamp_closed_campus_message', new Date().getTime());
+				show_help();
 			});
 			window.localStorage.removeItem('timestamp_closed_campus_message');
 		}else if(pdata.rights == 'restricted'){
 			$('#alert-restricted').removeClass('hidden')
 			.on('closed.bs.alert', function () {
 				$('#panopto-help').removeClass('hidden');
-				bind_help();
 				window.localStorage.setItem('timestamp_closed_restricted_message', new Date().getTime());
+				show_help();
 			});
 			window.localStorage.removeItem('timestamp_closed_restricted_message');
 
