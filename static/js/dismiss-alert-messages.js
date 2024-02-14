@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	var pdata = $('#panopto-data').data();
-	var enough_time = 31540000000; // one year in milisecnods
+	var enough_time = 31540000000; // one year in millisecnods
 	var current = new Date().getTime();
 
 	function show_help(){
