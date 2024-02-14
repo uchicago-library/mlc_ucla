@@ -11,12 +11,12 @@
     <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}"></span>
     {% if panopto_identifier %}
       {% if access_rights[0]|lower == 'campus' %}
-        <div id="alert-campus" class="alert alert-warning alert-dismissible hidden fade in" style="600px; margin: 0 auto 1rem; text-align:left !important" role="alert">
+        <div id="alert-campus" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           {% trans %}This item is a streamable file but has an ‘Account Required’ label. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
         </div>
       {% elif access_rights[0]|lower == 'restricted' %}
-        <div id="alert-restricted" class="alert alert-warning alert-dismissible hidden fade in" style="max-width: 600px; margin: 0 auto 1rem; text-align:left !important" role="alert">
+        <div id="alert-restricted" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           {% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}This item is a streamable file but has a ‘By Request’ label. <a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
         </div>
@@ -25,7 +25,9 @@
         <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i></button>
       {% endif %}
       <!-- {{ panopto_identifier }} -->
-      <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
+      {% if not ( not cnet_id and access_rights[0]|lower == 'restricted' ) %}
+        <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
+      {% endif %}
     {% endif %}
     <span class="hidden">
       {% if panopto_links %}
@@ -44,6 +46,7 @@
           <dd>
             {% for serie in series %}
               <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+                <i class="fa fa-folder-open-o" aria-hidden="true"></i>
                 {{ serie.1.titles.0 }}
               </a><br>
             {% endfor %}
@@ -192,6 +195,7 @@
             {% set showlevel = level-1 %}
           {% endif %}
           <h3 class="sr-only">Generation {{ level }}</h3>
+          <ul class="no-style-list">
           {% for medium in order_of_formats %}
             {% if medium in formats %}
               {% for descendant in formats[medium] %}
@@ -200,9 +204,23 @@
               {% endfor %}
             {% endif %}
           {% endfor %}
+          </ul>
           <hr style="margin: 0; border-color: #aaa">
         {% endfor %}
       </div>
     {% endif %}
+
+    {% if is_format_of|length >0 %}
+      <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
+      {% include 'component-item-in-list-header.html' %}
+      <ul class="no-style-list">
+      {% for medium, item_list in is_format_of.items() %}
+        {% for item in item_list %}
+          {% include 'component-item-in-list.html' %}
+        {% endfor %}
+      {% endfor %}
+      </ul>
+    {% endif %}
+
   </div>
 {% endblock %}

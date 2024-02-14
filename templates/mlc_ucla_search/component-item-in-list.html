@@ -1,3 +1,4 @@
+<li class="item-list-faux-table-wrapper">
 <a class="item-list-faux-table-row" href="/item/{{ item.ark|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}/">
   {# Format #}
   <span class="item-list-faux-table-format">
@@ -27,7 +28,10 @@
   {# Has Conversions #}
   <span class="item-list-faux-table-conversions">
     {% if item.has_format|length > 0 %}
-      <i class="fa fa-check" aria-hidden="true"></i>
+      <i class="fa fa-check-circle-o" aria-hidden="true"></i>
+    {% else %}
+      <i class="fa fa-circle-o text-muted o-80" aria-hidden="true"></i>
     {% endif %}
   </span>
 </a>
+</li>

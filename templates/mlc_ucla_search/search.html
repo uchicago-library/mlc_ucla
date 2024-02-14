@@ -21,8 +21,9 @@
       {# SERIES #}
       <div class="search-results-series-title">
         <span class="series-result-series-label">
+          <i class="fa fa-folder-open-o" aria-hidden="true"></i>
           {% trans %}Series{% endtrans %}
-          {% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}: 
+          <span class="hidden">{% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}</span>: 
         </span>
         <div class="search-results-series-title-badge">
           <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}"><h2>
@@ -114,8 +115,9 @@
       {% if result.1.sub_items|length > 0 %}
         <div class="items-listing">{# well well-sm  #}
           <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
-          <div class="row">
-          <ul class="item-masonry-grid">
+
+          {% include 'component-item-in-list-header.html' %}
+          <ul class="no-style-list">
           {% for item_o in result.1.sub_items %}
             {% with %}
               {% if item_o.is_format_of|length == 0 %}
@@ -125,7 +127,6 @@
             {% endwith %}
           {% endfor %}
           </ul>
-          </div>
         </div>
       {% endif %}
       </li>
