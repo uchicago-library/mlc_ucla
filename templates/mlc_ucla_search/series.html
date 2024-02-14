@@ -4,7 +4,7 @@
   <div class="" id="content" role="main">
     <div class="title-wrapper">
       <h1>
-        <strong>{% trans %}Series Title{% endtrans %}:</strong> {{ title_slug }}
+        <i class="fa fa-folder-open-o" aria-hidden="true"></i> {{ title_slug }}
       </h1>
       <div class="title-id-badge">
         <!-- <span class="text-muted-extra"> {{ identifier.0 }}</span> -->
@@ -116,6 +116,7 @@
     <h2>{% trans %}Items in the Series{% endtrans %}</h2>
     <div class="item-list-faux-table">
       {% include 'component-item-in-list-header.html' %}
+      <ul class="no-style-list">
       {% for medium in order_of_formats %}
         {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
           {% for item in grouped_items[medium] %}
@@ -123,6 +124,7 @@
           {% endfor %}
         {% endif %}
       {% endfor %}
+      </ul>
     </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}
