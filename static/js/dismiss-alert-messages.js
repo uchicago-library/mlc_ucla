@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	var pdata = $('#panopto-data').data();
-	var enough_time = 31540000000; // one year in millisecnods
+	var enough_time = 31536000000; // one year in millisecnods - 365*24*60*60*1000
 	var current = new Date().getTime();
 
 	function show_help(){
@@ -40,7 +40,7 @@ $(document).ready(function(){
 		}else if(pdata.rights == 'restricted'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 		}
-		enough_time = user_closed_r && current>(user_closed+enough_time);
+		enough_time = user_closed && current>(user_closed+enough_time);
 		// user has closed the message before
 		if( user_closed && !enough_time){
 			show_help();
