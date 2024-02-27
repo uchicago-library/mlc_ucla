@@ -12,7 +12,7 @@
     {% if panopto_identifier %}
       {% if access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted' %}
         <div id="alert-{{access_rights[0]|lower}}" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
-          <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button id="close-panopto-alert" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           {% if access_rights[0]|lower == 'campus' %}
               {% trans %}This item is a streamable file but has an ‘Account Required’ label. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
             </div>

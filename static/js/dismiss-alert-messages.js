@@ -15,30 +15,31 @@ $(document).ready(function(){
 
 	function show_alert(){
 		console.log('show_alert');
-			//alert alert-warning alert-dismissible fade in
+		//alert alert-warning alert-dismissible fade in
+		var alert;
+		var help_btn = $('#close-panopto-alert');
+		var user_var;
 		if(pdata.rights == 'campus'){
 			console.log('rights= campus');
-			$('#alert-campus').removeClass('hidden');
-			$('#alert-campus .close').on('click', function () {
-				$('#panopto-help').removeClass('hidden');
-				$('#alert-campus').addClass('hidden');
-				window.localStorage.setItem('timestamp_closed_campus_message', new Date().getTime());
-				console.log('close alert');
-				show_help();
-			});
-			window.localStorage.removeItem('timestamp_closed_campus_message');
+			alert = $('#alert-campus');
+			user_var = "timestamp_closed_campus_message";
 		}else if(pdata.rights == 'restricted'){
 			console.log('rights= restricted');
-			$('#alert-restricted').removeClass('hidden');
-			$('#alert-restricted .close').on('closed.bs.alert', function () {
-				$('#panopto-help').removeClass('hidden');
-				$('#alert-restricted').addClass('hidden');
-				window.localStorage.setItem('timestamp_closed_restricted_message', new Date().getTime());
-				console.log('close alert');
-				show_help();
-			});
-			window.localStorage.removeItem('timestamp_closed_restricted_message');
+			alert = $('#alert-restricted');
+			user_var = "timestamp_closed_restricted_message";
 		}
+
+		alert.removeClass('hidden');
+		help_btn.on('click', function () {
+			alert.removeClass('hidden');
+			alert.addClass('hidden');
+			console.log('user_var: '+user_var);
+			window.localStorage.setItem(user_var, new Date().getTime());
+			console.log('closed value: '+parseInt(window.localStorage.getItem(user_var)));
+			console.log('close alert');
+			show_help();
+		});
+		window.localStorage.removeItem(user_var);
 	}
 
 	if(pdata.identifier){
