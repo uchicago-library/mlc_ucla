@@ -194,14 +194,12 @@
           {% endif %}
           <h3 class="sr-only">Generation {{ level }}</h3>
           <ul class="no-style-list">
-          {% for medium in order_of_formats %}
-            {% if medium in formats %}
+            {% for medium in formats %}
               {% for descendant in formats[medium] %}
                 {% set item = descendant %}
                 {% include 'component-item-in-list.html' %}
               {% endfor %}
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
           </ul>
           <hr style="margin: 0; border-color: #aaa">
         {% endfor %}

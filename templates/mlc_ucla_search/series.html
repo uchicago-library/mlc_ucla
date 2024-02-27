@@ -117,13 +117,13 @@
     <div class="item-list-faux-table">
       {% include 'component-item-in-list-header.html' %}
       <ul class="no-style-list">
-      {% for medium in order_of_formats %}
-        {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
-          {% for item in grouped_items[medium] %}
-            {% include 'component-item-in-list.html' %}
-          {% endfor %}
-        {% endif %}
-      {% endfor %}
+        {% for medium in grouped_items %}
+          {% if grouped_items[medium]|length > 0 %}
+            {% for item in grouped_items[medium] %}
+              {% include 'component-item-in-list.html' %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
       </ul>
     </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->

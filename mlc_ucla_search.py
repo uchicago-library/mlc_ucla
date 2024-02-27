@@ -307,6 +307,11 @@ access_key = {
     }
 }
 
+def sortDictByFormat(item):
+    order_of_formats = ["Sound", "(:unav)", "image", "MP4", "VOB file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"]
+    return order_of_formats.index(item) or 999
+
+
 def sortListOfItems(item):
     if isinstance(item, tuple):
         item = item[1]
@@ -502,11 +507,11 @@ def series(noid):
     all_formats = []
     for i in items:
         medium = i[1]['medium'][0]
-        # Get all formats available to display in Series metadata table
-        if medium not in all_formats:
-            all_formats.append(medium)
         # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
+            # Get all formats available to display in Series metadata table
+            if medium not in all_formats:
+                all_formats.append(medium)
             # Group items by medium/format
             if medium not in grouped_items:
                 grouped_items[medium] = []
@@ -521,6 +526,8 @@ def series(noid):
     # Sort Items by ID
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
+    # sort formats by custom order with sortDictByFormat
+    #grouped_items.sort(reverse=True,key=sortDictByFormat)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -544,7 +551,6 @@ def series(noid):
             'title_slug': title_slug,
             'has_panopto':has_panopto,
             'all_formats': all_formats,
-            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
@@ -610,6 +616,8 @@ def item(noid):
                     else:
                         item_data['descendants'][level][medium].pop(k)
         for level, formats in item_data['descendants'].items():
+            # sort mediums by custom order with sortDictByFormat
+            item_data['descendants'][level].sort(reverse=True,key=sortDictByFormat)
             for medium, item_list in formats.items():
                 item_data['descendants'][level][medium].sort(key=sortListOfItemsByID)
 
@@ -621,7 +629,6 @@ def item(noid):
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
             'all_formats': all_formats,
-            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'breadcrumb': breadcrumb})
     )
 
