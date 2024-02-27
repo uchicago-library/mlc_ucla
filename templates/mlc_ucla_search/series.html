@@ -39,7 +39,11 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -48,7 +52,11 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -57,7 +65,11 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -66,7 +78,11 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -75,7 +91,11 @@
           <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -84,7 +104,11 @@
           <dt>{% trans %}Date{% endtrans %}:</dt>
           <dd>
             {% for i in date %}
-              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -105,7 +129,11 @@
             {% if medium in all_formats %}
               <span>
                 {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
-                {{ medium }}
+                {% if medium=="(:unav)" %}
+                  unk
+                {% else %}
+                  {{ medium }}
+                {% endif %}
               </span>
             {% endif %}
           {% endfor %}
