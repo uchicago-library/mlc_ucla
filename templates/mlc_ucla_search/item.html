@@ -117,7 +117,7 @@
           <dt>Date:</dt>
           <dd>
             {% for i in date %}
-              {{ i }}<br>
+              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
             {% endfor %}
           </dd>
         {% endif %}
