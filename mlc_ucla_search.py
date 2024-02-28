@@ -309,8 +309,12 @@ access_key = {
 }
 
 def sortDictByFormat(item):
-    if( type(item) != str):
+    assert type(item) in (str, tuple)
+    if isinstance(item, tuple):
+        assert len(item)
+        assert isinstance(item[0], str)
         item = item[0]
+        
     order_of_formats = ["Sound", "image", "MP4", "VOB file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire", "(:unav)"]
     return order_of_formats.index(item) if item in order_of_formats else 999
 

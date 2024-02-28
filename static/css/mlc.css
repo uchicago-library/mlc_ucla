@@ -336,6 +336,14 @@ h1{
 		padding-bottom: 0;
 	}
 }
+@media (min-width: 768px){
+	.object-metadata dt{
+		flex-basis: 25% !important;
+	}
+	.object-metadata dd{
+		flex-basis: 75% !important;
+	}
+}
 
 .object-metadata dl>*:nth-child(4n-1),
 .object-metadata dl>*:nth-child(4n){
