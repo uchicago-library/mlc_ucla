@@ -8,20 +8,18 @@
       </h1>
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
     </div>
-    <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}"></span>
+    <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
     {% if panopto_identifier %}
-      {% if access_rights[0]|lower == 'campus' %}
-        <div id="alert-campus" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          {% trans %}This item is a streamable file but has an ‘Account Required’ label. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
-        </div>
-      {% elif access_rights[0]|lower == 'restricted' %}
-        <div id="alert-restricted" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          {% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}This item is a streamable file but has a ‘By Request’ label. <a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
-        </div>
-      {% endif %}
       {% if access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted' %}
+        <div id="alert-{{access_rights[0]|lower}}" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
+          <button id="close-panopto-alert" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          {% if access_rights[0]|lower == 'campus' %}
+              {% trans %}This item is a streamable file but has an ‘Account Required’ label. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
+            </div>
+          {% elif access_rights[0]|lower == 'restricted' %}
+              {% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}This item is a streamable file but has a ‘By Request’ label. <a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series. Please <a href="/login">login</a> and authenticate through the Panopto player, which might prompt a pop-up, or <a href="/request-account">request an account</a> first. See the <a href="/access-terms">terms of access page</a> for further information.{% endtrans %}
+          {% endif %}
+        </div>
         <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i></button>
       {% endif %}
       <!-- {{ panopto_identifier }} -->
@@ -56,7 +54,11 @@
           <dt>{% trans %}Item Title{% endtrans %}:</dt>
           <dd>
             {% for i in titles %}
-              {{ i }}<br>
+              {% if i=="(:unav)" %}
+                <!--(:unav)-->
+              {% else %}
+                {{ i }}<br>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -74,7 +76,11 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -83,7 +89,11 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -92,7 +102,11 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -101,7 +115,11 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term=ji{{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -110,7 +128,11 @@
           <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=location&term=ji{{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -119,7 +141,11 @@
           <dt>Date:</dt>
           <dd>
             {% for i in date %}
-              {{ i }}<br>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -164,7 +190,11 @@
           <dt>{% trans %}Media Type{% endtrans %}:</dt>
           <dd>
             {% for i in medium %}
-              {{ i }}<br>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                {{ i }}<br>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -172,11 +202,14 @@
         {% if all_formats and all_formats|length >0 %}
           <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
           <dd>
-          {% for medium in order_of_formats %}
-              {% if medium in all_formats %}
-                <span>{{ medium }}</span>
+            {% for medium in all_formats %}
+              {% if medium == "(:unav)" %}
+                <span>unk</span>
+              {% else %}
+                <span>
+                  {% if medium == "Sound" and panopto_in_child %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %} {{ medium }}</span>
               {% endif %}
-          {% endfor %}
+            {% endfor %}
           </dd>
         {% endif %}
       </dl>
@@ -196,14 +229,12 @@
           {% endif %}
           <h3 class="sr-only">Generation {{ level }}</h3>
           <ul class="no-style-list">
-          {% for medium in order_of_formats %}
-            {% if medium in formats %}
+            {% for medium in formats %}
               {% for descendant in formats[medium] %}
                 {% set item = descendant %}
                 {% include 'component-item-in-list.html' %}
               {% endfor %}
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
           </ul>
           <hr style="margin: 0; border-color: #aaa">
         {% endfor %}

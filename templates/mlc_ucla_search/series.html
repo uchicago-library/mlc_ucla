@@ -39,7 +39,11 @@
           <dt>{% trans %}Creator(s){% endtrans %}:</dt>
           <dd>
             {% for i in creator %}
-              <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -48,7 +52,11 @@
           <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
           <dd>
             {% for i in contributor %}
-              <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -57,7 +65,11 @@
           <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
           <dd>
             {% for i in subject_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -66,7 +78,11 @@
           <dt>{% trans %}Language{% endtrans %}:</dt>
           <dd>
             {% for i in primary_language %}
-              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -75,7 +91,11 @@
           <dt>{% trans %}Location{% endtrans %}:</dt>
           <dd>
             {% for i in location %}
-              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -84,7 +104,11 @@
           <dt>{% trans %}Date{% endtrans %}:</dt>
           <dd>
             {% for i in date %}
-              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}<br>
+              {% else %}
+                <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+              {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
@@ -101,13 +125,17 @@
         {% if all_formats and all_formats|length > 0 %}
           <dt>{% trans %}Formats{% endtrans %}:</dt>
           <dd>
-          {% for medium in order_of_formats %}
-            {% if medium in all_formats %}
-              <span>
-                {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
-                {{ medium }}
-              </span>
-            {% endif %}
+          {% for medium in all_formats %}
+            <span>
+              {% if medium=="(:unav)" %}
+                <span>unk</span>
+              {% else %}
+                <span>
+                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
+                  {{ medium }}
+                </span>
+              {% endif %}
+            </span>
           {% endfor %}
           </dd>
         {% endif %}
@@ -117,13 +145,13 @@
     <div class="item-list-faux-table">
       {% include 'component-item-in-list-header.html' %}
       <ul class="no-style-list">
-      {% for medium in order_of_formats %}
-        {% if medium in grouped_items and grouped_items[medium]|length > 0 %}
-          {% for item in grouped_items[medium] %}
-            {% include 'component-item-in-list.html' %}
-          {% endfor %}
-        {% endif %}
-      {% endfor %}
+        {% for medium in grouped_items %}
+          {% if grouped_items[medium]|length > 0 %}
+            {% for item in grouped_items[medium] %}
+              {% include 'component-item-in-list.html' %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
       </ul>
     </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->

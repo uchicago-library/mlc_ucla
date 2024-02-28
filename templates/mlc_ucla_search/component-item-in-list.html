@@ -10,7 +10,11 @@
       <span style="width: 20px;"></span>
     {% endif %}
     <span title="{% trans %}Type of Media{% endtrans %}">
-      {{item.medium[0]}}:
+      {% if item.medium[0]=="(:unav)" %}
+        unk:
+      {% else %}
+        {{item.medium[0]}}:
+      {% endif %}
     </span>
   </span>
 

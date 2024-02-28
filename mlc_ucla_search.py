@@ -6,6 +6,7 @@ from flask import abort, Blueprint, current_app, render_template, request, sessi
 from utils import GlottologLookup, MLCDB
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
+from collections import OrderedDict
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
@@ -307,6 +308,17 @@ access_key = {
     }
 }
 
+def sortDictByFormat(item):
+    assert type(item) in (str, tuple)
+    if isinstance(item, tuple):
+        assert len(item)
+        assert isinstance(item[0], str)
+        item = item[0]
+        
+    order_of_formats = ["Sound", "image", "MP4", "VOB file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire", "(:unav)"]
+    return order_of_formats.index(item) if item in order_of_formats else 999
+
+
 def sortListOfItems(item):
     if isinstance(item, tuple):
         item = item[1]
@@ -514,6 +526,7 @@ def series(noid):
         # Check if series has one item with a panopto file
         # Get details about one item with panopto file 
         #  to help locate series in panopto
+        all_formats.sort(reverse=False,key=sortDictByFormat)
         if i[1]['panopto_identifiers']:
             has_panopto = True # to display the Request Access button
             item_id_with_panopto = i[1]['identifier'][0]
@@ -521,6 +534,8 @@ def series(noid):
     # Sort Items by ID
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
+    # sort formats by custom order with sortDictByFormat
+    #grouped_items.sort(reverse=True,key=sortDictByFormat)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -544,7 +559,6 @@ def series(noid):
             'title_slug': title_slug,
             'has_panopto':has_panopto,
             'all_formats': all_formats,
-            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
@@ -599,6 +613,7 @@ def item(noid):
 
     # Descendats
     all_formats = []
+    panopto_in_child = False
     if len(item_data['descendants'])>0:
         for level, formats in item_data['descendants'].items():
             for medium, item_list in formats.items():
@@ -606,10 +621,18 @@ def item(noid):
                     fetched_item = mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
                         item_data['descendants'][level][medium][k] = fetched_item
-                        all_formats.append(medium)
+                        if( not medium in all_formats):
+                            all_formats.append(medium)
+                        # if 'panopto_links' in fetched_item :
+                        if len(fetched_item['panopto_links'])>0 :
+                            panopto_in_child = True
                     else:
                         item_data['descendants'][level][medium].pop(k)
+
+        all_formats.sort(key=sortDictByFormat)
         for level, formats in item_data['descendants'].items():
+            # sort mediums by custom order
+            item_data['descendants'][level] = OrderedDict(sorted(item_data['descendants'][level].items(), key=sortDictByFormat  ))
             for medium, item_list in formats.items():
                 item_data['descendants'][level][medium].sort(key=sortListOfItemsByID)
 
@@ -621,7 +644,7 @@ def item(noid):
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
             'all_formats': all_formats,
-            'order_of_formats' : ["Sound", "(:unav)", "image", "MP4", "video", "video_file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire"],
+            'panopto_in_child': panopto_in_child,
             'breadcrumb': breadcrumb})
     )
 

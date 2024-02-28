@@ -12,44 +12,41 @@ $(document).ready(function(){
 	}
 
 	function show_alert(){
+		console.log('show_alert');
+		//alert alert-warning alert-dismissible fade in
+		var alert;
+		var help_btn = $('#close-panopto-alert');
+		var user_var;
 		if(pdata.rights == 'campus'){
-			$('#alert-campus').removeClass('hidden')
-			.on('closed.bs.alert', function () {
-				$('#panopto-help').removeClass('hidden');
-				bind_help();
-				window.localStorage.setItem('timestamp_closed_campus_message', new Date().getTime());
-			});
-			window.localStorage.removeItem('timestamp_closed_campus_message');
+			alert = $('#alert-campus');
+			user_var = "timestamp_closed_campus_message";
 		}else if(pdata.rights == 'restricted'){
-			$('#alert-restricted').removeClass('hidden')
-			.on('closed.bs.alert', function () {
-				$('#panopto-help').removeClass('hidden');
-				bind_help();
-				window.localStorage.setItem('timestamp_closed_restricted_message', new Date().getTime());
-			});
-			window.localStorage.removeItem('timestamp_closed_restricted_message');
-
+			alert = $('#alert-restricted');
+			user_var = "timestamp_closed_restricted_message";
 		}
+
+		alert.removeClass('hidden');
+		help_btn.on('click', function () {
+			alert.removeClass('hidden');
+			alert.addClass('hidden');
+			window.localStorage.setItem(user_var, new Date().getTime());
+			show_help();
+		});
+		window.localStorage.removeItem(user_var);
 	}
 
 	if(pdata.identifier){
 		var user_closed;
-		var is_enough_time;
 		if(pdata.rights == 'campus'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_campus_message'));
 		}else if(pdata.rights == 'restricted'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 		}
-		is_enough_time = user_closed && current>(user_closed+enough_time);
-		// user has closed the message before
-		if( user_closed && !is_enough_time){
+		console.log('user_closed: '+user_closed);
+		if( !user_closed || ( pdata.cnetid=='None' &&  pdata.rights == 'restricted') ){
+			show_alert();
+		}else{
 			show_help();
 		}
-		// user has closed the message before, but enough time has ellapsed
-		// OR user did not close dismiss the message before
-		if( (user_closed && is_enough_time) || !user_closed ){
-			show_alert();
-		}
-
 	}
 });

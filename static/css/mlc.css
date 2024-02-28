@@ -20,6 +20,9 @@ html{	font-size: 14px; }
 body{	color: #000 }
 pre{	text-wrap: wrap; }
 a{		color: #3174ae }
+#global-navbar{
+  box-shadow: none;
+}
 .breadcrumbs{ padding-left: 15px; }
 
 .main-content{padding-top: 2rem; }
@@ -333,6 +336,14 @@ h1{
 		padding-bottom: 0;
 	}
 }
+@media (min-width: 768px){
+	.object-metadata dt{
+		flex-basis: 25% !important;
+	}
+	.object-metadata dd{
+		flex-basis: 75% !important;
+	}
+}
 
 .object-metadata dl>*:nth-child(4n-1),
 .object-metadata dl>*:nth-child(4n){
@@ -509,7 +520,7 @@ ul.no-style-list{
 /* =============== ITEM */
 #panopto-help{
 	padding: .2rem;
-	    margin-top: -20px;
+	margin-top: -30px;
 }
 /* Title Element */
 /* easy fix */
