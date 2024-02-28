@@ -11,3 +11,4 @@ data_import/local_db/
 data_import/export*
 *.db
 glottolog_lookup.json
+*.db-journal

@@ -203,15 +203,14 @@
         {% if all_formats and all_formats|length >0 %}
           <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
           <dd>
-          {% for medium in order_of_formats %}
-              {% if medium in all_formats %}
-                {% if medium == "(:unav)" %}
-                  unk
-                {% else %}
-                  {{ medium }}
-                {% endif %}
+            {% for medium in all_formats %}
+              {% if medium == "(:unav)" %}
+                <span>unk</span>
+              {% else %}
+                <span>
+                  {% if medium == "Sound" and panopto_in_child %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %} {{ medium }}</span>
               {% endif %}
-          {% endfor %}
+            {% endfor %}
           </dd>
         {% endif %}
       </dl>
