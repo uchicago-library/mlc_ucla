@@ -20,6 +20,9 @@ html{	font-size: 14px; }
 body{	color: #000 }
 pre{	text-wrap: wrap; }
 a{		color: #3174ae }
+#global-navbar{
+  box-shadow: none;
+}
 .breadcrumbs{ padding-left: 15px; }
 
 .main-content{padding-top: 2rem; }

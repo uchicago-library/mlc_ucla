@@ -4,10 +4,8 @@ $(document).ready(function(){
 	var current = new Date().getTime();
 
 	function show_help(){
-		console.log('show_help');
 		$('#panopto-help').removeClass('hidden')
 		.on('click', function (){
-			console.log('click help');
 			show_alert();
 			$('#panopto-help').addClass('hidden');
 		});
@@ -20,11 +18,9 @@ $(document).ready(function(){
 		var help_btn = $('#close-panopto-alert');
 		var user_var;
 		if(pdata.rights == 'campus'){
-			console.log('rights= campus');
 			alert = $('#alert-campus');
 			user_var = "timestamp_closed_campus_message";
 		}else if(pdata.rights == 'restricted'){
-			console.log('rights= restricted');
 			alert = $('#alert-restricted');
 			user_var = "timestamp_closed_restricted_message";
 		}
@@ -33,10 +29,7 @@ $(document).ready(function(){
 		help_btn.on('click', function () {
 			alert.removeClass('hidden');
 			alert.addClass('hidden');
-			console.log('user_var: '+user_var);
 			window.localStorage.setItem(user_var, new Date().getTime());
-			console.log('closed value: '+parseInt(window.localStorage.getItem(user_var)));
-			console.log('close alert');
 			show_help();
 		});
 		window.localStorage.removeItem(user_var);
@@ -50,12 +43,10 @@ $(document).ready(function(){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 		}
 		console.log('user_closed: '+user_closed);
-		if( user_closed ){
-			console.log('user closed');
-			show_help();
-		}else{
-			console.log('user NOT closed');
+		if( !user_closed || ( pdata.cnetid=='None' &&  pdata.rights == 'restricted') ){
 			show_alert();
+		}else{
+			show_help();
 		}
 	}
 });
