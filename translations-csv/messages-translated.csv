@@ -24,7 +24,7 @@ Search Results for,mlc_ucla_search.py:470 mlc_ucla_search.py:472,Resultados de b
 Search Results,mlc_ucla_search.py:474,Resultados de la búsqueda
 Suggest Corrections,mlc_ucla_search.py:665 templates/mlc_ucla_search/component-sidebar-right.html:84 templates/mlc_ucla_search/form-suggest-corrections.html:6,Sugerir correcciones
 Access Terms,mlc_ucla_search.py:683 ucla.py:78,Términos de acceso
-Online Language Archives,templates/ucla/home.html:9 ucla.py:29 ucla.py:32,Archivos Lingüístico Online
+Online Language Archive,templates/ucla/home.html:9 ucla.py:29 ucla.py:32,Archivo Lingüístico Online
 History,ucla.py:47,Historia
 Contribute your Material,ucla.py:53,Contribuya su material
 About the Contributors,ucla.py:59,Sobre los contribuyentes

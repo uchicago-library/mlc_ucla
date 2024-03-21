@@ -133,7 +133,7 @@ msgid "Access Terms"
 msgstr ""
 
 #: templates/ucla/home.html:9 ucla.py:29 ucla.py:32
-msgid "Online Language Archives"
+msgid "Online Language Archive"
 msgstr ""
 
 #: ucla.py:47

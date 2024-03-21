@@ -27,10 +27,10 @@ def inject_dict():
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
-                'Online Language Archives'
+                'Online Language Archive'
             ),
             'collection_title_banner': lazy_gettext(
-                'Online Language Archives'
+                'Online Language Archive'
             )
         }
     }
