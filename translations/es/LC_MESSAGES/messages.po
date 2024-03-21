@@ -141,8 +141,8 @@ msgid "Access Terms"
 msgstr "Términos de acceso"
 
 #: templates/ucla/home.html:9+ucla.py:29+ucla.py:32
-msgid "Online Language Archives"
-msgstr "Archivos Lingüístico Online"
+msgid "Online Language Archive"
+msgstr "Archivo Lingüístico Online"
 
 #: ucla.py:47
 msgid "History"

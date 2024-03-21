@@ -24,7 +24,7 @@
 "mlc_ucla_search.py:474","Search Results",""
 "mlc_ucla_search.py:665 templates/mlc_ucla_search/component-sidebar-right.html:84 templates/mlc_ucla_search/form-suggest-corrections.html:6","Suggest Corrections",""
 "mlc_ucla_search.py:683 ucla.py:78","Access Terms",""
-"templates/ucla/home.html:9 ucla.py:29 ucla.py:32","Online Language Archives",""
+"templates/ucla/home.html:9 ucla.py:29 ucla.py:32","Online Language Archive",""
 "ucla.py:47","History",""
 "ucla.py:53","Contribute your Material",""
 "ucla.py:59","About the Contributors",""
