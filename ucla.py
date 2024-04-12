@@ -13,7 +13,8 @@ app.register_blueprint(mlc_ucla_search)
 
 Session(app)
 
-babel = Babel(app, default_locale='en', locale_selector=get_locale)
+# babel = Babel(app, default_locale='en', locale_selector=get_locale)
+babel = Babel(app, default_locale='en')
 
 
 @app.context_processor
@@ -52,23 +53,23 @@ def contribute_material():
         'form-contribute-material.html',
         title_slug = lazy_gettext(u'Contribute your Material'),
     )
-@app.route('/about-contributors')
-def about_contributors():
+@app.route('/about-supporters')
+def about_supporters():
     return render_template(
-        'static-about-contributors.html',
-        title_slug = lazy_gettext(u'About the Contributors'),
+        'static-about-supporters.html',
+        title_slug = lazy_gettext(u'About the Supporters'),
     )
-@app.route('/aquisitions-guidelines')
-def aquisitions_guidelines():
+@app.route('/acquisitions-guidelines')
+def acquisitions_guidelines():
     return render_template(
-        'static-aquisitions-guidelines.html',
-        title_slug = lazy_gettext(u'Aquisitions Guidelines'),
+        'static-acquisitions-guidelines.html',
+        title_slug = lazy_gettext(u'Acquisitions Guidelines'),
     )
-@app.route('/aquisitions-policy')
-def aquisitions_policy():
+@app.route('/acquisitions-policy')
+def acquisitions_policy():
     return render_template(
-        'static-aquisitions-policy.html',
-        title_slug = lazy_gettext(u'Aquisitions Policy'),
+        'static-acquisitions-policy.html',
+        title_slug = lazy_gettext(u'Acquisitions Policy'),
     )
 
 @app.route('/access-terms')

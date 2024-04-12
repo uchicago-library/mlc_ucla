@@ -558,3 +558,54 @@ ul.no-style-list{
 	max-width: 100%;
   margin: 0 auto 1rem;
 }
+
+
+
+/* =============== Brand updates */
+nav.navbar.navbar-default{
+	background: white;
+	color: #800000;
+}
+#navbar-right > li > a,
+i.ask-icon{
+	color: #800000;
+}
+/* bottom nav and dropdowns */
+#global-navbar,
+#global-navbar .navbar-nav > li > a{
+	background: #800000;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+#global-navbar .navbar-nav > li.open > a,
+#global-navbar .navbar-nav > li > a:focus,
+#global-navbar .navbar-nav > li > a:hover{
+	background: #570000;
+}
+.navbar-default .navbar-nav .open .dropdown-menu{
+	background: #570000;
+}
+.navbar-default .navbar-nav .open .dropdown-menu a:hover{
+	color: white !important;
+	text-decoration: underline !important;
+}
+.navbar-default .navbar-nav .open .dropdown-menu hr{
+	background: #a6a6a6;
+}
+.ul-left{
+	border-right-color: #a6a6a6;
+}
+.twocol-head{
+	color: #d9d9d9;
+}
+
+footer.footer{
+	background: #404040;
+}
+/* mobile */
+.navbar-default .navbar-toggle .icon-bar{
+	background: #800000;
+}
+.mobile-topnav{
+	color: transparent;
+}
