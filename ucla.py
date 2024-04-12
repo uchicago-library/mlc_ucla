@@ -13,7 +13,8 @@ app.register_blueprint(mlc_ucla_search)
 
 Session(app)
 
-babel = Babel(app, default_locale='en', locale_selector=get_locale)
+# babel = Babel(app, default_locale='en', locale_selector=get_locale)
+babel = Babel(app, default_locale='en')
 
 
 @app.context_processor

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="UTF-8">
+      <title>
+    {% if title_slug %}
+      {{ title_slug }} |
+    {% endif %}
+     {{ trans.collection_title }}
+    </title>
+	<meta name="generator" content="Bootply" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://uchicago-library.github.io/LibPattern/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://uchicago-library.github.io/LibPattern/css/lib-main.css" rel="stylesheet">
+    <link href="https://uchicago-library.github.io/LibPattern/css/collex.css" rel="stylesheet">
+    <link href="/static/css/mlc.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="https://uchicago-library.github.io/LibPattern/css/calendar/font-awesome.min.css">
+  <link rel="icon" type="image/x-icon" href="https://lib.uchicago.edu/web-resources/img/favicon.ico">
+
+  <style>
+    .rightside dl {
+      display: block;
+      padding-left: 0;
+    }
+    .rightside dl dd {
+      border-bottom: none;
+      display: block;
+      flex-basis: auto;
+      padding-left: 0;
+      padding-top: 0;
+    }
+    .rightside dl dt {
+      border-bottom: none;
+      display: block;
+      flex-basis: auto;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+
+<body class="digitalobjectpage">
+  <div id="skip">
+    <a href="#content">{% trans %}Skip to Main Content{% endtrans %}</a>
+  </div>
+  <div>
+    {% include "header.html" %}
+    <div class="mlc-banner">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            <p class="w-100">{{ trans.collection_title }}</p>
+          </div>
+        </div>
+      </div>
+      </div>
+
+    <!-- Awesome Page Content -->
+    <div class="container"> <!-- Main Container Wrapper -->
+      <div class="row"> <!-- Off Canvas Wrapper Row -->
+        <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
+        <div class="col-xs-9 breadcrumbs">
+          <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
+          <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
+          <a href="/">{{ trans.collection_title }}</a> 
+          {% if breadcrumb or title_slug %}
+            &gt;
+            {{ breadcrumb|safe or title_slug}}
+          {% endif %}
+        </div> <!-- // Breadcrumbs -->
+
+        {# <div class="col-xs-3 text-right">
+          <form action="/language-change" method="POST">
+            <button type="submit"class="btn language-selector-btn">
+              <span class="lang-en">EN</span>/<span class="lang-es">ES</span>
+            </button>
+          </form>
+          <!-- locale is:{{ locale }} -->
+        </div>#}
+      </div>
+
+        <div class="row">
+          <div id="content" class="col-xs-12 pt-5 main-content">
+            <div class="row">
+
+              <div class="col-xs-12 {{ 'col-sm-8 col-md-8 col-lg-9' if not hide_right_column else 'col-md-12' }}">
+                {% block content %}{% endblock %}
+              </div>
+
+              {% if ( not hide_right_column ) %}
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+                  {% include 'component-sidebar-right.html' %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div> <!-- // Content Container -->
+      </div> <!-- // Off Canvas Wrapper Row -->
+      <!-- // Awesome Page Content -->
+      <div id="push"></div>
+      {% include 'footer.html' %}
+
+      <!-- Scripts -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script src="https://uchicago-library.github.io/LibPattern/js/jquery.min.js"></script>
+      {% set page = request.path.split('/') %}
+      {% if page[1] == "item" %}
+        <script src="/static/js/dismiss-alert-messages.js"></script>
+      {% endif %} 
+      <script src="https://uchicago-library.github.io/LibPattern/js/bootstrap.min.js"></script>
+      <script src="https://uchicago-library.github.io/LibPattern/js/lib-main.min.js"></script>
+      <!-- // Scripts -->
+    </div>
+  </body>
+  </html>
