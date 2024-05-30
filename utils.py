@@ -6,11 +6,9 @@ import urllib.parse
 import rdflib
 import sys
 from rdflib.plugins.sparql import prepareQuery
-from threading import Lock
 
 import regex as re
 
-lock = Lock()
 
 def regularize_string(_):
     """Regularize a string for browses by trimming excess whitespace,
@@ -1449,13 +1447,11 @@ class MLCDB:
         self.con = sqlite3.connect(self.config['DB'], check_same_thread=False)
         self.cur = self.con.cursor()
 
-        lock.acquire(True)
         for row in self.cur.execute('select id, info from item;').fetchall():
             self._item_info[row[0]] = json.loads(row[1])
+
         for row in self.cur.execute('select id, info from series;').fetchall():
             self._series_info[row[0]] = json.loads(row[1])
-        lock.release()
-    
 
     def convert_raw_query_to_fts(self, query):
         """
@@ -1517,8 +1513,7 @@ class MLCDB:
             # key=lambda i: i[1]*-1
 
         if( browse_sort == 'count' ):
-            lock.acquire(True)
-            results = sorted(
+           return sorted(
                 self.cur.execute('''
                     select term, count(id)
                     from browse
@@ -1529,11 +1524,8 @@ class MLCDB:
                                  ).fetchall(),
                 key=lambda i: i[1]*-1
             )
-            lock.release()
-            return results
         else:
-            lock.acquire(True)
-            results = sorted(
+            return sorted(
                 self.cur.execute('''
                     select term, count(id)
                     from browse
@@ -1544,8 +1536,6 @@ class MLCDB:
                                  ).fetchall(),
                 key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
             )
-            lock.release()
-            return results
 
     def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
         """
@@ -1578,7 +1568,6 @@ class MLCDB:
             self.connect()
 
         results = []
-        lock.acquire(True)
         for row in self.cur.execute(
             '''
                 select browse.id, series.info, 0.0
@@ -1591,7 +1580,6 @@ class MLCDB:
             (browse_type, browse_term)
         ).fetchall():
             results.append((row[0], json.loads(row[1]), row[2]))
-        lock.release()
         return results
 
     def get_formats_by_level(self, identifier):
@@ -1621,10 +1609,7 @@ class MLCDB:
             return out
     
         def get_has_format(i):
-            lock.acquire(True)
-            results = self.cur.execute('SELECT info FROM item WHERE id = ?', (i,))
-            lock.release()
-            for row in results:
+            for row in self.cur.execute('SELECT info FROM item WHERE id = ?', (i,)):
                 info = json.loads(row[0])
                 return info['has_format']
     
@@ -1715,10 +1700,8 @@ class MLCDB:
             self.connect()
 
         item_ids = []
-        lock.acquire(True)
         for row in self.cur.execute('select id from item;').fetchall():
             item_ids.append(row[0])
-        lock.release()
         return item_ids
 
     def get_items_for_series(self, identifier):
@@ -1735,16 +1718,13 @@ class MLCDB:
             self.connect()
 
         results = []
-        lock.acquire(True)
-        rows = self.cur.execute('''
+        for row in self.cur.execute('''
             select id
             from item
             where series_ids like ?
             ''',
             ('%' + identifier + '%',)
-        ).fetchall()
-        lock.release()
-        for row in rows:
+        ).fetchall():
             results.append(str(row[0]))
         return results
 
@@ -1821,10 +1801,7 @@ class MLCDB:
             '''
 
         series_results = []
-        lock.acquire(True)
-        rows = self.cur.execute(sql, vars).fetchall()
-        lock.release()
-        for row in rows:
+        for row in self.cur.execute(sql, vars).fetchall():
             if len(row) == 1:
                 series_results.append([row[0], [], 0.0])
             else:
@@ -1862,10 +1839,7 @@ class MLCDB:
             '''
 
         item_results = []
-        lock.acquire(True)
-        rows = self.cur.execute(sql, vars).fetchall()
-        lock.release()
-        for row in rows:
+        for row in self.cur.execute(sql, vars).fetchall():
             item_results.append((
                 row[0],
                 row[1].split('|')
@@ -1903,14 +1877,12 @@ class MLCDB:
         if not self.con:
             self.connect()
 
-        lock.acquire(True)
-        result = self.cur.execute(
-            'select info from series where id = ?',
-            (identifier,)
-        ).fetchone()[0]
-        lock.release()
-
-        return json.loads(result)
+        return json.loads(
+            self.cur.execute(
+                'select info from series where id = ?',
+                (identifier,)
+            ).fetchone()[0]
+        )
 
     def get_series_for_item(self, identifier):
         """
@@ -1926,14 +1898,13 @@ class MLCDB:
             self.connect()
 
         results = []
-        rows = self.cur.execute('''
+        for row in self.cur.execute('''
             select series_ids
             from item
             where id = ?
             ''',
             (identifier,)
-        ).fetchall()
-        for row in rows:
+        ).fetchall():
             for series_id in row[0].split('|'):
                 results.append(series_id)
         return results
@@ -1967,9 +1938,6 @@ class MLCDB:
             self.connect()
 
         series_ids = []
-        lock.acquire(True)
-        rows = self.cur.execute('select id from series;').fetchall()
-        lock.release()
-        for row in rows:
+        for row in self.cur.execute('select id from series;').fetchall():
             series_ids.append(row[0])
         return series_ids
