@@ -21,16 +21,6 @@ mlc_db = MLCDB({
 
 # FUNCTIONS
 
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(DB)
-    return g.db
-
-def close_db(exception):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
-
 def get_locale():
     """Language switching."""
     if 'language' not in session:
@@ -123,7 +113,6 @@ def cli_build_glottolog_lookup():
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
     """List browse terms."""
-    mlc_db.connect(get_db())
     for row in mlc_db.get_browse(browse_type):
         sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
 
@@ -135,7 +124,6 @@ def cli_get_browse(browse_type):
 @click.argument('browse_type')
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
-    mlc_db.connect(get_db())
     for row in mlc_db.get_browse_term(browse_type, browse_term):
         print_series(row[1])
 
@@ -146,7 +134,6 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    mlc_db.connect(get_db())
     print_item(mlc_db.get_item(item_identifier))
 
 
@@ -156,7 +143,6 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    mlc_db.connect(get_db())
     print_series(mlc_db.get_series(series_identifier))
 
 
@@ -166,7 +152,6 @@ def cli_get_series(series_identifier):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
-    mlc_db.connect(get_db())
     for i in mlc_db.get_item_list():
         if verbose:
             print_item(mlc_db.get_item(i))
@@ -180,7 +165,6 @@ def cli_list_items(verbose):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
-    mlc_db.connect(get_db())
     for i in mlc_db.get_series_list():
         if verbose:
             print_series(mlc_db.get_series(i))
@@ -195,7 +179,6 @@ def cli_list_series(verbose):
 @click.argument('term')
 @click.argument('facet')
 def cli_search(term, facet):
-    mlc_db.connect(get_db())
     for i in mlc_db.get_search(term, [facet], 'rank'):
         print(i[0])
         print(i[2])
@@ -400,8 +383,6 @@ def home():
 
 @mlc_ucla_search.route('/browse/')
 def browse():
-    mlc_db.connect(get_db())
-
     title_slugs = {
         'contributor': lazy_gettext(u'Browse by Contributors'),
         'creator':     lazy_gettext(u'Browse by Creator'),
@@ -461,8 +442,6 @@ def browse():
 
 @mlc_ucla_search.route('/search/')
 def search():
-    mlc_db.connect(get_db())
-
     facets = request.args.getlist('facet')
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
@@ -470,10 +449,10 @@ def search():
     db_results = mlc_db.get_search(query, facets, sort_type)
 
     # TESTING
-    test_access = []
-    for db_series in db_results:
-        series_data = mlc_db.get_series(db_series[0])
-        test_access.append(series_data['access_rights'])
+    # test_access = []
+    # for db_series in db_results:
+    #     series_data = mlc_db.get_series(db_series[0])
+    #     test_access.append(series_data['access_rights'])
     # print('target')
     # print(test_access)
     # END TESTING
@@ -482,7 +461,6 @@ def search():
     for db_series in db_results:
         series_data = mlc_db.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
-
         series_data['sub_items'] = []
         for i in db_series[1]:
             info = mlc_db.get_item(i)
@@ -509,8 +487,6 @@ def search():
 
 @mlc_ucla_search.route('/series/<noid>/')
 def series(noid):
-    mlc_db.connect(get_db())
-
     if not re.match('^[a-z0-9]{12}$', noid):
         mlc_ucla_search.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
@@ -588,8 +564,6 @@ def series(noid):
 
 @mlc_ucla_search.route('/item/<noid>/')
 def item(noid):
-    mlc_db.connect(get_db())
-
     if not re.match('^[a-z0-9]{12}$', noid):
         mlc_ucla_search.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(

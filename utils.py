@@ -1435,7 +1435,7 @@ class MLCDB:
         finally:
             cur.close()
 
-    def connect(self, con):
+    def connect(self):
         """
         Connect to database.
 
@@ -1445,10 +1445,9 @@ class MLCDB:
         Returns:
             None
         """
-        self.con = con
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
     
             for row in cur.execute('select id, info from item;').fetchall():
                 self._item_info[row[0]] = json.loads(row[1])
@@ -1457,6 +1456,7 @@ class MLCDB:
                 self._series_info[row[0]] = json.loads(row[1])
         finally: 
             cur.close()
+            con.close()
 
     def convert_raw_query_to_fts(self, query):
         """
@@ -1508,10 +1508,9 @@ class MLCDB:
             'location'
         )
 
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
     
             # sort browse results on case-insensitive characters only, stripping
             # out things like leading quotation marks. Because SQLite doesn't let
@@ -1545,6 +1544,7 @@ class MLCDB:
                 )
         finally:
             cur.close()
+            con.close()
 
     def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
         """
@@ -1573,10 +1573,9 @@ class MLCDB:
             'date'
         )
 
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
     
             results = []
             for row in cur.execute(
@@ -1593,6 +1592,7 @@ class MLCDB:
                 results.append((row[0], json.loads(row[1]), row[2]))
         finally:
             cur.close()
+            con.close()
 
         return results
 
@@ -1624,12 +1624,14 @@ class MLCDB:
     
         def get_has_format(i):
             try:
-                cur = self.con.cursor()
+                con = sqlite3.connect(self.config['DB'])
+                cur = con.cursor()
                 for row in cur.execute('SELECT info FROM item WHERE id = ?', (i,)):
                     info = json.loads(row[0])
                 return info['has_format']
             finally:
                 cur.close()
+                con.close()
     
         items_to_check = set((identifier,))
         items_to_check_next = set()
@@ -1671,7 +1673,7 @@ class MLCDB:
         Returns:
             dict: a metadata dictionary.
         """
-        if not self.con:
+        if self._item_info == {}:
             self.connect()
 
         info = copy.deepcopy(self._item_info[identifier])
@@ -1714,16 +1716,16 @@ class MLCDB:
         Returns:
             list: a list of item identifiers
         """
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             item_ids = []
             for row in cur.execute('select id from item;').fetchall():
                 item_ids.append(row[0])
             return item_ids
         finally:
             cur.close()
+            con.close()
 
     def get_items_for_series(self, identifier):
         """
@@ -1735,10 +1737,9 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             results = []
             for row in cur.execute('''
                 select id
@@ -1751,6 +1752,7 @@ class MLCDB:
             return results
         finally:
             cur.close()
+            con.close()
 
     def get_search(self, query, facets=[], sort_type='rank'):
         """
@@ -1769,8 +1771,6 @@ class MLCDB:
                   that series, and a rank.
         """
         assert sort_type in ('date', 'rank', 'series.id')
-
-        assert self.con is not None
 
         if query:
             query = self.convert_raw_query_to_fts(query)
@@ -1825,7 +1825,8 @@ class MLCDB:
 
         series_results = []
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             for row in cur.execute(sql, vars).fetchall():
                 if len(row) == 1:
                     series_results.append([row[0], [], 0.0])
@@ -1833,6 +1834,7 @@ class MLCDB:
                     series_results.append([row[0], [], row[1]])
         finally:
             cur.close()
+            con.close()
 
         # Execute item search.
 
@@ -1867,7 +1869,8 @@ class MLCDB:
 
         item_results = []
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             for row in cur.execute(sql, vars).fetchall():
                 item_results.append((
                     row[0],
@@ -1875,6 +1878,7 @@ class MLCDB:
                 ))
         finally:
             cur.close()
+            con.close()
 
         # Build a series lookup to speed up processing.
         series_lookup = {}
@@ -1905,18 +1909,13 @@ class MLCDB:
         Returns:
             dict: a metadata dictionary.
         """
-        assert self.con is not None
+        if self._series_info == {}:
+            self.connect()
 
-        try:
-            cur = self.con.cursor()
-            return json.loads(
-                cur.execute(
-                    'select info from series where id = ?',
-                    (identifier,)
-                ).fetchone()[0]
-            )
-        finally:
-            cur.close()
+        try: 
+            return self._series_info[identifier]
+        except KeyError:
+            return {}
 
     def get_series_for_item(self, identifier):
         """
@@ -1928,10 +1927,9 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             results = []
             for row in cur.execute('''
                 select series_ids
@@ -1945,6 +1943,7 @@ class MLCDB:
             return results
         finally:
             cur.close()
+            con.close()
 
     def get_series_info(self, series_id):
         """
@@ -1968,13 +1967,13 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        assert self.con is not None
-
         try:
-            cur = self.con.cursor()
+            con = sqlite3.connect(self.config['DB'])
+            cur = con.cursor()
             series_ids = []
             for row in cur.execute('select id from series;').fetchall():
                 series_ids.append(row[0])
             return series_ids
         finally:
             cur.close()
+            con.close()
