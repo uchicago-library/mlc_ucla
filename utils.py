@@ -1309,36 +1309,86 @@ class MLCDB:
         if os.path.exists(self.config['DB']):
             os.remove(self.config['DB'])
 
-        try:
-            cur = con.cursor()
-    
-            g = rdflib.Graph()
-            g.parse(self.config['MESO_TRIPLES'], format='turtle')
-            g.parse(self.config['TGN_TRIPLES'])
-    
-            mlc_graph = MLCGraph(self.config, g)
-    
-            # build an item to series lookup
-            item_series_lookup = {}
-            for item_id in mlc_graph.get_item_identifiers():
-                if item_id not in item_series_lookup:
-                    item_series_lookup[item_id] = []
-                for series_id in mlc_graph.get_series_identifiers_for_item(
-                        item_id):
-                    item_series_lookup[item_id].append(series_id)
-    
-            # build tables
-            cur.execute('begin')
-    
+        cur = con.cursor()
+
+        g = rdflib.Graph()
+        g.parse(self.config['MESO_TRIPLES'], format='turtle')
+        g.parse(self.config['TGN_TRIPLES'])
+
+        mlc_graph = MLCGraph(self.config, g)
+
+        # build an item to series lookup
+        item_series_lookup = {}
+        for item_id in mlc_graph.get_item_identifiers():
+            if item_id not in item_series_lookup:
+                item_series_lookup[item_id] = []
+            for series_id in mlc_graph.get_series_identifiers_for_item(
+                    item_id):
+                item_series_lookup[item_id].append(series_id)
+
+        # build tables
+        cur.execute('begin')
+
+        cur.execute('''
+            create table browse(
+                type text,
+                term text,
+                id text
+            );
+        ''')
+        cur.execute('''
+            create virtual table item using fts5(
+                id,
+                dbid,
+                has_panopto_link,
+                info,
+                medium,
+                text,
+                series_ids
+            );
+        ''')
+        cur.execute('''
+            create virtual table series using fts5(
+                id,
+                dbid,
+                date,
+                info,
+                text
+            );
+        ''')
+        cur.execute('commit')
+
+        # load data
+        cur.execute('begin')
+
+        # load browses
+        for browse_type in (
+            'contributor',
+            'creator',
+            'date',
+            'decade',
+            'language',
+            'location'
+        ):
+            for browse_term, identifiers in mlc_graph.get_browse_terms(
+                browse_type
+            ).items():
+                for identifier in identifiers:
+                    cur.execute('''
+                        insert into browse (type, term, id)
+                        values (?, ?, ?);
+                        ''',
+                                (
+                                    browse_type,
+                                    browse_term,
+                                    identifier
+                                )
+                                )
+
+        # load item
+        for i in mlc_graph.get_item_identifiers():
             cur.execute('''
-                create table browse(
-                    type text,
-                    term text,
-                    id text
-                );
-            ''')
-            cur.execute('''
-                create virtual table item using fts5(
+                insert into item (
                     id,
                     dbid,
                     has_panopto_link,
@@ -1346,94 +1396,41 @@ class MLCDB:
                     medium,
                     text,
                     series_ids
-                );
-            ''')
+                )
+                values (?, ?, ?, ?, ?, ?, ?);
+                ''',
+                        (
+                            i,
+                            mlc_graph.get_item_dbid(i),
+                            mlc_graph.get_item_has_panopto_link(i),
+                            json.dumps(mlc_graph.get_item_info(i)),
+                            json.dumps(mlc_graph.get_item_medium(i)),
+                            mlc_graph.get_search_tokens_for_item_identifier(i),
+                            '|'.join(item_series_lookup[i])
+                        )
+                        )
+
+        # load series
+        for i in mlc_graph.get_series_identifiers():
             cur.execute('''
-                create virtual table series using fts5(
+                insert into series (
                     id,
                     dbid,
                     date,
                     info,
-                    text
-                );
-            ''')
-            cur.execute('commit')
-    
-            # load data
-            cur.execute('begin')
-    
-            # load browses
-            for browse_type in (
-                'contributor',
-                'creator',
-                'date',
-                'decade',
-                'language',
-                'location'
-            ):
-                for browse_term, identifiers in mlc_graph.get_browse_terms(
-                    browse_type
-                ).items():
-                    for identifier in identifiers:
-                        cur.execute('''
-                            insert into browse (type, term, id)
-                            values (?, ?, ?);
-                            ''',
-                                    (
-                                        browse_type,
-                                        browse_term,
-                                        identifier
-                                    )
-                                    )
-    
-            # load item
-            for i in mlc_graph.get_item_identifiers():
-                cur.execute('''
-                    insert into item (
-                        id,
-                        dbid,
-                        has_panopto_link,
-                        info,
-                        medium,
-                        text,
-                        series_ids
-                    )
-                    values (?, ?, ?, ?, ?, ?, ?);
-                    ''',
-                            (
-                                i,
-                                mlc_graph.get_item_dbid(i),
-                                mlc_graph.get_item_has_panopto_link(i),
-                                json.dumps(mlc_graph.get_item_info(i)),
-                                json.dumps(mlc_graph.get_item_medium(i)),
-                                mlc_graph.get_search_tokens_for_item_identifier(i),
-                                '|'.join(item_series_lookup[i])
-                            )
-                            )
-    
-            # load series
-            for i in mlc_graph.get_series_identifiers():
-                cur.execute('''
-                    insert into series (
-                        id,
-                        dbid,
-                        date,
-                        info,
-                        text) values (?, ?, ?, ?, ?);
-                    ''',
-                            (
-                                i,
-                                mlc_graph.get_series_dbid(i),
-                                mlc_graph.get_series_date(i),
-                                json.dumps(mlc_graph.get_series_info(i)),
-                                mlc_graph.get_search_tokens_for_series_identifier(
-                                    i)
-                            )
-                            )
+                    text) values (?, ?, ?, ?, ?);
+                ''',
+                        (
+                            i,
+                            mlc_graph.get_series_dbid(i),
+                            mlc_graph.get_series_date(i),
+                            json.dumps(mlc_graph.get_series_info(i)),
+                            mlc_graph.get_search_tokens_for_series_identifier(
+                                i)
+                        )
+                        )
 
-            cur.execute('commit')
-        finally:
-            cur.close()
+        cur.execute('commit')
 
     def connect(self):
         """
@@ -1445,8 +1442,7 @@ class MLCDB:
         Returns:
             None
         """
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
     
             for row in cur.execute('select id, info from item;').fetchall():
@@ -1454,9 +1450,6 @@ class MLCDB:
     
             for row in cur.execute('select id, info from series;').fetchall():
                 self._series_info[row[0]] = json.loads(row[1])
-        finally: 
-            cur.close()
-            con.close()
 
     def convert_raw_query_to_fts(self, query):
         """
@@ -1508,8 +1501,7 @@ class MLCDB:
             'location'
         )
 
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
     
             # sort browse results on case-insensitive characters only, stripping
@@ -1542,9 +1534,6 @@ class MLCDB:
                     ).fetchall(),
                     key=lambda i: re.sub(u'\\P{L}+', '', i[0]).lower()
                 )
-        finally:
-            cur.close()
-            con.close()
 
     def get_browse_term(self, browse_type, browse_term, sort_field='dbid'):
         """
@@ -1573,8 +1562,7 @@ class MLCDB:
             'date'
         )
 
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
     
             results = []
@@ -1590,9 +1578,6 @@ class MLCDB:
                 (browse_type, browse_term)
             ).fetchall():
                 results.append((row[0], json.loads(row[1]), row[2]))
-        finally:
-            cur.close()
-            con.close()
 
         return results
 
@@ -1623,15 +1608,11 @@ class MLCDB:
             return out
     
         def get_has_format(i):
-            try:
-                con = sqlite3.connect(self.config['DB'])
+            with sqlite3.connect(self.config['DB']) as con:
                 cur = con.cursor()
                 for row in cur.execute('SELECT info FROM item WHERE id = ?', (i,)):
                     info = json.loads(row[0])
                 return info['has_format']
-            finally:
-                cur.close()
-                con.close()
     
         items_to_check = set((identifier,))
         items_to_check_next = set()
@@ -1716,16 +1697,12 @@ class MLCDB:
         Returns:
             list: a list of item identifiers
         """
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             item_ids = []
             for row in cur.execute('select id from item;').fetchall():
                 item_ids.append(row[0])
             return item_ids
-        finally:
-            cur.close()
-            con.close()
 
     def get_items_for_series(self, identifier):
         """
@@ -1737,8 +1714,7 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             results = []
             for row in cur.execute('''
@@ -1750,9 +1726,6 @@ class MLCDB:
             ).fetchall():
                 results.append(str(row[0]))
             return results
-        finally:
-            cur.close()
-            con.close()
 
     def get_search(self, query, facets=[], sort_type='rank'):
         """
@@ -1824,17 +1797,13 @@ class MLCDB:
             '''
 
         series_results = []
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             for row in cur.execute(sql, vars).fetchall():
                 if len(row) == 1:
                     series_results.append([row[0], [], 0.0])
                 else:
                     series_results.append([row[0], [], row[1]])
-        finally:
-            cur.close()
-            con.close()
 
         # Execute item search.
 
@@ -1868,17 +1837,13 @@ class MLCDB:
             '''
 
         item_results = []
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             for row in cur.execute(sql, vars).fetchall():
                 item_results.append((
                     row[0],
                     row[1].split('|')
                 ))
-        finally:
-            cur.close()
-            con.close()
 
         # Build a series lookup to speed up processing.
         series_lookup = {}
@@ -1927,8 +1892,7 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             results = []
             for row in cur.execute('''
@@ -1941,9 +1905,6 @@ class MLCDB:
                 for series_id in row[0].split('|'):
                     results.append(series_id)
             return results
-        finally:
-            cur.close()
-            con.close()
 
     def get_series_info(self, series_id):
         """
@@ -1967,13 +1928,9 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        try:
-            con = sqlite3.connect(self.config['DB'])
+        with sqlite3.connect(self.config['DB']) as con:
             cur = con.cursor()
             series_ids = []
             for row in cur.execute('select id from series;').fetchall():
                 series_ids.append(row[0])
             return series_ids
-        finally:
-            cur.close()
-            con.close()
