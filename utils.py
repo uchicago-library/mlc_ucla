@@ -1,7 +1,7 @@
+import apsw
 import copy
 import json
 import os
-import sqlite3
 import urllib.parse
 import rdflib
 import sys
@@ -9,6 +9,7 @@ from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
 
+apsw.config(apsw.SQLITE_CONFIG_MULTITHREAD)
 
 def regularize_string(_):
     """Regularize a string for browses by trimming excess whitespace,
@@ -1442,13 +1443,11 @@ class MLCDB:
         Returns:
             None
         """
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
-    
-            for row in cur.execute('select id, info from item;').fetchall():
+        with apsw.Connection(self.config['DB']) as con:
+            for row in con.execute('select id, info from item;').fetchall():
                 self._item_info[row[0]] = json.loads(row[1])
     
-            for row in cur.execute('select id, info from series;').fetchall():
+            for row in con.execute('select id, info from series;').fetchall():
                 self._series_info[row[0]] = json.loads(row[1])
 
     def convert_raw_query_to_fts(self, query):
@@ -1501,9 +1500,7 @@ class MLCDB:
             'location'
         )
 
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
-    
+        with apsw.Connection(self.config['DB']) as con:
             # sort browse results on case-insensitive characters only, stripping
             # out things like leading quotation marks. Because SQLite doesn't let
             # us strip out things like punctuation for sorting we do that after
@@ -1512,7 +1509,7 @@ class MLCDB:
     
             if browse_sort == 'count':
                 return sorted(
-                    cur.execute('''
+                    con.execute('''
                         select term, count(id)
                         from browse
                         where type=?
@@ -1524,7 +1521,7 @@ class MLCDB:
                 )
             else:
                 return sorted(
-                    cur.execute('''
+                    con.execute('''
                         select term, count(id)
                         from browse
                         where type=?
@@ -1562,11 +1559,9 @@ class MLCDB:
             'date'
         )
 
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
-    
+        with apsw.Connection(self.config['DB']) as con:
             results = []
-            for row in cur.execute(
+            for row in con.execute(
                 '''
                     select browse.id, series.info, 0.0
                     from browse
@@ -1608,9 +1603,8 @@ class MLCDB:
             return out
     
         def get_has_format(i):
-            with sqlite3.connect(self.config['DB']) as con:
-                cur = con.cursor()
-                for row in cur.execute('SELECT info FROM item WHERE id = ?', (i,)):
+            with apsw.Connection(self.config['DB']) as con:
+                for row in con.execute('SELECT info FROM item WHERE id = ?', (i,)):
                     info = json.loads(row[0])
                 return info['has_format']
     
@@ -1654,9 +1648,6 @@ class MLCDB:
         Returns:
             dict: a metadata dictionary.
         """
-        if self._item_info == {}:
-            self.connect()
-
         info = copy.deepcopy(self._item_info[identifier])
 
         # load item hasFormat / isFormatOf relationships
@@ -1697,10 +1688,9 @@ class MLCDB:
         Returns:
             list: a list of item identifiers
         """
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
+        with apsw.Connection(self.config['DB']) as con:
             item_ids = []
-            for row in cur.execute('select id from item;').fetchall():
+            for row in con.execute('select id from item;').fetchall():
                 item_ids.append(row[0])
             return item_ids
 
@@ -1714,10 +1704,9 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
+        with apsw.Connection(self.config['DB']) as con:
             results = []
-            for row in cur.execute('''
+            for row in con.execute('''
                 select id
                 from item
                 where series_ids like ?
@@ -1797,9 +1786,8 @@ class MLCDB:
             '''
 
         series_results = []
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
-            for row in cur.execute(sql, vars).fetchall():
+        with apsw.Connection(self.config['DB']) as con:
+            for row in con.execute(sql, vars).fetchall():
                 if len(row) == 1:
                     series_results.append([row[0], [], 0.0])
                 else:
@@ -1837,9 +1825,8 @@ class MLCDB:
             '''
 
         item_results = []
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
-            for row in cur.execute(sql, vars).fetchall():
+        with apsw.Connection(self.config['DB']) as con:
+            for row in con.execute(sql, vars).fetchall():
                 item_results.append((
                     row[0],
                     row[1].split('|')
@@ -1874,9 +1861,6 @@ class MLCDB:
         Returns:
             dict: a metadata dictionary.
         """
-        if self._series_info == {}:
-            self.connect()
-
         try: 
             return self._series_info[identifier]
         except KeyError:
@@ -1892,10 +1876,9 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
+        with apsw.Connection(self.config['DB']) as con:
             results = []
-            for row in cur.execute('''
+            for row in con.execute('''
                 select series_ids
                 from item
                 where id = ?
@@ -1928,9 +1911,8 @@ class MLCDB:
         Returns:
             list: a list of series identifiers.
         """
-        with sqlite3.connect(self.config['DB']) as con:
-            cur = con.cursor()
+        with apsw.Connection(self.config['DB']) as con:
             series_ids = []
-            for row in cur.execute('select id from series;').fetchall():
+            for row in con.execute('select id from series;').fetchall():
                 series_ids.append(row[0])
             return series_ids

@@ -12,13 +12,6 @@ from collections import OrderedDict
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
 
-mlc_db = MLCDB({
-    'DB': DB,
-    'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
-    'MESO_TRIPLES': MESO_TRIPLES,
-    'TGN_TRIPLES': TGN_TRIPLES
-})
-
 # FUNCTIONS
 
 def get_locale():
@@ -86,6 +79,16 @@ def print_series(series_info):
         ' | '.join(series_info['description'])
     ))
 
+@mlc_ucla_search.before_app_request
+def before_request():
+    if 'mlc_db' not in g:
+        g.mlc_db = MLCDB({
+            'DB': DB,
+            'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
+            'MESO_TRIPLES': MESO_TRIPLES,
+            'TGN_TRIPLES': TGN_TRIPLES
+        })
+        g.mlc_db.connect()
 
 @mlc_ucla_search.cli.command(
     'build-db',
@@ -93,7 +96,7 @@ def print_series(series_info):
 )
 def cli_build_db():
     """Build a SQLite database from linked data triples."""
-    mlc_db.build_db()
+    g.mlc_db.build_db()
 
 
 @mlc_ucla_search.cli.command(
@@ -113,7 +116,7 @@ def cli_build_glottolog_lookup():
 @click.argument('browse_type')
 def cli_get_browse(browse_type):
     """List browse terms."""
-    for row in mlc_db.get_browse(browse_type):
+    for row in g.mlc_db.get_browse(browse_type):
         sys.stdout.write('{} ({})\n'.format(row[0], row[1]))
 
 
@@ -124,7 +127,7 @@ def cli_get_browse(browse_type):
 @click.argument('browse_type')
 @click.argument('browse_term')
 def cli_get_browse_term(browse_type, browse_term):
-    for row in mlc_db.get_browse_term(browse_type, browse_term):
+    for row in g.mlc_db.get_browse_term(browse_type, browse_term):
         print_series(row[1])
 
 
@@ -134,7 +137,7 @@ def cli_get_browse_term(browse_type, browse_term):
 )
 @click.argument('item_identifier')
 def cli_get_item(item_identifier):
-    print_item(mlc_db.get_item(item_identifier))
+    print_item(g.mlc_db.get_item(item_identifier))
 
 
 @mlc_ucla_search.cli.command(
@@ -143,7 +146,7 @@ def cli_get_item(item_identifier):
 )
 @click.argument('series_identifier')
 def cli_get_series(series_identifier):
-    print_series(mlc_db.get_series(series_identifier))
+    print_series(g.mlc_db.get_series(series_identifier))
 
 
 @mlc_ucla_search.cli.command(
@@ -152,9 +155,9 @@ def cli_get_series(series_identifier):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_items(verbose):
-    for i in mlc_db.get_item_list():
+    for i in g.mlc_db.get_item_list():
         if verbose:
-            print_item(mlc_db.get_item(i))
+            print_item(g.mlc_db.get_item(i))
         else:
             sys.stdout.write('{}\n'.format(i))
 
@@ -165,9 +168,9 @@ def cli_list_items(verbose):
 )
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output.')
 def cli_list_series(verbose):
-    for i in mlc_db.get_series_list():
+    for i in g.mlc_db.get_series_list():
         if verbose:
-            print_series(mlc_db.get_series(i))
+            print_series(g.mlc_db.get_series(i))
         else:
             sys.stdout.write('{}\n'.format(i))
 
@@ -179,7 +182,7 @@ def cli_list_series(verbose):
 @click.argument('term')
 @click.argument('facet')
 def cli_search(term, facet):
-    for i in mlc_db.get_search(term, [facet], 'rank'):
+    for i in g.mlc_db.get_search(term, [facet], 'rank'):
         print(i[0])
         print(i[2])
         sys.stdout.write(('{}: {}\n' * 6 + '\n').format(
@@ -415,7 +418,7 @@ def browse():
         if browse_type == 'decade':
             sort_field = 'date'
 
-        results = mlc_db.get_browse_term(browse_type, browse_term, sort_field)
+        results = g.mlc_db.get_browse_term(browse_type, browse_term, sort_field)
 
         results_with_label_ui_data = []
         for item in results:
@@ -436,7 +439,7 @@ def browse():
         return render_template(
             'browse.html',
             title_slug=title_slugs[browse_type],
-            browse_terms=mlc_db.get_browse(browse_type, browse_sort),
+            browse_terms=g.mlc_db.get_browse(browse_type, browse_sort),
             browse_type=browse_type
         )
 
@@ -446,12 +449,12 @@ def search():
     query = request.args.get('query')
     sort_type = request.args.get('sort', 'rank')
 
-    db_results = mlc_db.get_search(query, facets, sort_type)
+    db_results = g.mlc_db.get_search(query, facets, sort_type)
 
     # TESTING
     # test_access = []
     # for db_series in db_results:
-    #     series_data = mlc_db.get_series(db_series[0])
+    #     series_data = g.mlc_db.get_series(db_series[0])
     #     test_access.append(series_data['access_rights'])
     # print('target')
     # print(test_access)
@@ -459,11 +462,11 @@ def search():
 
     processed_results = []
     for db_series in db_results:
-        series_data = mlc_db.get_series(db_series[0])
+        series_data = g.mlc_db.get_series(db_series[0])
         series_data['access_rights'] = get_access_label_obj(series_data)
         series_data['sub_items'] = []
         for i in db_series[1]:
-            info = mlc_db.get_item(i)
+            info = g.mlc_db.get_item(i)
             series_data['sub_items'].append(info)
         series_data['sub_items'].sort(key=sortListOfItemsByID)
         processed_results.append((db_series[0], series_data))
@@ -495,13 +498,13 @@ def series(noid):
         )
         abort(400)
 
-    series_data = mlc_db.get_series(BASE + noid)
+    series_data = g.mlc_db.get_series(BASE + noid)
 
     items = []
-    for i in mlc_db.get_items_for_series(BASE + noid):
+    for i in g.mlc_db.get_items_for_series(BASE + noid):
         items.append((
             i,
-            mlc_db.get_item(i)
+            g.mlc_db.get_item(i)
         ))
 
     # Iterate through all items to regroup and extract information
@@ -572,7 +575,7 @@ def item(noid):
         )
         abort(400)
 
-    item_data = mlc_db.get_item(BASE + noid, True)
+    item_data = g.mlc_db.get_item(BASE + noid, True)
 
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
@@ -580,8 +583,8 @@ def item(noid):
         panopto_identifier = ''
 
     series = []
-    for s in mlc_db.get_series_for_item(BASE + noid):
-        series.append((s, mlc_db.get_series_info(s)))
+    for s in g.mlc_db.get_series_for_item(BASE + noid):
+        series.append((s, g.mlc_db.get_series_info(s)))
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
@@ -616,7 +619,7 @@ def item(noid):
         for level, formats in item_data['descendants'].items():
             for medium, item_list in formats.items():
                 for k, item in reversed(list(enumerate(item_list))):
-                    fetched_item = mlc_db.get_item(item)
+                    fetched_item = g.mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
                         item_data['descendants'][level][medium][k] = fetched_item
                         if( not medium in all_formats):
