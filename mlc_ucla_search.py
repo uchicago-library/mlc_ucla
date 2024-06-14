@@ -397,7 +397,7 @@ def browse():
 
     browse_type = request.args.get('type')
     if browse_type not in title_slugs.keys():
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), type parameter not a key in browses dict.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -491,7 +491,7 @@ def search():
 @mlc_ucla_search.route('/series/<noid>/')
 def series(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )
@@ -568,7 +568,7 @@ def series(noid):
 @mlc_ucla_search.route('/item/<noid>/')
 def item(noid):
     if not re.match('^[a-z0-9]{12}$', noid):
-        mlc_ucla_search.logger.debug(
+        current_app.logger.debug(
             'in {}(), user-supplied noid appears invalid.'.format(
                 sys._getframe().f_code.co_name
             )
