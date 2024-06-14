@@ -33,6 +33,13 @@ pip install -r requirements.txt
 Get a copy of local.py from another developer or from one of the production
 servers and place it in the mlc directory.
 
+Alternatively, once you get a copy of local.py, you can run the site locally
+with mod_wsgi with Docker:
+```console
+docker build -t <imagename> .
+docker run -p 8080:80 -it <imagename>
+```
+
 Build a Glottolog lookup and SQLite database for the site.
 ```console
 flask build-glottolog-lookup
