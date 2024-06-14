@@ -1,3 +1,4 @@
+apsw
 docopt
 flask
 openpyxl
