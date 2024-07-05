@@ -5,62 +5,6 @@
   <div class="title-wrapper">
     <h1>{% trans %}Request Account for Access{% endtrans %}</h1>
   </div>
-  <p style="max-width: 600px">
-    {% trans %}This form is for visitors who do not have a UChicago ID. It allows them to request an account for accessing the Mesoamerican Language Collection Portal. An account is required to access content that is restricted or under controlled access. For more information visit <a href="/access-terms">/access-terms</a>.{% endtrans %}
-  </p>
-  <p style="max-width: 600px">
-    {% trans %}Please briefly describe the purpose of your access. Once you click 'Submit,' you will be directed to a confirmation receipt of your request. Account requests are reviewed individually and typically processed within five business days. You will receive an email with instructions on how to use your account.{% endtrans %}
-  </p>
-  <form class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
-    <div class="row">
-      <div class="col-xs-12">
-        <input type="hidden" name="msg_type" value="request_account">
-        <div class="form-group">
-          <label for="name">{% trans %}Name{% endtrans %}*</label>
-          <input type="text" class="form-control" id="name" name="User's Name" placeholder="{% trans %}Enter your name{% endtrans %}" required>
-        </div>
-        <div class="form-group">
-          <label for="email">{% trans %}Email address{% endtrans %}*</label>
-          <input type="email" class="form-control" id="Email" name="User's Email" placeholder="{% trans %}Enter your email address{% endtrans %}" required onchange="document.getElementById('cgimailfrom').value =(this.value)">
-        </div>
-        <div class="form-group">
-          <label for="birthdate">{% trans %}Birthdate{% endtrans %}*</label>
-          <input type="date" class="form-control" id="birthday" name="User's Birthday" value="2005-01-01" required>
-        </div>
-        <div class="form-group">
-          <label for="requestReason">{% trans %}Reason for Request{% endtrans %}*</label>
-          <select name="Reason for Request" id="requestReason" class="form-control" required onchange="showIfOther()">
-            <option value="" disabled selected>Select an option</option>
-            <option value="student">I am a student doing research in this field</option>
-            <option value="academic">I am an academic doing research in this field</option>
-            <option value="community">I am a member of a language community represented in the collection</option>
-            <option value="other">Other. Please describe your interest (followed by text box)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="requestReasonOther" style="display:none">{% trans %}Name{% endtrans %}</label>
-          <input type="text" class="form-control" id="requestReasonOther" name="Other Request Reason" placeholder="{% trans %}Please specify{% endtrans %}" style="display:none">
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" required> {% trans %}I agree to the terms stated in the{% endtrans %} <a href="https://www.lib.uchicago.edu/scrc/visiting/policies-governing-use-archives-manuscripts-and-special-collections/">{% trans %}policy{% endtrans %}</a>.
-          </label>
-        </div>
-        <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
-      </div>
-    </div>
-    <script type="text/javascript">
-      function showIfOther() {
-        let el = document.getElementById("requestReasonOther");
-        if (document.getElementById("requestReason").value == "other") {
-            el.style.display = "block";
-            el.required = true;
-        } else {
-            el.style.display = "none";
-            el.required = false;
-        }
-      }
-    </script>
-  </form>
+  <p>This feature is currently unavailable.</p>
 </div>
 {% endblock %}
