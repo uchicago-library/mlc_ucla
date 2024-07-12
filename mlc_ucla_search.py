@@ -451,15 +451,6 @@ def search():
 
     db_results = g.mlc_db.get_search(query, facets, sort_type)
 
-    # TESTING
-    # test_access = []
-    # for db_series in db_results:
-    #     series_data = g.mlc_db.get_series(db_series[0])
-    #     test_access.append(series_data['access_rights'])
-    # print('target')
-    # print(test_access)
-    # END TESTING
-
     processed_results = []
     for db_series in db_results:
         series_data = g.mlc_db.get_series(db_series[0])
