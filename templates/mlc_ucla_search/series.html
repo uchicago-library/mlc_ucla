@@ -1,18 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="" id="content" role="main">
-    <div class="title-wrapper">
-      <h1>
-        <i class="fa fa-folder-open-o" aria-hidden="true"></i> {{ title_slug }}
-      </h1>
-      <div class="title-id-badge">
-        <!-- <span class="text-muted-extra"> {{ identifier.0 }}</span> -->
-        <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
-      </div>
+  {# BOOTSTRAP PANEL #}
+  {# <div class="panel panel-default">
+    <div class="panel-heading">
+      Panel heading without title
     </div>
+    <div class="panel-body">
+      Panel content
+    </div>
+  </div> #}
 
-    <div class="object-metadata">
+  <div class="" id="content" role="main">
+
+    {# OBJECT TITLE #}
+    {% include 'component-object-title.html' %}
+
+    {# METADATA #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Item Data{% endtrans %}</h2>
+      </div>
       <dl>
         {% if alternative_title %}
           <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
@@ -141,18 +149,24 @@
         {% endif %}
       </dl>
     </div>
-    <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-    <div class="item-list-faux-table">
-      {% include 'component-item-in-list-header.html' %}
-      <ul class="no-style-list">
-        {% for medium in grouped_items %}
-          {% if grouped_items[medium]|length > 0 %}
-            {% for item in grouped_items[medium] %}
-              {% include 'component-item-in-list.html' %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </ul>
+    
+    {# ITEM LIST #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Items in the Series{% endtrans %}</h2>
+      </div>
+      <div class="item-list-faux-table">
+        {% include 'component-item-in-list-header.html' %}
+        <ul class="no-style-list">
+          {% for medium in grouped_items %}
+            {% if grouped_items[medium]|length > 0 %}
+              {% for item in grouped_items[medium] %}
+                {% include 'component-item-in-list.html' %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
     </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}

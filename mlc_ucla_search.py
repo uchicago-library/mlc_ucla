@@ -299,11 +299,11 @@ def submission_receipt():
 access_key = {
     'restricted': {
         'trans': lazy_gettext(u'By Request'),
-        'class': ''
+        'class': 'warning'
     },
     'campus': {
         'trans': lazy_gettext(u'Account Required'),
-        'class': 'warning'
+        'class': 'info'
     },
     'public domain':  {
         'trans': lazy_gettext(u'Open'),

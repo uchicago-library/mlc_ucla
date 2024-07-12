@@ -8,6 +8,7 @@
 /* =============== METADATA */	
 /* =============== ITEMS */
 /* =============== BROWSE */
+/* =============== OBJECTS */
 /* =============== ITEM */
 /* =============== Panopto */
 
@@ -17,7 +18,7 @@ doesn't seem necessary. */
 	padding: 0;
 }*/
 html{	font-size: 14px; }
-body{	color: #000 }
+body{	color: #000; background: #fcfcfc }
 pre{	text-wrap: wrap; }
 a{		color: #3174ae }
 #global-navbar{
@@ -517,6 +518,28 @@ ul.no-style-list{
 }
 .browse-list-wrapper ul li a .browse-item-count{
 }
+
+/* =============== OBJECTS */
+
+/*dl dd, dl dt{
+	padding-left:12px;
+	padding-right:12px;
+	border: none;
+}*/
+/*dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
+	background-color: #fafafa;
+}*/
+.panel{
+	padding:12px;
+	/* border-radius:8px;background-color:#fff;border:none;*/
+}
+.panel h1{
+	margin-bottom: .2em;
+	border: none;
+	padding: 5px 0;
+  margin: 0;
+}
+
 /* =============== ITEM */
 #panopto-help{
 	padding: .2rem;
