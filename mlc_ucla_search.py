@@ -210,7 +210,7 @@ def cli_search(term, facet):
 
 cgimail_dic= {
     'default' : {
-        'from' : 'MLC Website <vitorg@uchicago.edu>'
+        'from' : 'MLC Website'
     },
     'error': {
         'title': lazy_gettext('Error'),
@@ -218,13 +218,13 @@ cgimail_dic= {
     },
     'request_account': {
         'rcpt': 'askscrc',
-        'subject': '[TEST] Request for MLC account',
+        'subject': 'Request for MLC account',
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.')
     },
     'request_access': {
         'rcpt': 'askscrc',
-        'subject': '[TEST] Request for access to MLC restricted series',
+        'subject': 'Request for access to MLC restricted series',
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for your interest in this content. '
             'Request to content access is typically processed within 3 businessdays. '
@@ -234,7 +234,7 @@ cgimail_dic= {
     },
     'feedback': {
         'rcpt': 'woken',
-        'subject': '[TEST] Feedback about Mesoamerican Language Collection Portal',
+        'subject': 'Feedback about Mesoamerican Language Collection Portal',
         'title': lazy_gettext('Thank you for your submission'),
         'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
     }
