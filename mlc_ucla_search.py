@@ -518,11 +518,11 @@ def series(noid):
         # Check if series has one item with a panopto file
         # Get details about one item with panopto file 
         #  to help locate series in panopto
-        all_formats.sort(reverse=False,key=sortDictByFormat)
         if i[1]['panopto_identifiers']:
             has_panopto = True # to display the Request Access button
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
+    all_formats.sort(reverse=False,key=sortDictByFormat)
     # Sort Items by ID
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
