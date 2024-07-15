@@ -1,74 +1,79 @@
 <div class="panel panel-default">
-  <div>
+  <div class="panel-body">
     {# CHARACTERIZATION #}
-    {% if series %}
-      <span style="display:inline-block;">
-        <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-          <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-          {{ series[0].1.titles.0 }}
-        </a><br>
-      </span>
-    {% endif %}
-    <!-- {{ identifier.0 }} -->
-    <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+    <div>
+      {% if series %}
+        <span style="display:inline-block;">
+          <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+            <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+            {{ series[0].1.titles.0 }}
+          </a><br>
+        </span>
+      {% endif %}
+      <!-- {{ identifier.0 }} -->
+      <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
 
-    {% if medium %}
-        {% for i in medium %}
-          <span class="badge badge-default">
-            {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}
-            {% else %}
-              <i class="fa fa-file" aria-hidden="true"></i> &nbsp;
-              {{ i }}<br>
-            {% endif %}
-          </span>
+      {% if medium %}
+          {% for i in medium %}
+            <span class="badge badge-default" title="{% trans %}Format{% endtrans %}">
+              {% if i=="(:unav)" %}
+                {% trans %}unknown{% endtrans %}
+              {% else %}
+                <i class="fa fa-file" aria-hidden="true"></i> &nbsp;
+                {{ i }}<br>
+              {% endif %}
+            </span>
+          {% endfor %}
+      {% endif %}
+    </div>
+
+    {# TITLE #}
+    <h1  title="{% trans %}Object title{% endtrans %}">
+      {% if not series %}
+        <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
+      {% endif %}
+      {{ title_slug }}
+    </h1>
+
+    {# DETAILS #}
+    <div>
+      {% if subject_language %}
+        {% set l = subject_language|length %}
+        {% for i in subject_language %}
+          {% if i=="(:unav)" %}
+            <span title="{% trans %}Unknown indigenous language{% endtrans %}">{% trans %}unknown{% endtrans %}</span>
+          {% else %}
+            <a href="/browse?type=language&term={{ i|urlencode }}" title="{% trans %}Indigenous language{% endtrans %}">{{ i }}</a>
+          {% endif %}
         {% endfor %}
-    {% endif %}
+      {% endif %} 
+
+      {% if location %}
+        <span> - </span>
+        {% set l = location|length %}
+        {% for i in location %}
+          {% if i=="(:unav)" %}
+            <span title="{% trans %}Unknown Location{% endtrans %}">{% trans %}unknown{% endtrans %} </span>
+          {% else %}
+            <a href="/browse?type=location&term={{ i|urlencode }}" title="{% trans %}Location{% endtrans %}">{{ i }}</a>
+          {% endif %}
+
+        {% endfor %}
+      {% endif %}
+
+      {% if date %}
+        <span> - </span>
+        {% set l = date|length %}
+        {% for i in date %}
+          {% if i=="(:unav)" %}
+            <span title="{% trans %}Unknown date{% endtrans %}">{% trans %}unknown{% endtrans %}</span>
+          {% else %}
+            <a href="/browse?type=date&term={{ i|urlencode }}" title="{% trans %}Date{% endtrans %}">{{ i }}</a>
+          {% endif %}
+
+        {% endfor %}
+      {% endif %}  
+    </div>
+
   </div>
-
-  {# TITLE #}
-  <h1>
-    <i class="fa fa-folder-open-o" aria-hidden="true"></i> {{ title_slug }}
-  </h1>
-
-  {# DETAILS #}
-  {% if subject_language %}
-    {% set l = subject_language|length %}
-    {% for i in subject_language %}
-      {% if i=="(:unav)" %}
-        {% trans %}unknown{% endtrans %}
-      {% else %}
-        <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
-      {% endif %}
-    {% endfor %}
-  {% endif %} 
-
-  {% if location %}
-    <span> - </span>
-    {% set l = location|length %}
-    {% for i in location %}
-      {% if i=="(:unav)" %}
-        {% trans %}unknown{% endtrans %} 
-      {% else %}
-        <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
-      {% endif %}
-
-    {% endfor %}
-  {% endif %}
-
-  {% if date %}
-    <span> - </span>
-    {% set l = date|length %}
-    {% for i in date %}
-      {% if i=="(:unav)" %}
-        {% trans %}unknown{% endtrans %} 
-      {% else %}
-        <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
-      {% endif %}
-
-    {% endfor %}
-  {% endif %}  
-
-
-
 </div>
