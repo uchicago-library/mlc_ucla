@@ -18,7 +18,7 @@ doesn't seem necessary. */
 	padding: 0;
 }*/
 html{	font-size: 14px; }
-body{	color: #000; background: #fcfcfc }
+body{	color: #000; background: #fefefe }
 pre{	text-wrap: wrap; }
 a{		color: #3174ae }
 #global-navbar{
@@ -287,81 +287,23 @@ h1{
 }
 
 
-
-/* =============== METADATA inline items */
-.object-metadata dd a{
-	text-decoration: underline;
-}
-.object-metadata dd a:not(:last-child),
-.object-metadata dd span:not(:last-child){
-	padding-right: 1rem;
-}
-.search-result .object-metadata dd a{
-	color: inherit;
-}
-
-/* =============== METADATA */	
-.object-metadata {
-	margin-right: -15px;
-  margin-left: -15px;
-}
-.object-metadata dl{
-	display: flex;
-  flex-wrap: wrap;
-  margin: 0;
-}
-.object-metadata dt{
-	border: none;
-	color: #757575;/* same as .text-muted */
-	padding: .3rem 15px 0;
-	flex-basis: 100% !important;
-}
-.object-metadata dd{
-	border-top: none;
-	border-bottom: 1px dashed #ddd;
-	padding: 0 15px .3rem;
-	flex-basis: 100% !important;
-}
-.object-metadata dd:after{
-	content:'\00000a';
-}
-
 @media (min-width:420px){
-	.object-metadata dt{
-		border-bottom: 1px dashed #ddd;
+	.comp-object-metadata dt{
 		flex-basis: 20% !important;
-		padding-top: 0;
 	}
-	.object-metadata dd{
+	.comp-object-metadata dd{
 		flex-basis: 70% !important;
-		padding-bottom: 0;
 	}
 }
 @media (min-width: 768px){
-	.object-metadata dt{
+	.comp-object-metadata dt{
 		flex-basis: 25% !important;
 	}
-	.object-metadata dd{
+	.comp-object-metadata dd{
 		flex-basis: 75% !important;
 	}
 }
 
-.object-metadata dl>*:nth-child(4n-1),
-.object-metadata dl>*:nth-child(4n){
-	background: #fafafa;
-}
-@media (min-width: 768px){
-	.object-metadata {
-		margin-right: 0;
-	  margin-left: 0;
-	}
-	.object-metadata dt,
-	.object-metadata dd{
-			padding-right: .5rem;
-			padding-left: .5rem;
-
-	}
-} 
 /* Metadata Description List */ 
 /* fix default behaviour */ 
 @media (min-width: 62em){
@@ -370,7 +312,29 @@ h1{
 	}
 } 
 
+/* =============== OBJECTS */
 
+dl dd, dl dt{
+	padding-left: 15px;
+	padding-right: 15px;
+	border: none;
+}
+dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
+	background-color: #fafafa;
+}
+.panel{
+/*	padding:12px;*/
+	/* border-radius:8px;background-color:#fff;border:none;*/
+}
+.panel h1{
+	margin-bottom: .2em;
+	border: none;
+	padding: 5px 0;
+  margin: 0;
+}
+.panel-heading h2{
+	margin: 5px 0 0;
+}
 
 
 
@@ -385,8 +349,8 @@ h1{
   flex-wrap: nowrap;
   flex-direction: row;
 }
+/*.item-list-faux-table ul,*/
 .item-list-faux-table-header,
-.item-list-faux-table ul,
 .item-list-faux-table hr{
 	margin-right: -15px !important;
   margin-left: -15px !important;
@@ -519,26 +483,6 @@ ul.no-style-list{
 .browse-list-wrapper ul li a .browse-item-count{
 }
 
-/* =============== OBJECTS */
-
-/*dl dd, dl dt{
-	padding-left:12px;
-	padding-right:12px;
-	border: none;
-}*/
-/*dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
-	background-color: #fafafa;
-}*/
-.panel{
-	padding:12px;
-	/* border-radius:8px;background-color:#fff;border:none;*/
-}
-.panel h1{
-	margin-bottom: .2em;
-	border: none;
-	padding: 5px 0;
-  margin: 0;
-}
 
 /* =============== ITEM */
 #panopto-help{

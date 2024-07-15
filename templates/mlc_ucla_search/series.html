@@ -21,134 +21,139 @@
       <div class="panel-heading">
         <h2>{% trans %}Item Data{% endtrans %}</h2>
       </div>
-      <dl>
-        {% if alternative_title %}
-          <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
-          <dd>
-            {% for i in alternative_title %}
-              {{ i }}<br>
+      <div class="">
+        <!-- previous: OBJECT METADATA -->
+        <dl>
+          {% if alternative_title %}
+            <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
+            <dd>
+              {% for i in alternative_title %}
+                {{ i }}<br>
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if identifier %}
+            <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
+            <dd>
+              {% for i in identifier %}
+                {{ i }}<br>
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          <dt>{% trans %}Collection{% endtrans %}:</dt>
+          <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
+
+          {% if creator %}
+            <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+            <dd>
+              {% for i in creator %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if contributor %}
+            <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
+            <dd>
+              {% for i in contributor %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if subject_language %}
+            <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
+            <dd>
+              {% for i in subject_language %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if primary_language %}
+            <dt>{% trans %}Language{% endtrans %}:</dt>
+            <dd>
+              {% for i in primary_language %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if location %}
+            <dt>{% trans %}Location{% endtrans %}:</dt>
+            <dd>
+              {% for i in location %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if date %}
+            <dt>{% trans %}Date{% endtrans %}:</dt>
+            <dd>
+              {% for i in date %}
+                {% if i=="(:unav)" %}
+                  {% trans %}unknown{% endtrans %}<br>
+                {% else %}
+                  <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+                {% endif %}
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if description %}
+            <dt>{% trans %}Description{% endtrans %}:</dt>
+            <dd>
+              {% for i in description %}
+                {{ i }}<br>
+              {% endfor %}
+            </dd>
+          {% endif %}
+
+          {% if all_formats and all_formats|length > 0 %}
+            <dt>{% trans %}Formats{% endtrans %}:</dt>
+            <dd>
+            {% for medium in all_formats %}
+              <span>
+                {% if medium=="(:unav)" %}
+                  <span>unk</span>
+                {% else %}
+                  <span>
+                    {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
+                    {{ medium }}
+                  </span>
+                {% endif %}
+              </span>
             {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if identifier %}
-          <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
-          <dd>
-            {% for i in identifier %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        <dt>{% trans %}Collection{% endtrans %}:</dt>
-        <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
-
-        {% if creator %}
-          <dt>{% trans %}Creator(s){% endtrans %}:</dt>
-          <dd>
-            {% for i in creator %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if contributor %}
-          <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
-          <dd>
-            {% for i in contributor %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if subject_language %}
-          <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
-          <dd>
-            {% for i in subject_language %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if primary_language %}
-          <dt>{% trans %}Language{% endtrans %}:</dt>
-          <dd>
-            {% for i in primary_language %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if location %}
-          <dt>{% trans %}Location{% endtrans %}:</dt>
-          <dd>
-            {% for i in location %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if date %}
-          <dt>{% trans %}Date{% endtrans %}:</dt>
-          <dd>
-            {% for i in date %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if description %}
-          <dt>{% trans %}Description{% endtrans %}:</dt>
-          <dd>
-            {% for i in description %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if all_formats and all_formats|length > 0 %}
-          <dt>{% trans %}Formats{% endtrans %}:</dt>
-          <dd>
-          {% for medium in all_formats %}
-            <span>
-              {% if medium=="(:unav)" %}
-                <span>unk</span>
-              {% else %}
-                <span>
-                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
-                  {{ medium }}
-                </span>
-              {% endif %}
-            </span>
-          {% endfor %}
-          </dd>
-        {% endif %}
-      </dl>
+            </dd>
+          {% endif %}
+        </dl>
+      </div>
     </div>
+    {% include 'component-object-metadata.html' %}
+
     
     {# ITEM LIST #}
     <div class="panel panel-default">

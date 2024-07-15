@@ -547,6 +547,7 @@ def series(noid):
     return render_template(
         'series.html',
         **(series_data | {
+            'is_series' : True,
             'grouped_items': grouped_items,
             'title_slug': title_slug,
             'has_panopto':has_panopto,

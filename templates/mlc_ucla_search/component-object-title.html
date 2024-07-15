@@ -2,7 +2,7 @@
   <div class="panel-body">
     {# CHARACTERIZATION #}
     <div>
-      {% if series %}
+      {% if not is_series and series %}
         <span style="display:inline-block;">
           <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
             <i class="fa fa-folder-open-o" aria-hidden="true"></i>
@@ -13,7 +13,7 @@
       <!-- {{ identifier.0 }} -->
       <span class="badge badge-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
 
-      {% if medium %}
+      {% if not is_series and medium %}
           {% for i in medium %}
             <span class="badge badge-default" title="{% trans %}Format{% endtrans %}">
               {% if i=="(:unav)" %}
@@ -29,7 +29,7 @@
 
     {# TITLE #}
     <h1  title="{% trans %}Object title{% endtrans %}">
-      {% if not series %}
+      {% if is_series %}
         <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
       {% endif %}
       {{ title_slug }}
