@@ -352,9 +352,10 @@ dl dd, dl dt{
 	padding-left: 15px;
 	padding-right: 15px;
 	border: none;
+	background: #fafafa;
 }
 dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
-	background-color: #fafafa;
+	background-color: #fff;
 }
 .panel{
 /*	padding:12px;*/
