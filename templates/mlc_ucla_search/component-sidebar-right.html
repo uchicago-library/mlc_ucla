@@ -1,79 +1,93 @@
-<div class="sidebar sidebar-right">
-  <div class="row">
-    <div class="col-xs-6 col-sm-12">
-      <h2>{% trans %}Search & Browse{% endtrans %}</h2>
-      <div class="collections">
-        <div class="form-group">
-          <form action="/search/" class="searchbox" method="GET">
-            <input name="query" placeholder="{% trans %}Search language, location, people, etc.{% endtrans %}" required="required" type="search" aria-label="search" class="searchbox-input" value=""/>
-            <span class="searchbox-icon"><i title="search" class="fa fa-search"></i>
-              <input type="submit" class="searchbox-submit" value="search" style="background-color: transparent; color: transparent;"/>
-            </span>
-          </form>
+<div class="row">
+  <div class="col-xs-6 col-sm-12">
+
+    <div class="sidebar panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Search & Browse{% endtrans %}</h2>
+      </div>
+      <div class="panel-body">
+        <form action="/search/" class="searchbox" method="GET">
+          <input name="query" placeholder="{% trans %}Search language, location, people, etc.{% endtrans %}" required="required" type="search" aria-label="search" class="searchbox-input" value=""/>
+          <span class="searchbox-icon"><i title="search" class="fa fa-search"></i>
+            <input type="submit" class="searchbox-submit" value="search" style="background-color: transparent; color: transparent;"/>
+          </span>
+        </form>
+        <div class="collections browse"><!-- Browse Collection by -->
+          <span class="headline">{% trans %}Browse Collection by{% endtrans %}</span>
+          <ul>
+            <li><a href="/browse/?type=language">
+              {% trans %}Language{% endtrans %}
+            </a></li>
+            <li><a href="/browse/?type=location">
+              {% trans %}Location{% endtrans %}
+            </a></li>
+            <li><a href="/browse/?type=creator">
+              {% trans %}Creators{% endtrans %}
+            </a></li>
+            <li><a href="/browse/?type=contributor">
+              {% trans %}Contributors{% endtrans %}
+            </a></li>
+            <li><a href="/browse/?type=decade">
+              {% trans %}Dates{% endtrans %}
+            </a></li>
+          </ul>
         </div>
       </div>
-      <div class="collections browse"><!-- Browse Collection by -->
-        <span class="headline">{% trans %}Browse Collection by{% endtrans %}</span>
-        <ul>
-          <li><a href="/browse/?type=language">
-            {% trans %}Language{% endtrans %}
-          </a></li>
-          <li><a href="/browse/?type=location">
-            {% trans %}Location{% endtrans %}
-          </a></li>
-          <li><a href="/browse/?type=creator">
-            {% trans %}Creators{% endtrans %}
-          </a></li>
-          <li><a href="/browse/?type=contributor">
-            {% trans %}Contributors{% endtrans %}
-          </a></li>
-          <li><a href="/browse/?type=decade">
-            {% trans %}Dates{% endtrans %}
-          </a></li>
-        </ul>
+    </div>
+
+    <div class="sidebar panel panel-default">
+      <div class="panel-heading">
+          <h2>{% trans %}Access{% endtrans %}</h2>
       </div>
-      <div class="collections access"> <!-- Access -->
-        <h2>{% trans %}Access{% endtrans %}</h2>
-        <ul>
-          {% if not cnet_id %}
+      <div class="panel-body">
+          <ul>
+            {% if not cnet_id %}
+              <li>
+                <a href="/login"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
+              </li>
+              <li>
+                <a href="/request-account">{% trans %}Request an Account{% endtrans %}</a><br>
+              </li>
+            {% else %}
+              <li>
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Logged in as{% endtrans %} {{ cnet_id }}<br>
+              </li>
+            {% endif %}
+            {% if request_access_button and request_access_button.show %}
+              <li>
+                <a href="/request-access?series_id={{request_access_button.series_id}}&item_id={{request_access_button.item_id}}&item_title={{request_access_button.item_title}}">{% trans %}Request Access to this Series{% endtrans %}</a><br>
+              </li>
+            {% endif %}
             <li>
-              <a href="/login"><i class="fa fa-user-o" aria-hidden="true"></i> {% trans %}Log In{% endtrans %}</a><br>
+              <a href="/access-terms">{% trans %}Terms of Access{% endtrans %}</a><br>
             </li>
-            <li>
-              <a href="/request-account">{% trans %}Request an Account{% endtrans %}</a><br>
-            </li>
-          {% else %}
-            <li>
-              <i class="fa fa-user-circle-o" aria-hidden="true"></i> {% trans %}Logged in as{% endtrans %} {{ cnet_id }}<br>
-            </li>
-          {% endif %}
-          {% if request_access_button and request_access_button.show %}
-            <li>
-              <a href="/request-access?series_id={{request_access_button.series_id}}&item_id={{request_access_button.item_id}}&item_title={{request_access_button.item_title}}">{% trans %}Request Access to this Series{% endtrans %}</a><br>
-            </li>
-          {% endif %}
-          <li>
-            <a href="/access-terms">{% trans %}Terms of Access{% endtrans %}</a><br>
-          </li>
-        </ul>
-        {#<p>-<a href="http://dma.uchicago.edu/forms/request-research-access">[DMA]-Request-Research-Access</a>-</p><br> #}
+          </ul>
+          {#<p>-<a href="http://dma.uchicago.edu/forms/request-research-access">[DMA]-Request-Research-Access</a>-</p><br> #}
       </div>
     </div>
-    <div class="col-xs-6 col-sm-12">
-      {# TODO https://github.com/uchicago-library/mlc_ucla/issues/33 
-      We used to have a content specialist here but we'll keep a Contact Us section for now. #}
-      <div class="collections specialist"><!-- Subject Specialist -->
-        <h2>{% trans %}Contact Us{% endtrans %}</h2>
+
+  </div>
+  <div class="col-xs-6 col-sm-12">
+
+    <div class="sidebar panel panel-default">
+      <div class="panel-heading">
+          <h2>{% trans %}Contact Us{% endtrans %}</h2>
+      </div>
+      <div class="panel-body">
         <p>
           <a href="https://humanities.uchicago.edu/articles/2017/03/meet-staff-courtney-guerra">Courtney Guerra</a><br/>
           <em>{% trans %}Online Media Archive{% endtrans %}</em><br/>
           <a href="dma@uchicago.edu">dma@uchicago.edu</a><br/>
           <a href="tel:+17737027045">(773) 702-7045</a>
         </p>
-      </div> 
-      
-      <div class="collections feedback"> <!-- Feedback -->
-        <h2>{% trans %}Feedback{% endtrans %}</h2>
+      </div>
+    </div>
+
+    <div class="sidebar panel panel-default">
+      <div class="panel-heading">
+          <h2>{% trans %}Feedback{% endtrans %}</h2>
+      </div>
+      <div class="panel-body">
         <ul>
           <li>
             <!-- <p>Report errors, omissions, or other issues in the description of this collection.</p> -->
@@ -90,5 +104,6 @@
         </ul>
       </div>
     </div>
+
   </div>
 </div>

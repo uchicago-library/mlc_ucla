@@ -5,24 +5,28 @@
     <div class="col-xs-12 col-md-4 col-lg-3">
         {% include 'component-sidebar-left.html' %}
     </div>
-    <div class="col-xs-12 col-md-8">
-        <h1>{{trans.collection_title}}</h1>
-        <!-- locale is:{{ locale }} -->
+    <div class="col-xs-12 col-md-8 col-lg-9">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h1>{{trans.collection_title}}</h1>
+                <!-- locale is:{{ locale }} -->
 
-        <p>
-        The Online Language Archive at the University of Chicago holds some 2,100 language collections across 270 languages. This interface makes many of these collections freely available for use by researchers and members of speaker communities and lists many others that can be accessed by special arrangement.
-        </p>
- 
-        <p>
-        Whether you are a linguist, anthropologist, a scholar looking for a global corpus of language in use, a student, language learner, a speaker of an endangered language, part of a heritage community with ties to a language, or a member of the general public, we hope you will find something here to explore.
-
-        </p>
+                <p>
+                The Online Language Archive at the University of Chicago holds some 2,100 language collections across 270 languages. This interface makes many of these collections freely available for use by researchers and members of speaker communities and lists many others that can be accessed by special arrangement.
+                </p>
          
-        <p>
-        You might want to start by browsing the <a href="/browse/?type=language">languages</a> and <a href="/browse/?type=location">locations</a> in the archive. If you want access to one of the restricted collections you can <a href="/access-terms">make an access request</a>, or you can read more about the project’s <a href="/history">history</a> and its supporters.
-        </p>
+                <p>
+                Whether you are a linguist, anthropologist, a scholar looking for a global corpus of language in use, a student, language learner, a speaker of an endangered language, part of a heritage community with ties to a language, or a member of the general public, we hope you will find something here to explore.
 
-        {% include 'elements-browse-bar.html' %}
+                </p>
+                 
+                <p>
+                You might want to start by browsing the <a href="/browse/?type=language">languages</a> and <a href="/browse/?type=location">locations</a> in the archive. If you want access to one of the restricted collections you can <a href="/access-terms">make an access request</a>, or you can read more about the project’s <a href="/history">history</a> and its supporters.
+                </p>
+            </div>
+        </div>
+
+        {% include 'component-browse-bar.html' %}
     </div>
 </div>
 {% endblock %}

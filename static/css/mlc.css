@@ -1,4 +1,5 @@
 /* Table of Contents */
+/* ======= TYPOGRAPHY */
 /* ======= UTILS */
 /* ======= SIDEBAR LEFT */
 /* ======= SIDEBAR RIGHT */
@@ -79,10 +80,14 @@ h1{
 	margin-bottom: 2rem;
 }
 
-.sidebar{
+/*.sidebar{
 	background: #f6f7f2;
 	padding: 0;
 	margin-bottom: 1rem;
+}*/
+.sidebar{
+	background: #ffffff;
+	padding: 0;
 }
 .sidebar ul{
 	padding: 0;
@@ -123,6 +128,12 @@ h1{
   display: inline-block;
 }
 
+/* ======= TYPOGRAPHY */
+.panel h1{ font-size: 2em; }
+.panel-heading h2{ font-size: 1.3em }
+.sidebar h2, .sidebar h2 a{ font-size: 1em; font-style: normal; }
+
+
 /* ======= UTILS */
 .mb-1{
 	margin-bottom: 1rem;
@@ -149,24 +160,44 @@ h1{
 	margin: 0;
 	min-height: unset;
 }
-.sidebar.sidebar-left .btn.sidebar-collapse-btn{
-	background: transparent;
+.sidebar.sidebar-left .sidebar-collapse-btn{
+	width: 100%;
 	color: #800000;
 	font-weight: 600;
+	text-align: left;
+	display: flex;
+	justify-content: space-between;
+	border-width: 0 0 1px 0;
 }
-.sidebar.sidebar-left .sidebar-collapse-btn .fa-plus{
+.sidebar.sidebar-left .sidebar-collapse-btn span{
+	margin-right: auto;
+}
+
+.sidebar.sidebar-left .sidebar-collapse-btn .fa-chevron-down{
 	display: none;
 }
-.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-plus{
+[data-toggle="collapse"] .fa:before,
+.fa-chevron-up:before {
+  content: "\f077";
+}
+[data-toggle="collapse"].collapsed .fa:before,
+.fa-chevron-down:before {
+  content: "\f078";
+}
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-chevron-down{
 	display: block;
 }
-.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-minus{
+.sidebar.sidebar-left .sidebar-collapse-btn.collpased .fa-chevron-up{
 	display: none;
+}
+.sidebar.sidebar-left .navbar {
+	border: 0;
 }
 .sidebar.sidebar-left .navbar .nav.navbar-nav{
 	margin: 0;
 	padding-left: 1rem;
 	padding-left: 0;
+	border: 0;
 }
 .sidebar.sidebar-left .navbar .nav.navbar-nav li a{
   padding: .8rem 1rem !important;
@@ -224,6 +255,9 @@ h1{
 }
 .search-results-facet{
 	padding-right: .8rem;
+}
+.searchbox{
+	margin: 0 0 15px 0;
 }
 /* =============== BROWSE */
 .browse-bar{
