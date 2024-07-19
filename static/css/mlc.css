@@ -4,7 +4,7 @@
 /* ======= SIDEBAR LEFT */
 /* ======= SIDEBAR RIGHT */
 /* =============== SEARCH */
-/* =============== BROWSE */
+/* =============== BROWSE-BAR */
 /* =============== METADATA inline items */
 /* =============== METADATA */	
 /* =============== ITEMS */
@@ -129,7 +129,12 @@ h1{
 }
 
 /* ======= TYPOGRAPHY */
-.panel h1{ font-size: 2em; }
+.panel h1, h1, .h1{ 
+	font-size: 2.5em;
+	margin-top: .5em;
+	margin-bottom: .5em;
+	border: none;
+}
 .panel-heading h2{ font-size: 1.3em }
 .sidebar h2, .sidebar h2 a{ font-size: 1em; font-style: normal; }
 
@@ -154,6 +159,15 @@ h1{
 	opacity: .8;
 }
 
+.panel-heading-icon{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.panel-heading-icon h1{
+	margin-bottom: .2em;
+}
+
 /* ======= SIDEBAR LEFT */
 
 .sidebar.sidebar-left .navbar{
@@ -168,9 +182,6 @@ h1{
 	display: flex;
 	justify-content: space-between;
 	border-width: 0 0 1px 0;
-}
-.sidebar.sidebar-left .sidebar-collapse-btn span{
-	margin-right: auto;
 }
 
 .sidebar.sidebar-left .sidebar-collapse-btn .fa-chevron-down{
@@ -259,25 +270,13 @@ h1{
 .searchbox{
 	margin: 0 0 15px 0;
 }
-/* =============== BROWSE */
-.browse-bar{
-	margin-bottom: 2rem;
+.searchbox-input{
+	background: #d9d9d9;
+	padding: 0 40px 0 15px;
 }
-.browse-bar h2{
-	margin-top: 0rem;
-}
-.browse-bar .btn{	
-	background-color: #645E5E;
-}
-.browse-bar .btn:active,
-.browse-bar .btn:hover,
-.browse-bar .btn:focus{	
-	color: #fff;
-	background-color: #7b7474;
-}
-.browse-bar .btn:not(:last-child){	
-	margin-right: .5rem;
-}
+
+
+
 
 .search-results-page .page-title {
 	padding: 0;
@@ -318,6 +317,25 @@ h1{
 }
 .search-results-page ul li.search-result p{
 	margin: 0;
+}
+/* =============== BROWSE-BAR */
+.browse-bar{
+	margin-bottom: 2rem;
+}
+.browse-bar h2{
+	margin-top: 0rem;
+}
+.browse-bar .btn{	
+	background-color: #645E5E;
+}
+.browse-bar .btn:active,
+.browse-bar .btn:hover,
+.browse-bar .btn:focus{	
+	color: #fff;
+	background-color: #7b7474;
+}
+.browse-bar .btn:not(:last-child){	
+	margin-right: .5rem;
 }
 
 
@@ -361,14 +379,26 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 /*	padding:12px;*/
 	/* border-radius:8px;background-color:#fff;border:none;*/
 }
-.panel h1{
-	margin-bottom: .2em;
+.comp-object-title h1{
+	font-size: 2em;
+  margin-top: .3em;
+	margin-bottom: .1em;
 	border: none;
-	padding: 5px 0;
-  margin: 0;
+	padding: 0;
 }
 .panel-heading h2{
 	margin: 5px 0 0;
+}
+.badge-link fa{
+}
+.badge-link{
+	border-color: inherit;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 
