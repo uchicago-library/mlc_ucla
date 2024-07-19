@@ -486,14 +486,14 @@ ul.no-style-list{
 	margin: 0;
 }
 .browse-list-wrapper ul{
-	columns: 2;
-	column-gap: 2rem;
+/*	columns: 2;*/
+/*	column-gap: 2rem;*/
 }
 .browse-list-wrapper ul li{
-  padding: 0;
-  margin: 0 !important;
-  height: 42px;
+  min-height: 40px;
+  padding: 5px 0;
 }
+/*
 @media (min-width:500px){
 	.browse-list-wrapper ul{
 		columns: 3;
@@ -518,7 +518,7 @@ ul.no-style-list{
 	.browse-list-wrapper ul{
 		columns: 6;
 	}
-}
+}*/
 .browse-list-wrapper ul li a{
 	display: flex;
 	width: 100%;

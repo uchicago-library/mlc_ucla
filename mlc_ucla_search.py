@@ -436,10 +436,23 @@ def browse():
         )
     else:
         browse_sort = request.args.get('sort')
+        browse_terms_list = g.mlc_db.get_browse(browse_type, browse_sort)
+        if browse_sort != "count":
+            browse_terms_dic = {}
+            alphabet = ""
+            for b in browse_terms_list:
+                if alphabet != b[0][0]:
+                    alphabet = b[0][0]
+                    browse_terms_dic[alphabet] = []
+                browse_terms_dic[alphabet].append(b)
+        else:
+            browse_terms_dic = browse_terms_list
+
         return render_template(
             'browse.html',
             title_slug=title_slugs[browse_type],
-            browse_terms=g.mlc_db.get_browse(browse_type, browse_sort),
+            browse_terms=browse_terms_dic,
+            is_alphabetical = browse_sort != "count",
             browse_type=browse_type
         )
 

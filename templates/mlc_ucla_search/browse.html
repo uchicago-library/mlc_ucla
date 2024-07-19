@@ -3,32 +3,49 @@
 {% block content %}
 <div class="" id="content" role="main">
 
-  {% include 'elements-browse-bar.html' %}
+  {% include 'component-browse-bar.html' %}
   
-  <div class="title-wrapper">
-    <h1>{{ title_slug }}</h1>
-    {% if not request.args.sort == 'count' %}
-      <a class="btn btn-link btn-xs" aria-label="sort by numerical descending order" title="sort by numerical descending order" href="{{request.path}}?type={{request.args.type}}&sort=count">
-      <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
-        </a>
-    {% else %} 
-      <a class="btn btn-link btn-xs" aria-label="sort by alphabetical order" title="sort by alphabetical order" href="{{request.path}}?type={{request.args.type}}">
-      <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-        </a>
-    {% endif %} 
-  </div>
-          
-  <div class="browse-list-wrapper container-fluid">
-    <ul class="row no-style-list">
-      {% for b in browse_terms %}
-        <li class="">
-          <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
-            <span class="browse-item-name">{{ b[0] }}</span>
-            <span class="text-muted">{{ b[1] }}</span>
+  <div class="panel panel-default">
+    <div class="panel-heading panel-heading-icon">
+      <h1>{{ title_slug }}</h1>
+      {% if not request.args.sort == 'count' %}
+        <a class="btn btn-link btn-xs" aria-label="sort by numerical descending order" title="sort by numerical descending order" href="{{request.path}}?type={{request.args.type}}&sort=count">
+        <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i>
           </a>
-        </li>
-      {% endfor %}
-    </ul>
+      {% else %} 
+        <a class="btn btn-link btn-xs" aria-label="sort by alphabetical order" title="sort by alphabetical order" href="{{request.path}}?type={{request.args.type}}">
+        <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+          </a>
+      {% endif %} 
+    </div>
+    <div class="panel-body browse-list-wrapper">
+      <ul class="row no-style-list">
+        {% if is_alphabetical %}
+          {% for alphabet in browse_terms %}
+            <div class="col-xs-12"><h2>{{ alphabet }}</h2></div>
+            {% for b in browse_terms[alphabet] %}
+              <li class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
+                <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
+                  <span class="browse-item-name">{{ b[0] }}</span>
+                  <span class="text-muted">{{ b[1] }}</span>
+                </a>
+              </li>
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for b in browse_terms %}
+            <li class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
+              <a href="/browse/?type={{ browse_type }}&term={{ b[0]|urlencode }}">
+                <span class="browse-item-name">{{ b[0] }}</span>
+                <span class="text-muted">{{ b[1] }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
+
+      </ul>
+    </div>
   </div>
 </div>
+
 {% endblock %}
