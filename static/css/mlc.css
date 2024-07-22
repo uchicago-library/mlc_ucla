@@ -28,6 +28,11 @@ a{		color: #3174ae }
 .breadcrumbs{ padding-left: 15px; }
 
 .main-content{padding-top: 2rem; }
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+    }
+}
 @media (min-width: 1400px){
 	.container {
 	    width: 1300px;
