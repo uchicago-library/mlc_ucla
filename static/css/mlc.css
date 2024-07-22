@@ -417,7 +417,7 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
   flex-wrap: nowrap;
   flex-direction: row;
 }
-/*.item-list-faux-table ul,*/
+.item-list-faux-table ul,
 .item-list-faux-table-header,
 .item-list-faux-table hr{
 	margin-right: -15px !important;
@@ -432,14 +432,24 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 	.item-list-faux-table-header,
 	.item-list-faux-table ul,
 	.item-list-faux-table hr{
-		margin-right: 0 !important;
-	  margin-left: 0 !important;
+/*		margin-right: 0 !important;*/
+/*	  margin-left: 0 !important;*/
 	}
 	.item-list-faux-table-header,
 	.item-list-faux-table-row{
-		padding: .3rem .5rem;
+/*		padding: .3rem .5rem;*/
 	}
 }
+
+.item-list-faux-table h3{
+	margin: 15px 0 5px;
+}
+.item-list-faux-table hr{
+	margin: 0 0 10px 0;
+	border-color: #aaa;
+}
+
+
 .item-list-faux-table-wrapper:nth-child(odd){
 	background-color: #fafafa;
 }

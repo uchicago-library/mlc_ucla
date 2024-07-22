@@ -19,24 +19,9 @@
     {# METADATA #}
     {% include 'component-object-metadata.html' %}
 
+    {# ITEMS LIST #}
+    {% set context = "series" %}
+    {% include 'component-item-list.html' %}
     
-    {# ITEM LIST #}
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h2>{% trans %}Items in the Series{% endtrans %}</h2>
-      </div>
-      <div class="item-list-faux-table">
-        {% include 'component-item-in-list-header.html' %}
-        <ul class="no-style-list">
-          {% for medium in grouped_items %}
-            {% if grouped_items[medium]|length > 0 %}
-              {% for item in grouped_items[medium] %}
-                {% include 'component-item-in-list.html' %}
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
   </div> <!-- // .col-xs-12 .col-md-9 .centermain -->
 {% endblock %}
