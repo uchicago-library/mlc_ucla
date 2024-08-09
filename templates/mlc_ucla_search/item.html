@@ -38,10 +38,14 @@
     </span>
 
     {# OBJECT METADATA #}
-    {% include 'component-object-metadata.html' %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Item Data{% endtrans %}</h2>
+      </div>
+      {% include 'component-object-metadata.html' %}
+    </div>
 
     {# ITEMS LIST #}
-    {% set context = "item" %}
     {% include 'component-item-list.html' %}
     
   </div>

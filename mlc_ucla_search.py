@@ -484,6 +484,7 @@ def search():
 
     return render_template(
         'search.html',
+        is_search=True,
         facets=[],
         query=query,
         query_field='',
@@ -644,7 +645,9 @@ def item(noid):
 
     return render_template(
         'item.html',
-        **(item_data | {'series': series,
+        **(item_data | {
+            'is_item' : True,
+            'series': series,
             'title_slug': title_slug,
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,

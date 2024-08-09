@@ -1,136 +1,141 @@
-<div class="panel panel-default">
-  {% if not is_series %}
-    <div class="panel-heading">
-      <h2>{% trans %}Item Data{% endtrans %}</h2>
-    </div>
-  {% else %}
-    <div class="panel-heading">
-      <h2>{% trans %}Series Data{% endtrans %}</h2>
-    </div>
-  {% endif %}
-  <div class="comp-object-metadata">
-    <!-- COMPONENT: OBJECT METADATA -->
-    <dl>
+{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
+<div class="comp-object-metadata">
+  <!-- COMPONENT: OBJECT METADATA -->
+  <dl>
 
-      {# CONTEXT #}
-        {% if alternative_title %}
-          <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
-          <dd>
-            {% for i in alternative_title %}
+    {# CONTEXT #}
+      {% if alternative_title and is_series %}
+        <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
+        <dd>
+          {% for i in alternative_title %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if is_series %}
+        <dt>{% trans %}Collection{% endtrans %}:</dt>
+        <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
+      {% endif %}
+
+      {% if series and is_item %}
+        <dt>{% trans %}Series{% endtrans %}:</dt>
+        <dd>
+          {% for serie in series %}
+            <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+              <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+              {{ serie.1.titles.0 }}
+            </a><br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if titles and is_item %}
+        <dt>{% trans %}Item Title{% endtrans %}:</dt>
+        <dd>
+          {% for i in titles %}
+            {% if i=="(:unav)" %}
+              <!--(:unav)-->
+            {% else %}
               {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
 
+      {% if identifier and (is_series or is_item)%}
         {% if is_series %}
-          <dt>{% trans %}Collection{% endtrans %}:</dt>
-          <dd>{% trans %}Digital Media Archive{% endtrans %}</dd>
+          <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
+        {% else %}
+          <dt>{% trans %}Item Identifier{% endtrans %}:</dt>
         {% endif %}
+        <dd>
+          {% for i in identifier %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-        {% if series %}
-          <dt>{% trans %}Series{% endtrans %}:</dt>
+    {# DETAILS #}
+
+      {% if subject_language %}
+        <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
+        <dd>
+          {% for i in subject_language %}
+            {% if i=="(:unav)" %}
+              {% trans %}unknown{% endtrans %}<br>
+            {% else %}
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if primary_language %}
+        <dt>{% trans %}Language{% endtrans %}:</dt>
+        <dd>
+          {% for i in primary_language %}
+            {% if i=="(:unav)" %}
+              {% trans %}unknown{% endtrans %}<br>
+            {% else %}
+              <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if location %}
+        <dt>{% trans %}Location{% endtrans %}:</dt>
+        <dd>
+          {% for i in location %}
+            {% if i=="(:unav)" %}
+              {% trans %}unknown{% endtrans %}<br>
+            {% else %}
+              <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if date %}
+        <dt>{% trans %}Date{% endtrans %}:</dt>
+        <dd>
+          {% for i in date %}
+            {% if i=="(:unav)" %}
+              {% trans %}unknown{% endtrans %}<br>
+            {% else %}
+              <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if description and (is_series or is_item) %}
+        <dt>{% trans %}Description{% endtrans %}:</dt>
+        <dd>
+          {% for i in description %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+    {# EXTRA #}
+      {% if creator %}
+        <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+        {% if is_search %}
           <dd>
-            {% for serie in series %}
-              <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-                <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-                {{ serie.1.titles.0 }}
-              </a><br>
-            {% endfor %}
+            {% if creator|length > 3 %}
+              {% for creator in creator[:3] %}
+                <a href="/browse/?type=creator&term={{ creator|urlencode }}">{{ creator }}</a>
+              {% endfor %}
+              (+{{ creator|length -3 }})
+            {% else %}
+              {% for i in creator %}
+                <a href="/browse/?type=creator&term={{ i|urlencode }}">{{ i }}</a>
+              {% endfor %}
+            {% endif %}
           </dd>
-        {% endif %}
-
-        {% if titles %}
-          <dt>{% trans %}Item Title{% endtrans %}:</dt>
-          <dd>
-            {% for i in titles %}
-              {% if i=="(:unav)" %}
-                <!--(:unav)-->
-              {% else %}
-                {{ i }}<br>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if identifier %}
-          {% if is_series %}
-            <dt>{% trans %}Series Identifier{% endtrans %}:</dt>
-          {% else %}
-            <dt>{% trans %}Item Identifier{% endtrans %}:</dt>
-          {% endif %}
-          <dd>
-            {% for i in identifier %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-      {# DETAILS #}
-
-        {% if subject_language %}
-          <dt>{% trans %}Indigenous Language{% endtrans %}:</dt>
-          <dd>
-            {% for i in subject_language %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if primary_language %}
-          <dt>{% trans %}Language{% endtrans %}:</dt>
-          <dd>
-            {% for i in primary_language %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if location %}
-          <dt>{% trans %}Location{% endtrans %}:</dt>
-          <dd>
-            {% for i in location %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if date %}
-          <dt>{% trans %}Date{% endtrans %}:</dt>
-          <dd>
-            {% for i in date %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
-              {% else %}
-                <a href="/browse?type=date&term={{ i|urlencode }}">{{ i }}</a>
-              {% endif %}
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if description %}
-          <dt>{% trans %}Description{% endtrans %}:</dt>
-          <dd>
-            {% for i in description %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-      {# EXTRA #}
-        {% if creator %}
-          <dt>{% trans %}Creator(s){% endtrans %}:</dt>
+        {% else %}
           <dd>
             {% for i in creator %}
               {% if i=="(:unav)" %}
@@ -141,9 +146,25 @@
             {% endfor %}
           </dd>
         {% endif %}
+      {% endif %}
 
-        {% if contributor %}
-          <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
+
+      {% if contributor %}
+        <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
+        {% if is_search %}
+          <dd>
+            {% if contributor|length > 3 %}
+              {% for i in contributor[:3] %}
+                <a href="/browse/?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% endfor %}
+              (+{{ contributor|length -3 }})
+            {% else %}
+              {% for i in contributor %}
+                <a href="/browse/?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
+              {% endfor %}
+            {% endif %}
+          </dd>
+        {% else %}
           <dd>
             {% for i in contributor %}
               {% if i=="(:unav)" %}
@@ -154,82 +175,82 @@
             {% endfor %}
           </dd>
         {% endif %}
+      {% endif %}
 
-        {% if linguistic_data_type %}
-          <dt>{% trans %}Linguistic Data Type{% endtrans %}:</dt>
-          <dd>
-            {% for i in linguistic_data_type %}
+      {% if linguistic_data_type %}
+        <dt>{% trans %}Linguistic Data Type{% endtrans %}:</dt>
+        <dd>
+          {% for i in linguistic_data_type %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if discourse_type %}
+        <dt>{% trans %}Discourse Type{% endtrans %}:</dt>
+        <dd>
+          {% for i in discourse_type %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+      {% if content_type %}
+        <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
+        <dd>
+          {% for i in content_type %}
+            {{ i }}<br>
+          {% endfor %}
+        </dd>
+      {% endif %}
+
+    {# FORMAT #}
+
+      {% if medium %}
+        <dt>{% trans %}Media Type{% endtrans %}:</dt>
+        <dd>
+          {% for i in medium %}
+            {% if i=="(:unav)" %}
+              {% trans %}unknown{% endtrans %}<br>
+            {% else %}
               {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
+            {% endif %}
+          {% endfor %}
+        </dd>
+      {% endif %}
 
-        {% if discourse_type %}
-          <dt>{% trans %}Discourse Type{% endtrans %}:</dt>
+      {% if is_series %}
+        {% if all_formats and all_formats|length > 0 %}
+          <dt>{% trans %}Formats{% endtrans %}:</dt>
           <dd>
-            {% for i in discourse_type %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-        {% if content_type %}
-          <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
-          <dd>
-            {% for i in content_type %}
-              {{ i }}<br>
-            {% endfor %}
-          </dd>
-        {% endif %}
-
-      {# FORMAT #}
-
-        {% if medium %}
-          <dt>{% trans %}Media Type{% endtrans %}:</dt>
-          <dd>
-            {% for i in medium %}
-              {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
+          {% for medium in all_formats %}
+            <span>
+              {% if medium=="(:unav)" %}
+                <span>unk</span>
               {% else %}
-                {{ i }}<br>
+                <span>
+                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
+                  {{ medium }}
+                </span>
+              {% endif %}
+            </span>
+          {% endfor %}
+          </dd>
+        {% endif %}
+      {% elif is_item %}
+        {% if all_formats and all_formats|length >0 %}
+          <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
+          <dd>
+            {% for medium in all_formats %}
+              {% if medium == "(:unav)" %}
+                <span>unk</span>
+              {% else %}
+                <span>
+                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %} {{ medium }}</span>
               {% endif %}
             {% endfor %}
           </dd>
         {% endif %}
-
-        {% if is_series %}
-          {% if all_formats and all_formats|length > 0 %}
-            <dt>{% trans %}Formats{% endtrans %}:</dt>
-            <dd>
-            {% for medium in all_formats %}
-              <span>
-                {% if medium=="(:unav)" %}
-                  <span>unk</span>
-                {% else %}
-                  <span>
-                    {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
-                    {{ medium }}
-                  </span>
-                {% endif %}
-              </span>
-            {% endfor %}
-            </dd>
-          {% endif %}
-        {% else %}
-          {% if all_formats and all_formats|length >0 %}
-            <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
-            <dd>
-              {% for medium in all_formats %}
-                {% if medium == "(:unav)" %}
-                  <span>unk</span>
-                {% else %}
-                  <span>
-                    {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %} {{ medium }}</span>
-                {% endif %}
-              {% endfor %}
-            </dd>
-          {% endif %}
-        {% endif %}
-    </dl>
-  </div>
+      {% endif %}
+  </dl>
 </div>
