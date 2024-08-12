@@ -17,7 +17,7 @@
     <ul class="no-style-list">
     {# RESULT #}
     {% for result in results %}
-      <li class="search-result panel panel-default" style="background-color: #ff005580;">
+      <li class="search-result panel panel-default">
         {# SERIES #}
         <div class="panel-heading"> 
             <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
@@ -44,7 +44,7 @@
         {# ITEMS #}
         {% if result.1.sub_items|length > 0 %}
           <hr style="margin: 0">
-          <div class="panel-body" style="background-color: #ffffff;">
+          <div class="panel-body">
             <div class="items-listing">{# well well-sm  #}
               <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
 
