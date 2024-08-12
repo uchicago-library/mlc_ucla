@@ -319,6 +319,10 @@ h1{
 .search-results-page ul li.search-result p{
 	margin: 0;
 }
+
+.search-result .panel{
+	overflow: hidden;
+}
 /* =============== BROWSE-BAR */
 .browse-bar{
 	margin-bottom: 2rem;
