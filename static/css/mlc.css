@@ -424,7 +424,7 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 .item-list-faux-table ul,
 .item-list-faux-table-header,
 .item-list-faux-table hr,
-.item-list-faux-table-row{
+.item-list-faux-table-wrapper{
 	margin-right: -15px !important;
   margin-left: -15px !important;
 }
