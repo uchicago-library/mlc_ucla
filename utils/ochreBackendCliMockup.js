@@ -137,26 +137,127 @@ function getUuid(ochreData) {
 }
 
 /**
+ * Check whether the document describes an item.
+ * 
+ * @param {Object} OCHRE data.
+ * @returns {bool}
+ */
+function isItem(ochreData) {
+    let results = _findKeys(ochreData, 'concept');
+    for (let i = 0; i < results.length; i++) {
+        let concepts = results[i];
+        if (!Array.isArray(concepts)) {
+            concepts = [concepts];
+        }
+        for (let j = 0; j < concepts.length; j++) {
+            if ('n' in concepts[j] && 
+                concepts[j].n <= -3 && 
+                'content' in concepts[j] &&
+                concepts[j].content == 'Open Language Archive') {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Check whether the document describes a series.
+ * 
+ * @param {Object} OCHRE data.
+ * @returns {bool}
+ */
+function isSeries(ochreData) {
+    let results = _findKeys(ochreData, 'concept');
+    for (let i = 0; i < results.length; i++) {
+        let concepts = results[i];
+        if (!Array.isArray(concepts)) {
+            concepts = [concepts];
+        }
+        for (let j = 0; j < concepts.length; j++) {
+            if ('n' in concepts[j] && 
+                concepts[j].n == -2 && 
+                'content' in concepts[j] &&
+                concepts[j].content == 'Open Language Archive') {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+   
+/**
+ * Check whether the document describes a series.
+ * 
+ * @param {Object} OCHRE data.
+ * @returns {bool}
+ */
+function isOpenLanguageArchive(ochreData) {
+    return getUuid(ochreData) == 'b9f4fde4-649c-491f-a813-2405cea57915';
+}
+
+/**
  * Get the title for an item or series.
  *
  * @param {Object} ochreData - OCHRE data to search.
  * @returns {str} a title.
  */
 function getTitle(ochreData) {
-    return _.get(ochreData, 'ochre.metadata.item.label.content');
-    /*
-    contents = document['ochre']['metadata']['item']['label']['content']
-    if not type(contents) == list:
-        contents = [contents]
-    strings = []
-    for content in contents:
-        string = content['string']
-        if type(string) == dict and 'content' in string:
-            strings.append(string['content'])
-        else:
-            strings.append(string)
-    return ' '.join(strings)
-    */
+    let content = ochreData
+        .ochre
+        .metadata
+        .item
+        .label
+        .content;
+
+    if (!Array.isArray(content)) {
+        content = [content];
+    }
+
+    return content
+        .filter(content => content.languages == 'eng')
+        .map(content => {
+            return (typeof content.string === 'object' && 'content' in content.string) ? content.string.content : content.string
+        }).join(' ');
+}
+
+/**
+ * Get the identifier for an item or series.
+ *
+ * @param {Object} ochreData - OCHRE data to search.
+ * @returns {num} an identifier
+ */
+function getIdentifier(ochreData) {
+    try {
+        return ochreData
+            .ochre
+            .metadata
+            .item
+            .abbreviation
+            .content
+            .string;
+    } catch (err) {
+        return '';
+    }
+}
+
+/**
+ * Get the description for an item or series.
+ *
+ * @param {Object} ochreData - OCHRE data to search.
+ * @returns {str} a description
+ */
+function getDescription(ochreData) {
+    try {
+        return ochreData
+            .ochre
+            .concept
+            .description
+            .content
+            .string;
+    } catch (err) {
+        return '';
+    }
 }
 
 function getLocations(documents) {
@@ -172,7 +273,7 @@ function getLocations(documents) {
         'eng',
         new Set(['Production location ...'])
     );
-    return Array.from(locations);
+    return Array.from(locations).join(' ');
 }
 
 function getDates(documents) {
@@ -188,7 +289,7 @@ function getDates(documents) {
         'eng',
         new Set(["Date notation"])
     );
-    return Array.from(dates);
+    return Array.from(dates).join(' ');
 }
 
 /**
@@ -198,8 +299,8 @@ function getDates(documents) {
  * @returns {list} a list of UUIDs.
  */
 function getUuidChildren(uuid) {
-    const ochreData = getOchre(uuid);
-    return _.compact(_.map(ochreData.ochre.concept.concept, 'uuid'));
+    //let ochreData = getOchre(uuid);
+    return _.compact(_.map(getOchre(uuid).ochre.concept.concept, 'uuid'));
 }
 
 /**
@@ -250,7 +351,7 @@ function getOchreDocuments(uuid) {
 function getContributors(documents) {
     return Array.from(
         _findProperties(documents, 'zxx', new Set(['Consultant']))
-    );
+    ).join(' ');
 }
 
 
@@ -263,7 +364,7 @@ function getContributors(documents) {
 function getCreators(documents) {
     return Array.from(
         _findProperties(documents, 'zxx', new Set(['Researcher']))
-    );
+    ).join(' ');
 }
 
 /**
@@ -275,7 +376,7 @@ function getCreators(documents) {
 function getSubjectLanguages(documents) {
     return Array.from(
         _findProperties(documents, 'eng', new Set(['Subject language ...']))
-    );
+    ).join(' ');
 }
 
 /**
@@ -287,64 +388,89 @@ function getSubjectLanguages(documents) {
 function getPrimaryLanguages(documents) {
     return Array.from(
         _findProperties(documents, 'eng', new Set(['Primary language ...']))
-    );
+    ).join(' ');
 }
 
-let uuids = [
-    '02a80238-e7bf-44b3-bb6a-fd69ac072aa0',
-    '05d42aa9-24a3-4374-b643-f12a9f9fda83',
-    '17a3e4f5-c82b-4ab4-aecf-e74061d0573a',
-    '1e85a27b-f87d-4450-9fb8-1c4fa9e2577e',
-    '22f22e4d-3bb9-47d1-87d6-ac6be0636f48',
-    '28ea3422-3839-48d2-9a9d-c4f8c884df91',
-    '2b0d1c76-28a0-4c3d-a81b-fc9b4f18d09e',
-    '3789c341-ea40-47c5-9ec1-75914a383780',
-    '464f2c94-8d57-46ae-b293-87d9b0a8faf9',
-    '4a284297-779e-40dd-9f43-077fabefd8c5',
-    '4aaf8bce-dd20-4b1e-adcb-b6d563510d51',
-    '4b376b98-531d-4b6c-9111-294724e9327a',
-    '4c5784c2-642b-46cb-be58-c010f1edd93c',
-    '4e60bcf9-a98a-4e0d-b800-cd370cb41e17',
-    '51bba353-1f3b-4e7c-b96c-80da9768e6e8',
-    '532d54b1-6bb0-4272-9b20-5a46debd607f',
-    '55978918-369c-4616-b979-082eadf90362',
-    '68d37b2b-0fd5-4807-9021-69e8c478ca61',
-    '6b91a3a7-22ce-4900-ad33-1bb18ce4e946',
-    '6fd362fa-6f60-43ed-a7af-510268ca1a1e',
-    '708f039a-b162-4863-ab06-a17967ceb3c8',
-    '7a7fb175-2aad-40dd-b658-e3ff3a087bde',
-    '7b02e742-ffff-4c46-8c5d-2583547ce404',
-    '7c1e7f1c-1e2d-4b24-9bbc-088892712340',
-    '7dfca2d9-2b09-4957-a6ff-c10aab6d2396',
-    '84d39667-7b1b-441c-a43d-ddb46292d7df',
-    '878c5152-f169-4bda-abe1-9619c7f95307',
-    '8d52d807-ed97-4aa6-8564-6e343408fb56',
-    '928b218e-13bc-429a-842b-0ebfd29dc6cd',
-    '9614938c-82b0-4668-a3a5-625f8fa1fad7',
-    'a7e578f4-63e4-416d-af94-a6bb4f79145e',
-    'ad3eaa18-661e-47ea-86fe-78b4e3439f8d',
-    'b0adbed7-a1f1-40d5-8789-9430458a3021',
-    'b3cac715-db17-4fd7-8e03-ce21a0424f57',
-    'b9f4fde4-649c-491f-a813-2405cea57915',
-    'd19ee0b3-dbaf-4ade-a1f4-56230aefe5cd',
-    'd95e97a3-be2d-4d34-961a-315b12a44753',
-    'e5d20bb5-fd31-4408-8d1a-c605d0882d1b',
-    'eb515512-4ee8-4065-baf9-4f9c99edefd8',
-    'eb541d61-153a-4ee6-ad2a-dd7b1393b123',
-    'ed64041a-4d28-465a-b553-e9f66f9230ee',
-    'f3d02c86-7649-4fa5-9a55-1fcd4af45ab4',
-    'f568f34b-4f28-41c8-b9df-a4ed46f676ba',
-    'f63a0959-a4c3-4bba-972f-ab5ab63029f3',
-    'f9b3621f-0bc9-4b7d-92b8-b4a265a724a9'
-];
-uuids = [
-    '9614938c-82b0-4668-a3a5-625f8fa1fad7',
-];
+if (process.argv.length >= 3) {
+    let ochreChild, ochreDoc, ochreDocuments;
+   
+    let uuid = process.argv[2]; 
 
-console.log(getDates(getOchreDocuments(uuids[0])));    
+    console.log(uuid);
+    if (isItem(ochreDoc)) {
+        console.log('an item');
+    }
+    if (isSeries(ochreDoc)) {
+        console.log('a series');
+    }
+    if (isOpenLanguageArchive(ochreDoc)) {
+        console.log('the open language archive.');
+    }
+    console.log('');
 
-/*
-uuids.forEach(uuid => {
-    console.log(getPrimaryLanguages(getOchreDocuments(uuid)));
-});
-*/
+    ochreDoc = getOchre(uuid);
+    ochreDocuments = getOchreDocuments(uuid);
+
+    if (isItem(ochreDoc)) {
+        [
+            ['Title',                    getTitle,            ochreDoc],
+            ['Alternative Series Title', undefined,           undefined],
+            ['Identifier',               getIdentifier,       ochreDoc],
+            ['Collection',               undefined,           undefined],
+            ['Creators',                 getCreators,         ochreDocuments],
+            ['Contributors',             getContributors,     ochreDocuments],
+            ['Indigenous Language',      getSubjectLanguages, ochreDocuments],
+            ['Language',                 getPrimaryLanguages, ochreDocuments],
+            ['Location',                 getLocations,        ochreDocuments],
+            ['Date',                     getDates,            ochreDocuments],
+            ['Description',              getDescription,      ochreDoc],
+        ].forEach(i => {
+            console.log(i[0]);
+            if (i[1] === undefined) {
+                console.log('not available in OCHRE?');
+            } else {
+                console.log(i[1](i[2]));
+            }
+            console.log('');
+        });
+    }
+
+    if (isSeries(ochreDoc)) {
+        [
+            ['Title',                    getTitle,            ochreDoc],
+            ['Alternative Series Title', undefined,           undefined],
+            ['Identifier',               getIdentifier,       ochreDoc],
+            ['Collection',               undefined,           undefined],
+            ['Creators',                 getCreators,         ochreDocuments],
+            ['Contributors',             getContributors,     ochreDocuments],
+            ['Indigenous Language',      getSubjectLanguages, ochreDocuments],
+            ['Language',                 getPrimaryLanguages, ochreDocuments],
+            ['Location',                 getLocations,        ochreDocuments],
+            ['Date',                     getDates,            ochreDocuments],
+            ['Description',              getDescription,      ochreDoc],
+        ].forEach(i => {
+            console.log(i[0]);
+            if (i[1] === undefined) {
+                console.log('not available in OCHRE?');
+            } else {
+                console.log(i[1](i[2]));
+            }
+            console.log('');
+        });
+    }
+
+    console.log('Children');
+    console.log('');
+    getUuidChildren(uuid).forEach(uuidChild => {
+        ochreChild = getOchre(uuidChild);
+        console.log(getTitle(ochreChild));
+        console.log(uuidChild);
+        console.log('');
+    });
+} else {
+    console.log('usage:');
+    console.log(process.argv[1] + ' uuid');
+    console.log('e.g., 9614938c-82b0-4668-a3a5-625f8fa1fad7 (a series)')
+    console.log('or    b9f4fde4-649c-491f-a813-2405cea57915 (the entire Open Language Archive)')
+}
+
