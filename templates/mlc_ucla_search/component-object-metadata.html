@@ -209,7 +209,7 @@
       {% if medium %}
         <dt>{% trans %}Media Type{% endtrans %}:</dt>
         <dd>
-          {% set show_full_medium = true %}
+          {% set show_full_format = true %}
           {% set format = medium %}
           {% include 'component-format-label.html' %}
         </dd>
@@ -224,6 +224,7 @@
         <dd>
         {% for f in available_formats %}
           {% set format = available_formats[f] %}
+          {% set show_format_count = true %}
           {% include 'component-format-label.html' %}
         {% endfor %}
         </dd>
