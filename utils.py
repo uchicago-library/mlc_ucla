@@ -1672,43 +1672,49 @@ class MLCDB:
 
         # Group and create a medium object
         # ! assumes 'medium' as a list will always have only one item
-        # output: [format_group, format_icon, format_medium]
+        # output: [format_group, format_style, format_icon, original_medium, <count>]
         format_key = {
          'sound':{
+            'style': 'primary-maroon',
             'match': [ 'audio', 'sound' ],
             'icon': 'fa-headphones'
             },
          'video':{
+            'style': 'default',
             'match': [ 'mp4', 'video', 'video_file' ],
             'icon': 'fa-dot-circle-o'
             },
          'image':{
+            'style': 'default',
             'match': [ 'image' ],
             'icon': 'fa-dot-circle-o'
             },
          'text':{
+            'style': 'default',
             'match': [ 'text' ],
             'icon': 'fa-dot-circle-o'
             },
          'archival':{
+            'style': 'default',
             'match': [ 'film', 'laser disc', 'cd', 'dvd', 'record', 'video8', 'slide', 'microform', 'vhs', 'dat', 'wire', 'lp record', 'lp record (45)', 'cylinder', '1/4 inch audio tape', '1/8 inch audio cassette', 'u-matic', 'cylinder', 'minidv', 'record album', 'vob file'],
             'icon': 'fa-archive'
             },
          'unknown':{
+            'style': 'default',
             'match': [ '(:unav)' ],
             'icon': 'fa-question-circle'
             }
         }
-        format_obj = ['fa-question-circle','unknown','unk']
+        format_obj = ['fa-question-circle','default','unknown','unk']
         medium = info['medium'][0]
         has_panopto = len(info['panopto_links'])>0
         for fk in format_key:
             if medium.lower() in format_key[fk]['match']:
                 if fk == "sound" and not has_panopto:
                     fk = "archival"
-                    format_obj = [fk, format_key[fk]['icon'], medium]
+                    format_obj = [fk, format_key[fk]['style'], format_key[fk]['icon'], medium]
                 else:   
-                    format_obj = [fk, format_key[fk]['icon'], medium]
+                    format_obj = [fk, format_key[fk]['style'], format_key[fk]['icon'], medium]
                 break
         info['medium'] = format_obj
 

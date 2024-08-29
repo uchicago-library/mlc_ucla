@@ -1,13 +1,11 @@
-{# format = [medium_group, medium_icon, original_medium] #}
-
-<span class="label label-default label-item-format" 
-title="{% trans %}Format{% endtrans %}">
-  <i class="fa {{format[1]}}" aria-hidden="true"></i>
+{# format = [format_group, format_style, format_icon, original_medium, <count>] #}
+<span class="label label-{{format[1]}} label-item-format" title="{% trans %}Format{% endtrans %}">
+  <i class="fa {{format[2]}}" aria-hidden="true"></i>
   {{format[0]}}
   {% if show_full_format %}
-    : {{format[2]}}
+    : {{format[3]}}
   {% endif %}
   {% if show_format_count %}
-    ({{format[3]}})
+    ({{format[4]}})
   {% endif %}
 </span>

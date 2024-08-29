@@ -534,13 +534,13 @@ def series(noid):
     grouped_items = {}
     available_formats = {}
     for i in items:
-        # format_obj = [format_group, format_icon, original_medium, <count>]
+        # format_obj = [format_group, format_style, format_icon, original_medium, <count>]
         format_obj = i[1]['medium']
         # Get all formats available to display in Series metadata table
         if format_obj[0] not in available_formats:
             available_formats[format_obj[0]] = format_obj+[1]
         else:
-            available_formats[format_obj[0]][3] += 1
+            available_formats[format_obj[0]][4] += 1
 
         # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
@@ -653,13 +653,13 @@ def item(noid):
                     else:
                         item_data['descendants'][level][medium][k] = fetched_item
 
-                        # format_obj = [format_group, format_icon, original_medium, <count>]
+                        # format_obj = [format_group, format_style, format_icon, original_medium, <count>]
                         format_obj = fetched_item['medium']
                         if format_obj[0] not in available_formats:
                             available_formats[format_obj[0]] = format_obj+[1]
                         else:
-                            available_formats[format_obj[0]][3] += 1
-                            
+                            available_formats[format_obj[0]][4] += 1
+
         available_formats = sortDictByFormatKey(available_formats)
         for level, formats in item_data['descendants'].items():
             # sort mediums by custom order
