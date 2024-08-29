@@ -4,7 +4,6 @@
   <div class="item-page" id="content" role="main">
 
     {# OBJECT TITLE #}
-    {% include 'component-object-title.html' %}
 
     {# PANOPTO #}
     <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
@@ -42,11 +41,9 @@
       <div class="panel-heading">
         <h2>{% trans %}Item Data{% endtrans %}</h2>
       </div>
-      {% include 'component-object-metadata.html' %}
     </div>
 
     {# ITEMS LIST #}
-    {% include 'component-item-list.html' %}
     
   </div>
 {% endblock %}

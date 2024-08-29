@@ -1,0 +1,10 @@
+{# format = [medium_group, medium_icon, original_medium] #}
+
+<span class="label label-default label-item-format" 
+title="{% trans %}Format{% endtrans %}">
+  <i class="fa {{format[1]}}" aria-hidden="true"></i>
+  {{format[0]}}
+  {% if show_full_format %}
+    : {{format[2]}}
+  {% endif %}
+</span>

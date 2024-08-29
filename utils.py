@@ -352,6 +352,7 @@ class MLCGraph:
         return has_panopto_link
 
     def get_item_info(self, item_id):
+        print('get_item_info')
         """
         Get info for search snippets and page views of a given item.
 
@@ -503,6 +504,11 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
+            print("what is this has_format")
+            print('format_id')
+            print(format_id)
+            print('medium')
+            print(medium)
             format_id = str(row[0])
             medium = str(row[1])
             if medium not in data['has_format']:
@@ -539,6 +545,11 @@ class MLCGraph:
         ):
             format_id = str(row[0])
             medium = str(row[1])
+            print("what is this is_format_of")
+            print('format_id')
+            print(format_id)
+            print('medium')
+            print(medium)
             if medium not in data['is_format_of']:
                 data['is_format_of'][medium] = []
             data['is_format_of'][medium].append(row[0])
@@ -1446,7 +1457,7 @@ class MLCDB:
         with apsw.Connection(self.config['DB']) as con:
             for row in con.execute('select id, info from item;').fetchall():
                 self._item_info[row[0]] = json.loads(row[1])
-    
+
             for row in con.execute('select id, info from series;').fetchall():
                 self._series_info[row[0]] = json.loads(row[1])
 
@@ -1659,11 +1670,59 @@ class MLCDB:
         #                     url = info[p][m][i]
         #                     info[p][m][i] = self._item_info[url]
 
-        # load descendants
+        # Group and create a medium object
+        # ! assumes 'medium' as a list will always have only one item
+        # output: [medium_group, medium_icon, original_medium]
+        medium_key = {
+         'sound':{
+            'match': [ 'audio', 'sound' ],
+            'icon': 'fa-headphones'
+            },
+         'video':{
+            'match': [ 'mp4', 'video', 'video_file' ],
+            'icon': 'fa-dot-circle-o'
+            },
+         'image':{
+            'match': [ 'image' ],
+            'icon': 'fa-dot-circle-o'
+            },
+         'text':{
+            'match': [ 'text' ],
+            'icon': 'fa-dot-circle-o'
+            },
+         'archival':{
+            'match': [ 'film', 'laser disc', 'cd', 'dvd', 'record', 'video8', 'slide', 'microform', 'vhs', 'dat', 'wire', 'lp record', 'lp record (45)', 'cylinder', '1/4 inch audio tape', '1/8 inch audio cassette', 'u-matic', 'cylinder', 'minidv', 'record album', 'vob file'],
+            'icon': 'fa-archive'
+            },
+         'unknown':{
+            'match': [ '(:unav)' ],
+            'icon': 'fa-question-circle'
+            }
+        }
+        medium_obj = ['fa-question-circle','unknown','unk']
+        medium = info['medium'][0]
+        has_panopto = len(info['panopto_links'])>0
+        for mk in medium_key:
+            if medium.lower() in medium_key[mk]['match']:
+                if mk == "sound" and not has_panopto:
+                    mk = "archival"
+                    medium_obj = [mk, medium_key[mk]['icon'], medium]
+                else:   
+                    medium_obj = [mk, medium_key[mk]['icon'], medium]
+                break
+        info['medium'] = medium_obj
+
+        # load relationships
         if get_format_relationships:
+            # Get child items
             info['descendants'] = self.get_formats_by_level(identifier)
+
+            # Get Parent items
             if 'is_format_of' in info:
-                for medium in info['is_format_of'].keys():
+                for medium in info['is_format_of']:
+                    print(" # Get Parent items ")
+                    print(" > medium: ")
+                    print(medium)
                     for parent_item_index in range(len(info['is_format_of'][medium])):
                         # identifier format: https://ark.lib.uchicago.edu/ark:61001/b29r8d35893d
                         url = info['is_format_of'][medium][parent_item_index]
@@ -1674,7 +1733,6 @@ class MLCDB:
                 for medium in list(info['is_format_of'].keys()):
                     if len(info['is_format_of'][medium]) == 0:
                         info['is_format_of'].pop(medium, None)
-
 
         return info
 

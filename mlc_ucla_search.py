@@ -311,16 +311,30 @@ access_key = {
     }
 }
 
+
 def sortDictByFormat(item):
-    assert type(item) in (str, tuple)
-    if isinstance(item, tuple):
+    assert type(item) in (str, list, tuple)
+    if not isinstance(item, str):
         assert len(item)
         assert isinstance(item[0], str)
-        item = item[0]
-        
-    order_of_formats = ["Sound", "image", "MP4", "VOB file", "Laser Disc", "Slide", "1/4 inch audio tape", "1/8 inch Audio Cassette", "1/8 inch audio cassette", "CD", "DAT", "DVD", "Film", "Image", "Microform", "Record", "Text", "VHS", "1/8 inch audio Cassette", "Cylinder", "LP Record", "LP Record (45)", "MiniDV", "U-Matic", "Video8", "Wire", "(:unav)"]
+        item = item[0]        
+    order_of_formats = ['sound','video','image','text','archival','unknown']
     return order_of_formats.index(item) if item in order_of_formats else 999
+def sortDictByFormatKey(d):
+    """
+    Sorts a dictionary by its keys based on a custom order.
 
+    Parameters:
+    d (dict): The dictionary to sort.
+
+    Returns:
+    dict: The dictionary sorted by the custom order of keys.
+    """
+    order_of_formats = ['sound','video','image','text','archival','unknown']
+    sorted_items = {key: d[key] for key in order_of_formats if key in d}
+    d.clear()
+    d.update(sorted_items)
+    return d
 
 def sortListOfItems(item):
     if isinstance(item, tuple):
@@ -345,6 +359,7 @@ def get_access_label_obj(item):
     #     string for url
     #     dictionary of data
     #       list of values
+    # ! assumes item['access_rights'] as a list will always have only one item
     ar = item['access_rights']
     if len(ar) > 0 and ar[0].lower() in access_key:
         return [
@@ -517,18 +532,21 @@ def series(noid):
     item_id_with_panopto = ''
     item_title_with_panopto = ''
     grouped_items = {}
-    all_formats = []
+    available_formats = {}
     for i in items:
-        medium = i[1]['medium'][0]
+        # medium = [medium_group, medium_icon, original_medium]
+        medium = i[1]['medium']
         # Get all formats available to display in Series metadata table
-        if medium not in all_formats:
-            all_formats.append(medium)
+        if medium[0] not in available_formats:
+            available_formats[medium[0]] = medium+[1]
+        else:
+            available_formats[medium[0]][3] += 1
         # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
             # Group items by medium/format
-            if medium not in grouped_items:
-                grouped_items[medium] = []
-            grouped_items[medium].append(i[1])
+            if medium[0] not in grouped_items:
+                grouped_items[medium[0]] = []
+            grouped_items[medium[0]].append(i[1])
         # Check if series has one item with a panopto file
         # Get details about one item with panopto file 
         #  to help locate series in panopto
@@ -536,12 +554,10 @@ def series(noid):
             has_panopto = True # to display the Request Access button
             item_id_with_panopto = i[1]['identifier'][0]
             item_title_with_panopto = i[1]['titles'][0]
-    all_formats.sort(reverse=False,key=sortDictByFormat)
+    available_formats = sortDictByFormatKey(available_formats)
     # Sort Items by ID
     for medium, item_list in grouped_items.items():
         grouped_items[medium].sort(key=sortListOfItemsByID)
-    # sort formats by custom order with sortDictByFormat
-    #grouped_items.sort(reverse=True,key=sortDictByFormat)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -565,7 +581,7 @@ def series(noid):
             'grouped_items': grouped_items,
             'title_slug': title_slug,
             'has_panopto':has_panopto,
-            'all_formats': all_formats,
+            'available_formats': available_formats,
             'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
@@ -583,11 +599,13 @@ def item(noid):
 
     item_data = g.mlc_db.get_item(BASE + noid, True)
 
+    # normalize panopto key value
     if item_data['panopto_identifiers']:
         panopto_identifier = item_data['panopto_identifiers'][0]
     else:
         panopto_identifier = ''
 
+    # Get all series for this item
     series = []
     for s in g.mlc_db.get_series_for_item(BASE + noid):
         series.append((s, g.mlc_db.get_series_info(s)))
@@ -619,7 +637,7 @@ def item(noid):
     )
 
     # Descendats
-    all_formats = []
+    available_formats = {}
     panopto_in_child = False
     if len(item_data['descendants'])>0:
         for level, formats in item_data['descendants'].items():
@@ -628,15 +646,24 @@ def item(noid):
                     fetched_item = g.mlc_db.get_item(item)
                     if item_data['identifier'][0] != fetched_item['identifier'][0]:
                         item_data['descendants'][level][medium][k] = fetched_item
-                        if( not medium in all_formats):
-                            all_formats.append(medium)
+                        print("===> Check this")
+                        print("medium",medium)
+
+                        # format = [medium_group, medium_icon, original_medium]
+                        # medium = i[1]['medium'] #medium
+                        # Get all formats available from children to display in Item metadata table
+                        if medium not in available_formats:
+                            available_formats[medium[0]] = medium+[1]
+                        else:
+                            available_formats[medium[0]][3] += 1
+
                         # if 'panopto_links' in fetched_item :
                         if len(fetched_item['panopto_links'])>0 :
                             panopto_in_child = True
                     else:
                         item_data['descendants'][level][medium].pop(k)
-
-        all_formats.sort(key=sortDictByFormat)
+        
+        available_formats = sortDictByFormatKey(available_formats)
         for level, formats in item_data['descendants'].items():
             # sort mediums by custom order
             item_data['descendants'][level] = OrderedDict(sorted(item_data['descendants'][level].items(), key=sortDictByFormat  ))
@@ -652,7 +679,7 @@ def item(noid):
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
-            'all_formats': all_formats,
+            'available_formats': all_formats,
             'panopto_in_child': panopto_in_child,
             'breadcrumb': breadcrumb})
     )

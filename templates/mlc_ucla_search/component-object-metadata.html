@@ -209,48 +209,24 @@
       {% if medium %}
         <dt>{% trans %}Media Type{% endtrans %}:</dt>
         <dd>
-          {% for i in medium %}
-            {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}<br>
-            {% else %}
-              {{ i }}<br>
-            {% endif %}
-          {% endfor %}
+          {% set show_full_medium = true %}
+          {% set format = medium %}
+          {% include 'component-format-label.html' %}
         </dd>
       {% endif %}
 
-      {% if is_series %}
-        {% if all_formats and all_formats|length > 0 %}
-          <dt>{% trans %}Formats{% endtrans %}:</dt>
-          <dd>
-          {% for medium in all_formats %}
-            <span>
-              {% if medium=="(:unav)" %}
-                <span>unk</span>
-              {% else %}
-                <span>
-                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %}
-                  {{ medium }}
-                </span>
-              {% endif %}
-            </span>
-          {% endfor %}
-          </dd>
-        {% endif %}
-      {% elif is_item %}
-        {% if all_formats and all_formats|length >0 %}
+      {% if available_formats and available_formats|length > 0 %}
+        {% if is_series %}
+          <dt>{% trans %}Formats available{% endtrans %}:</dt>
+        {% elif is_item %}
           <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
-          <dd>
-            {% for medium in all_formats %}
-              {% if medium == "(:unav)" %}
-                <span>unk</span>
-              {% else %}
-                <span>
-                  {% if medium == "Sound" and has_panopto %}<span><i class="fa fa-headphones" aria-hidden="true"></i></span>{% endif %} {{ medium }}</span>
-              {% endif %}
-            {% endfor %}
-          </dd>
         {% endif %}
+        <dd>
+        {% for f in available_formats %}
+          {% set format = available_formats[f] %}
+          {% include 'component-format-label.html' %}
+        {% endfor %}
+        </dd>
       {% endif %}
   </dl>
 </div>
