@@ -1672,8 +1672,8 @@ class MLCDB:
 
         # Group and create a medium object
         # ! assumes 'medium' as a list will always have only one item
-        # output: [medium_group, medium_icon, original_medium]
-        medium_key = {
+        # output: [format_group, format_icon, format_medium]
+        format_key = {
          'sound':{
             'match': [ 'audio', 'sound' ],
             'icon': 'fa-headphones'
@@ -1699,18 +1699,18 @@ class MLCDB:
             'icon': 'fa-question-circle'
             }
         }
-        medium_obj = ['fa-question-circle','unknown','unk']
+        format_obj = ['fa-question-circle','unknown','unk']
         medium = info['medium'][0]
         has_panopto = len(info['panopto_links'])>0
-        for mk in medium_key:
-            if medium.lower() in medium_key[mk]['match']:
-                if mk == "sound" and not has_panopto:
-                    mk = "archival"
-                    medium_obj = [mk, medium_key[mk]['icon'], medium]
+        for fk in format_key:
+            if medium.lower() in format_key[fk]['match']:
+                if fk == "sound" and not has_panopto:
+                    fk = "archival"
+                    format_obj = [fk, format_key[fk]['icon'], medium]
                 else:   
-                    medium_obj = [mk, medium_key[mk]['icon'], medium]
+                    format_obj = [fk, format_key[fk]['icon'], medium]
                 break
-        info['medium'] = medium_obj
+        info['medium'] = format_obj
 
         # load relationships
         if get_format_relationships:

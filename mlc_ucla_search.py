@@ -534,19 +534,20 @@ def series(noid):
     grouped_items = {}
     available_formats = {}
     for i in items:
-        # medium = [medium_group, medium_icon, original_medium]
-        medium = i[1]['medium']
+        # format_obj = [format_group, format_icon, original_medium, <count>]
+        format_obj = i[1]['medium']
         # Get all formats available to display in Series metadata table
-        if medium[0] not in available_formats:
-            available_formats[medium[0]] = medium+[1]
+        if format_obj[0] not in available_formats:
+            available_formats[format_obj[0]] = format_obj+[1]
         else:
-            available_formats[medium[0]][3] += 1
+            available_formats[format_obj[0]][3] += 1
+
         # filter out non-original items to display in series level
         if not i[1]['is_format_of']:
             # Group items by medium/format
-            if medium[0] not in grouped_items:
-                grouped_items[medium[0]] = []
-            grouped_items[medium[0]].append(i[1])
+            if format_obj[0] not in grouped_items:
+                grouped_items[format_obj[0]] = []
+            grouped_items[format_obj[0]].append(i[1])
         # Check if series has one item with a panopto file
         # Get details about one item with panopto file 
         #  to help locate series in panopto
@@ -556,8 +557,8 @@ def series(noid):
             item_title_with_panopto = i[1]['titles'][0]
     available_formats = sortDictByFormatKey(available_formats)
     # Sort Items by ID
-    for medium, item_list in grouped_items.items():
-        grouped_items[medium].sort(key=sortListOfItemsByID)
+    for format_type, item_list in grouped_items.items():
+        grouped_items[format_type].sort(key=sortListOfItemsByID)
 
     try:
         title_slug = ' '.join(series_data['titles'])
@@ -637,32 +638,28 @@ def item(noid):
     )
 
     # Descendats
+    # The descdants are a list of generations(levels),
+    # Which have lists of items (only identifier) grouped into mediums.
+    # We take them and get the full item object,
+    # we also obtain all the available formats from the descendant tree to list them
     available_formats = {}
-    panopto_in_child = False
     if len(item_data['descendants'])>0:
-        for level, formats in item_data['descendants'].items():
-            for medium, item_list in formats.items():
+        for level, mediums_in_level in item_data['descendants'].items():
+            for medium, item_list in mediums_in_level.items():
                 for k, item in reversed(list(enumerate(item_list))):
                     fetched_item = g.mlc_db.get_item(item)
-                    if item_data['identifier'][0] != fetched_item['identifier'][0]:
-                        item_data['descendants'][level][medium][k] = fetched_item
-                        print("===> Check this")
-                        print("medium",medium)
-
-                        # format = [medium_group, medium_icon, original_medium]
-                        # medium = i[1]['medium'] #medium
-                        # Get all formats available from children to display in Item metadata table
-                        if medium not in available_formats:
-                            available_formats[medium[0]] = medium+[1]
-                        else:
-                            available_formats[medium[0]][3] += 1
-
-                        # if 'panopto_links' in fetched_item :
-                        if len(fetched_item['panopto_links'])>0 :
-                            panopto_in_child = True
-                    else:
+                    if item_data['identifier'][0] == fetched_item['identifier'][0]:
                         item_data['descendants'][level][medium].pop(k)
-        
+                    else:
+                        item_data['descendants'][level][medium][k] = fetched_item
+
+                        # format_obj = [format_group, format_icon, original_medium, <count>]
+                        format_obj = fetched_item['medium']
+                        if format_obj[0] not in available_formats:
+                            available_formats[format_obj[0]] = format_obj+[1]
+                        else:
+                            available_formats[format_obj[0]][3] += 1
+                            
         available_formats = sortDictByFormatKey(available_formats)
         for level, formats in item_data['descendants'].items():
             # sort mediums by custom order
@@ -679,8 +676,7 @@ def item(noid):
             'access_rights': get_access_label_obj(item_data),
             'request_access_button' : request_access_button,
             'panopto_identifier': panopto_identifier,
-            'available_formats': all_formats,
-            'panopto_in_child': panopto_in_child,
+            'available_formats': available_formats,
             'breadcrumb': breadcrumb})
     )
 
