@@ -1,0 +1,87 @@
+{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
+{% if is_series %}
+    {# SERIES ITEM LIST #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Items in the Series{% endtrans %}</h2>
+      </div>
+      <div class="panel-body item-list-faux-table">
+        {% if grouped_items|length > 0 %}
+          {% include 'component-item-in-list-header.html' %}
+          <ul class="no-style-list">
+            {% for medium in grouped_items %}
+              {% if grouped_items[medium]|length > 0 %}
+                {% for item in grouped_items[medium] %}
+                  {% include 'component-item-in-list.html' %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>{% trans %}This series has no items to list.{% endtrans %}</p>
+        {% endif %}
+      </div>
+    </div>
+
+{% elif is_item %}
+
+    {# DESCENDANT ITEM LIST #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}Conversions List{% endtrans %}</h2>
+      </div>
+      <div class="panel-body item-list-faux-table">
+        {% if descendants|length >0 %}
+
+          {% for level, formats in descendants.items()  %}
+            {% if level == 1 %}
+              <h3>{% trans %}This item has been converted to the following items:{% endtrans %}</h3>
+              {% include 'component-item-in-list-header.html' %}
+            {% elif level == 2 %}
+              <h3>{% trans %}And further converted:{% endtrans %}</h3>
+              {% include 'component-item-in-list-header.html' %}
+            {% endif %}
+            {% if level >= 2 %}
+              {% set showlevel = level-1 %}
+            {% endif %}
+
+            <h4 class="sr-only">Conversion Generation {{ level }}</h4>
+            <ul class="no-style-list">
+              {% for medium in formats %}
+                {% for descendant in formats[medium] %}
+                  {% set item = descendant %}
+                  {% include 'component-item-in-list.html' %}
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          {% endfor %}
+
+        {% else %}
+          <p>{% trans %}This item has not been further converted.{% endtrans %}</p>
+        {% endif %}
+
+      </div>
+    </div>
+
+    {# PARENT ITEM LIST #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>{% trans %}This item has been converted from:{% endtrans %}</h2>
+      </div>
+      <div class="panel-body item-list-faux-table">
+        {% if is_format_of|length >0 %}
+          {% include 'component-item-in-list-header.html' %}
+          <ul class="no-style-list">
+            {% for medium, item_list in is_format_of.items() %}
+              {% for item in item_list %}
+                {% include 'component-item-in-list.html' %}
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>{% trans %}This item is an original recording.{% endtrans %}</p>
+        {% endif %}
+      </div>
+    </div>
+
+{% endif %}

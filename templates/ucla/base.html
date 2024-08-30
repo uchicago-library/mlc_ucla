@@ -47,7 +47,7 @@
   <div>
     {% include "header.html" %}
     <div class="mlc-banner">
-      <div class="container">
+      <div class="container ">
         <div class="row">
           <div class="col-xs-12">
             <p class="w-100">{{ trans.collection_title }}</p>
@@ -60,7 +60,7 @@
     <div class="container"> <!-- Main Container Wrapper -->
       <div class="row"> <!-- Off Canvas Wrapper Row -->
         <!-- <div class="col-md-12 breadcrumbs hidden-xs hidden-sm"> -->
-        <div class="col-xs-9 breadcrumbs">
+        <div class="col-xs-12 breadcrumbs">
           <a href="https://www.lib.uchicago.edu/collex/">{% trans %}Collections & Exhibits{% endtrans %}</a> &gt;
           <a href="https://www.lib.uchicago.edu/collex/collections/">{% trans %}Collections{% endtrans %}</a> &gt;
           <a href="/">{{ trans.collection_title }}</a> 
@@ -70,7 +70,8 @@
           {% endif %}
         </div> <!-- // Breadcrumbs -->
 
-        {# <div class="col-xs-3 text-right">
+        {# deactivated langugage for some reason. sibbling div needs to be changed to col-xs-9
+        <div class="col-xs-3 text-right">
           <form action="/language-change" method="POST">
             <button type="submit"class="btn language-selector-btn">
               <span class="lang-en">EN</span>/<span class="lang-es">ES</span>

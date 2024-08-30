@@ -1,0 +1,81 @@
+{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
+<div class="panel panel-default comp-object-title">
+  <div class="panel-body">
+    {# CHARACTERIZATION #}
+      {% if not is_series and series %}
+        <span style="display:inline-block;">
+          <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+            <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+            {{ series[0].1.titles.0 }}
+          </a><br>
+        </span>
+      {% endif %}
+    {# ACCESS and MEDIUM labels #}
+    <div class="object-title-labels">
+      <!-- {{ identifier.0 }} -->
+      <span class="label label-{{ access_rights[2] }}">{{ access_rights[1] }}</span>
+
+      {% if is_item and medium %}
+        {% set format = medium %}
+        {% include 'component-format-label.html' %}
+      {% endif %}
+    </div>
+
+    {# TITLE #}
+    <h1  title="{% trans %}Object title{% endtrans %}">
+      {% if is_series %}
+        <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
+      {% endif %}
+      {{ title_slug }}
+    </h1>
+
+    {# DETAILS #}
+    <div>
+      {% if subject_language %}
+        {% set l = subject_language|length %}
+        {% for i in subject_language %}
+          {% if i=="(:unav)" %}
+            <span class="text-muted" title="{% trans %}Unknown indigenous language{% endtrans %}">{% trans %}unk{% endtrans %}</span>
+          {% else %}
+            <a href="/browse?type=language&term={{ i|urlencode }}" title="{% trans %}Indigenous language{% endtrans %}">{{ i }}</a>
+          {% endif %}
+        {% endfor %}
+      {% else %} 
+        <span class="text-muted" title="{% trans %}Unknown indigenous language{% endtrans %}">{% trans %}unk{% endtrans %}</span>
+      {% endif %} 
+
+      {% if location %}
+        <span> - </span>
+        {% set l = location|length %}
+        {% for i in location %}
+          {% if i=="(:unav)" %}
+            <span class="text-muted" title="{% trans %}Unknown Location{% endtrans %}">{% trans %}unk{% endtrans %} </span>
+          {% else %}
+            <a href="/browse?type=location&term={{ i|urlencode }}" title="{% trans %}Location{% endtrans %}">{{ i }}</a>
+          {% endif %}
+
+        {% endfor %}
+      {% else %} 
+        <span> - </span>
+        <span class="text-muted" title="{% trans %}Unknown Location{% endtrans %}">{% trans %}unk{% endtrans %} </span>  
+      {% endif %}
+
+      {% if date %}
+        <span> - </span>
+        {% set l = date|length %}
+        {% for i in date %}
+          {% if i=="(:unav)" %}
+            <span class="text-muted" title="{% trans %}Unknown date{% endtrans %}">{% trans %}unk{% endtrans %}</span>
+          {% else %}
+            <a href="/browse?type=date&term={{ i|urlencode }}" title="{% trans %}Date{% endtrans %}">{{ i }}</a>
+          {% endif %}
+
+        {% endfor %}
+      {% else %} 
+        <span> - </span>
+        <span class="text-muted" title="{% trans %}Unknown date{% endtrans %}">{% trans %}unk{% endtrans %}</span>
+      {% endif %}  
+    </div>
+
+  </div>
+</div>

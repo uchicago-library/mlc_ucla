@@ -17,118 +17,51 @@
     <ul class="no-style-list">
     {# RESULT #}
     {% for result in results %}
-      <li class="search-result">
-      {# SERIES #}
-      <div class="search-results-series-title">
-        <span class="series-result-series-label">
-          <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-          {% trans %}Series{% endtrans %}
-          <span class="hidden">{% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}</span>: 
-        </span>
-        <div class="search-results-series-title-badge">
-          <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}"><h2>
-            {{ result.1.titles.0 }}
-          </h2></a>
-          <div class="title-id-badge">
-            {# <span class="text-muted-extra"> {{ result.1.identifier.0 }}</span> #}
+      <li class="search-result panel panel-default">
+        {# SERIES #}
+        <div class="panel-heading"> 
             <span class="badge badge-{{ result.1.access_rights.2 }}">{{ result.1.access_rights.1 }}</span>
+            <div class="search-results-series-title">
+              <a href="/series/{{ result.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}"><h2>
+              <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+              <span class="hidden">{% for identifier in result.1.identifier %}{{ identifier }}{% endfor %}</span>
+              {{ result.1.titles.0 }}
+              </h2></a>
+            </div>
+        </div>
+        {# METADATA #}
+          {% set subject_language = result.1.subject_language  %}
+          {% set primary_language = result.1.primary_language  %}
+          {% set location = result.1.location  %}
+          {% set date = result.1.date %}
+          {% set creator = result.1.creator %}
+          {% set contributor = result.1.contributor %}
+          {% set content_type = result.1.content_type %}
+
+          {% include 'component-object-metadata.html' %}
+          
+
+        {# ITEMS #}
+        {% if result.1.sub_items|length > 0 %}
+          <hr style="margin: 0">
+          <div class="panel-body">
+            <div class="items-listing">{# well well-sm  #}
+              <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
+
+              {% include 'component-item-in-list-header.html' %}
+              <ul class="no-style-list">
+              {% for item_o in result.1.sub_items %}
+                {% with %}
+                  {% if item_o.is_format_of|length == 0 %}
+                    {% set item = item_o %}
+                    {% include 'component-item-in-list.html' %}
+                  {% endif %}
+                {% endwith %}
+              {% endfor %}
+              </ul>
+            </div>
           </div>
-        </div>
-      </div>
-      {# METADATA #}
-      <div class="object-metadata">
-        <dl>
-          {% if result.1.subject_language %}
-            <dt>{% trans %}Indigenous Language(s){% endtrans %}: </dt>
-            <dd>
-            {% for language in result.1.subject_language %}
-              <a href="/browse/?type=language&term={{ language|urlencode }}">{{ language }}</a>
-            {% endfor %}
-            </dd>
-          {% endif %}
-          {% if result.1.primary_language %}
-            <dt>{% trans %}Language(s){% endtrans %}: </dt>
-            <dd>
-            {% for language in result.1.primary_language %}
-              <a href="/browse/?type=language&term={{ language|urlencode }}">{{ language }}</a>
-            {% endfor %}
-            </dd>
-          {% endif %}
-          {% if result.1.location %}
-            <dt>{% trans %}Location{% endtrans %}:</dt>
-            <dd>
-            {% for location in result.1.location %}
-              <a href="/browse/?type=location&term={{ location|urlencode }}">{{ location }}</a>
-            {% endfor %}
-            </dd>
-          {% endif %}
-          {% if result.1.date %}
-            <dt>{% trans %}Date{% endtrans %}:</dt>
-            <dd>
-            {% for date in result.1.date %}
-              <a href="/browse/?type=date&term={{ date|urlencode }}">{{ date }}</a>
-            {% endfor %}
-            </dd>
-          {% endif %}
-          {% if result.1.creator %}
-            <dt>{% trans %}Creator(s){% endtrans %}:</dt>
-            <dd>
-            {% if result.1.creator|length > 3 %}
-              {% for creator in result.1.creator[:3] %}
-                <a href="/browse/?type=creator&term={{ creator|urlencode }}">{{ creator }}</a>
-              {% endfor %}
-              (+{{ result.1.creator|length -3 }})
-            {% else %}
-              {% for creator in result.1.creator %}
-                <a href="/browse/?type=creator&term={{ creator|urlencode }}">{{ creator }}</a>
-              {% endfor %}
-            {% endif %}
-            </dd>
-          {% endif %}
-          {% if result.1.contributor %}
-            <dt>{% trans %}Contributor(s){% endtrans %}:</dt>
-            <dd>
-            {% if result.1.contributor|length > 3 %}
-              {% for contributor in result.1.contributor[:3] %}
-                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}">{{ contributor }}</a>
-              {% endfor %}
-              (+{{ result.1.contributor|length -3 }})
-            {% else %}
-              {% for contributor in result.1.contributor %}
-                <a href="/browse/?type=contributor&term={{ contributor|urlencode }}">{{ contributor }}</a>
-              {% endfor %}
-            {% endif %}
-            </dd>
-          {% endif %}
-          {% if result.1.content_type %}
-            <dt>{% trans %}Resource Type{% endtrans %}:</dt>
-            <dd>
-            {% for content_type in result.1.content_type %}
-              <span>{{ content_type }}</span>
-            {% endfor %}
-            </dd>
-          {% endif %}
-        </dl>
-      </div>
-
-      {# ITEMS #}
-      {% if result.1.sub_items|length > 0 %}
-        <div class="items-listing">{# well well-sm  #}
-          <b class="text-muted"> {% trans num=result.1.sub_items|length %} "{{ query }}" Found in {{ num }} item(s): {% endtrans %}  </b>
-
-          {% include 'component-item-in-list-header.html' %}
-          <ul class="no-style-list">
-          {% for item_o in result.1.sub_items %}
-            {% with %}
-              {% if item_o.is_format_of|length == 0 %}
-                {% set item = item_o %}
-                {% include 'component-item-in-list.html' %}
-              {% endif %}
-            {% endwith %}
-          {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
+        {% endif %}
       </li>
     {% endfor %}
     </ul>
