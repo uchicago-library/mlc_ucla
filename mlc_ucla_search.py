@@ -227,7 +227,7 @@ cgimail_dic= {
         'subject': 'Request for access to MLC restricted series',
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for your interest in this content. '
-            'Request to content access is typically processed within 3 businessdays. '
+            'Request to content access is typically processed within 3 business days. '
             'You will be notified of any status change to the email associated with your account. '
             'We ask each visitor to avoid making duplicate requests by keeping a record of them, '
             'as we have no way to display these for each user at the moment.')

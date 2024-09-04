@@ -5,6 +5,7 @@
       {% if not is_series and series %}
         <span style="display:inline-block;">
           <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+            Series: 
             <i class="fa fa-folder-open-o" aria-hidden="true"></i>
             {{ series[0].1.titles.0 }}
           </a><br>
