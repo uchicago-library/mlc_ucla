@@ -590,6 +590,24 @@ ul.no-style-list{
 #panopto-help{
 	padding: .2rem;
 	margin-top: -30px;
+	font-size: 18px;
+	overflow: hidden;
+	height: 35px;
+	display: -webkit-flex;
+	display: flex;
+}
+#panopto-help #panopto-help-text{
+	font-size: 14px;
+	display: inline-block;
+	width: 0;
+	overflow: hidden;
+	transition: .3s ;
+}
+#panopto-help:hover #panopto-help-text,
+#panopto-help:active #panopto-help-text{
+	margin-left: 5px;
+	width: 165px;
+	overflow: initial;
 }
 /* Title Element */
 /* easy fix */

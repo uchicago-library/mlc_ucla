@@ -27,12 +27,12 @@
           {% endif %}
             {% trans %}Read the <a href="/access-terms">terms of access page</a> for more information.{% endtrans %}
         </div>
-        <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i></button>
+        <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i><span id="panopto-help-text">How to stream this audio?</span></button>
       {% endif %}
       
       {# PANOPTO PLAYER #}
       <!-- {{ panopto_identifier }} -->
-      {% if not cnet_id and ( access_rights[0]|lower == 'restricted' or access_rights[0]|lower == 'campus ) %}
+      {% if not cnet_id and ( access_rights[0]|lower == 'restricted' or access_rights[0]|lower == 'campus' ) %}
         <div class="placeholder-iframe alert" style=" width: 720px; max-width: 100%; height: 100px; border: 2px solid #800000; background: #fffafa; color: #800000; min-width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0 auto 1rem;">
           <i class="fa fa-headphones" aria-hidden="true" style="font-size: 42px"></i>
           <p><a href="/login">Login</a> to stream this file.</p>
