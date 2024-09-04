@@ -35,7 +35,7 @@
           <input type="text" class="form-control" id="item_title" name="Item Title" value="{{ request.args.get('item_title') }}" readonly required>
         </div>
         <div class="form-group">
-          <label for="requestReason">{% trans %}Please describe the educational or fair use reason to access this series.{% endtrans %}*</label>
+          <label for="requestReason">{% trans %}Please describe the educational or <a href="https://www.lib.uchicago.edu/copyrightinfo/fairuse.html">fair use</a> reason to access this series.{% endtrans %}*</label>
           <textarea type="text" class="form-control" id="requestReason" name="Series access request reason" placeholder="{% trans %}Please specify{% endtrans %}" required></textarea>
         </div>
         <button type="submit">{% trans %}Submit{% endtrans %}</button><br>
