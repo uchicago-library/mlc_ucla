@@ -196,6 +196,17 @@ h1{
 	background: #800000;
 }
 
+.btn-tertiary{	
+	color: #777777;
+	border: 1px solid #777777;
+	background-color: #transparent;
+	border-radius: 4px;
+}
+.btn-tertiary:active,
+.btn-tertiary:hover,
+.btn-tertiary:focus{	
+	background-color: #e6e6e6;
+}
 
 
 /* ======= SIDEBAR LEFT */
@@ -337,15 +348,6 @@ h1{
 .browse-bar h2{
 	margin-top: 0rem;
 }
-.browse-bar .btn{	
-	background-color: #645E5E;
-}
-.browse-bar .btn:active,
-.browse-bar .btn:hover,
-.browse-bar .btn:focus{	
-	color: #fff;
-	background-color: #7b7474;
-}
 .browse-bar .btn:not(:last-child){	
 	margin-right: .5rem;
 }
@@ -387,6 +389,8 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 .label,
 .label-item-format{
 	font-size: .9em;
+	padding: .3em 1em;
+    border-radius: 1em;
 }
 .panel-heading h2{
 	margin: 5px 0 0;
@@ -394,7 +398,7 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 .badge-link fa{
 }
 .badge-link{
-	border-color: inherit;
+border-color: inherit;
   border-width: 1px;
   border-style: solid;
   border-radius: 4px;
@@ -408,8 +412,11 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 .comp-object-metadata dl{
 	margin: 0;
 }	
-.comp-object-metadata dd>*{
-	margin-right: 10px;
+.comp-object-metadata dl dd{
+	display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 15px;
 }
 
 @media (min-width:420px){

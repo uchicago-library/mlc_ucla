@@ -220,7 +220,7 @@
         {% elif is_item %}
           <dt>{% trans %}Other Media Types{% endtrans %}:</dt>
         {% endif %}
-        <dd>
+        <dd class="multiline-items">
         {% for f in available_formats %}
           {% set format = available_formats[f] %}
           {% set show_format_count = true %}
@@ -229,4 +229,103 @@
         </dd>
       {% endif %}
   </dl>
+  <div class="panel-footer" style="display: flex; flex-wrap: wrap;justify-content: space-between; align-items: flex-end; gap: 5px 15px;">
+    <div>
+      <b>Citation</b>
+      <div class="citation-text" aria-hidden="true">
+        {% if is_item %}  
+          {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},<br>
+          Online Language Archive, University of Chicago.
+        {% elif is_series %}
+          {{ titles[0] }}, {{creator[0]}}, {{date[0]}},<br>
+          Online Language Archive, University of Chicago.
+        {% endif %}
+      </div>
+    </div>
+    <button id="copy-citation-btn" class="btn btn-tertiary" style="margin-bottom: 0;">Copy Citation</button>
+  </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const copyButton = document.getElementById('copy-citation-btn');
+    if (!copyButton) return;
+
+    // Cache DOM elements and create announcer only once
+    const citationTextElement = document.querySelector('.citation-text');
+    let announcer;
+
+    copyButton.addEventListener('click', handleCopyClick);
+
+    function handleCopyClick() {
+      if (!citationTextElement) {
+        handleError('Citation text not found');
+        return;
+      }
+      
+      copyTextToClipboard(citationTextElement.textContent.trim());
+    }
+
+    function copyTextToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(handleSuccess)
+          .catch(error => handleError('Clipboard API failed', error));
+      } else {
+        fallbackCopyTextToClipboard(text);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        if (document.execCommand('copy')) {
+          handleSuccess();
+        } else {
+          throw new Error('Copy command was unsuccessful');
+        }
+      } catch (error) {
+        handleError('Fallback copy method failed', error);
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+
+    function handleSuccess() {
+      updateButtonState('Copied!', true);
+      announceMessage('Citation copied to clipboard');
+      setTimeout(() => updateButtonState('Copy Citation', false), 2000);
+    }
+
+    function handleError(message, error = null) {
+      console.error(`Error: ${message}`, error);
+      updateButtonState('Copy failed', false);
+      announceMessage('Failed to copy citation: ' + message);
+      setTimeout(() => updateButtonState('Copy Citation', false), 2000);
+    }
+
+    function updateButtonState(text, isDisabled) {
+      copyButton.textContent = text;
+      copyButton.disabled = isDisabled;
+      copyButton.setAttribute('aria-pressed', isDisabled);
+      copyButton.setAttribute('aria-label', `${text} citation`);
+    }
+
+    function announceMessage(message) {
+      if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = 'a11y-announcer';
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.className = 'sr-only'; 
+        document.body.appendChild(announcer);
+      }
+      announcer.textContent = message;
+    }
+  });
+</script>

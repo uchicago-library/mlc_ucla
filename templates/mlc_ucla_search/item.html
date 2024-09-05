@@ -6,14 +6,6 @@
     {# OBJECT TITLE #}
     {% include 'component-object-title.html' %}
 
-    <div class="panel panel-default">
-      <div class="citation-text visually-hidden" aria-hidden="true">
-        {{ title_slug }}, {{creator[0]}} et al., {{date[0]}},
-        Online Language Archive, University of Chicago.
-      </div>
-      <button id="copy-citation-btn" class="btn btn-primary">Copy Citation</button>
-    </div>
-
     {# PANOPTO #}
     <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
     {% if panopto_identifier %}
@@ -72,101 +64,4 @@
     {% include 'component-item-list.html' %}
     
   </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const copyButton = document.getElementById('copy-citation-btn');
-    if (!copyButton) return;
-
-    // Cache DOM elements and create announcer only once
-    const citationTextElement = document.querySelector('.citation-text');
-    let announcer;
-
-    copyButton.addEventListener('click', handleCopyClick);
-
-    function handleCopyClick() {
-      if (!citationTextElement) {
-        handleError('Citation text not found');
-        return;
-      }
-      
-      copyTextToClipboard(citationTextElement.textContent);
-    }
-
-    function copyTextToClipboard(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text)
-          .then(handleSuccess)
-          .catch(error => handleError('Clipboard API failed', error));
-      } else {
-        fallbackCopyTextToClipboard(text);
-      }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        if (document.execCommand('copy')) {
-          handleSuccess();
-        } else {
-          throw new Error('Copy command was unsuccessful');
-        }
-      } catch (error) {
-        handleError('Fallback copy method failed', error);
-      } finally {
-        document.body.removeChild(textArea);
-      }
-    }
-
-    function handleSuccess() {
-      updateButtonState('Copied!', true);
-      announceMessage('Citation copied to clipboard');
-      setTimeout(() => updateButtonState('Copy Citation', false), 2000);
-    }
-
-    function handleError(message, error = null) {
-      console.error(`Error: ${message}`, error);
-      updateButtonState('Copy failed', false);
-      announceMessage('Failed to copy citation: ' + message);
-      setTimeout(() => updateButtonState('Copy Citation', false), 2000);
-    }
-
-    function updateButtonState(text, isDisabled) {
-      copyButton.textContent = text;
-      copyButton.disabled = isDisabled;
-      copyButton.setAttribute('aria-pressed', isDisabled);
-      copyButton.setAttribute('aria-label', `${text} citation`);
-    }
-
-    function announceMessage(message) {
-      if (!announcer) {
-        announcer = document.createElement('div');
-        announcer.id = 'a11y-announcer';
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.className = 'visually-hidden';
-        document.body.appendChild(announcer);
-      }
-      announcer.textContent = message;
-    }
-  });
-</script>
-<style>
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>
 {% endblock %}
