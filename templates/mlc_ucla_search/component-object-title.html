@@ -25,13 +25,12 @@
     </div>
 
     {# TITLE #}
-    <h1  title="{% trans %}Object title{% endtrans %}">
+    <h1 title="{% trans %}Object title{% endtrans %}: {{series[0].1.titles.0}}">
       {% if not is_series and series %}
-        <span style="display:inline-block;">
-          <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-            {{ series[0].1.titles.0 }} >
-          </a><br>
-        </span>
+        <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+          {{ series[0].1.titles.0|truncate(35, True, '...') }}
+          >
+        </a>
       {% endif %}
       {{ title_slug }}
     </h1>

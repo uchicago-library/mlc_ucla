@@ -388,6 +388,14 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
 	border: none;
 	padding: 0;
 }
+/* .comp-object-title h1 .series-in-item-title{
+	display:inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%; 
+	max-width: 15ch;
+} */
 
 .label,
 .label-item-format{
@@ -553,6 +561,8 @@ ul.no-style-list{
 }
 
 /* =============== ITEM */
+/* You can add more specific classes as needed */
+
 #panopto-help{
 	padding: .2rem;
 	margin-top: -30px;

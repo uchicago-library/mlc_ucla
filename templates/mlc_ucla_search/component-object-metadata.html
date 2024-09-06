@@ -1,3 +1,4 @@
+{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
 <div class="comp-object-metadata">
   <!-- COMPONENT: OBJECT METADATA -->
   <dl>
@@ -7,7 +8,7 @@
         <dt>{% trans %}Alternative Series Title{% endtrans %}:</dt>
         <dd>
           {% for i in alternative_title %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -22,9 +23,11 @@
         <dd>
           {% for serie in series %}
             <a href="/series/{{ serie.0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-              <i class="fa fa-folder-open-o" aria-hidden="true"></i>
               {{ serie.1.titles.0 }}
-            </a><br>
+            </a>
+            {% if not loop.last %}
+              <br>
+            {% endif %}
           {% endfor %}
         </dd>
       {% endif %}
@@ -36,7 +39,7 @@
             {% if i=="(:unav)" %}
               <!--(:unav)-->
             {% else %}
-              {{ i }}<br>
+              {{ i }}
             {% endif %}
           {% endfor %}
         </dd>
@@ -50,7 +53,7 @@
         {% endif %}
         <dd>
           {% for i in identifier %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -62,7 +65,7 @@
         <dd>
           {% for i in subject_language %}
             {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}<br>
+              {% trans %}unknown{% endtrans %}
             {% else %}
               <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endif %}
@@ -75,7 +78,7 @@
         <dd>
           {% for i in primary_language %}
             {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}<br>
+              {% trans %}unknown{% endtrans %}
             {% else %}
               <a href="/browse?type=language&term={{ i|urlencode }}">{{ i }}</a>
             {% endif %}
@@ -88,7 +91,7 @@
         <dd>
           {% for i in location %}
             {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}<br>
+              {% trans %}unknown{% endtrans %}
             {% else %}
               <a href="/browse?type=location&term={{ i|urlencode }}">{{ i }}</a>
             {% endif %}
@@ -101,7 +104,7 @@
         <dd>
           {% for i in date %}
             {% if i=="(:unav)" %}
-              {% trans %}unknown{% endtrans %}<br>
+              {% trans %}unknown{% endtrans %}
             {% else %}
               <a href="/browse?type=date&term={{ i|urlencode }}">{{ i.split('/')[0] }}</a>
             {% endif %}
@@ -113,7 +116,7 @@
         <dt>{% trans %}Description{% endtrans %}:</dt>
         <dd>
           {% for i in description %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -138,7 +141,7 @@
           <dd>
             {% for i in creator %}
               {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
+                {% trans %}unknown{% endtrans %}
               {% else %}
                 <a href="/browse?type=creator&term={{ i|urlencode }}">{{ i }}</a>
               {% endif %}
@@ -166,7 +169,7 @@
           <dd>
             {% for i in contributor %}
               {% if i=="(:unav)" %}
-                {% trans %}unknown{% endtrans %}<br>
+                {% trans %}unknown{% endtrans %}
               {% else %}
                 <a href="/browse?type=contributor&term={{ i|urlencode }}">{{ i }}</a>
               {% endif %}
@@ -179,7 +182,7 @@
         <dt>{% trans %}Linguistic Data Type{% endtrans %}:</dt>
         <dd>
           {% for i in linguistic_data_type %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -188,7 +191,7 @@
         <dt>{% trans %}Discourse Type{% endtrans %}:</dt>
         <dd>
           {% for i in discourse_type %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -197,7 +200,7 @@
         <dt>{% trans %}Item Content Type{% endtrans %}:</dt>
         <dd>
           {% for i in content_type %}
-            {{ i }}<br>
+            {{ i }}
           {% endfor %}
         </dd>
       {% endif %}
@@ -233,10 +236,10 @@
       <b>Citation</b>
       <div class="citation-text" aria-hidden="true">
         {% if is_item %}  
-          {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},<br>
+          {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},
           Online Language Archive, University of Chicago.
         {% elif is_series %}
-          {{ titles[0] }}, {{creator[0]}}, {{date[0].split('/')[0]}},<br>
+          {{ titles[0] }}, {{creator[0]}}, {{date[0].split('/')[0]}},
           Online Language Archive, University of Chicago.
         {% endif %}
       </div>
