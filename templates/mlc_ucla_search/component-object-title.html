@@ -6,7 +6,6 @@
         <span style="display:inline-block;">
           <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
             Series: 
-            <i class="fa fa-folder-open-o" aria-hidden="true"></i>
             {{ series[0].1.titles.0 }}
           </a><br>
         </span>
@@ -24,9 +23,6 @@
 
     {# TITLE #}
     <h1  title="{% trans %}Object title{% endtrans %}">
-      {% if is_series %}
-        <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
-      {% endif %}
       {{ title_slug }}
     </h1>
 
@@ -68,7 +64,7 @@
           {% if i=="(:unav)" %}
             <span class="text-muted" title="{% trans %}Unknown date{% endtrans %}">{% trans %}unk{% endtrans %}</span>
           {% else %}
-            <a href="/browse?type=date&term={{ i|urlencode }}" title="{% trans %}Date{% endtrans %}">{{ i }}</a>
+            <a href="/browse?type=date&term={{ i|urlencode }}" title="{% trans %}Date{% endtrans %}">{{ i.split('/')[0] }}</a>
           {% endif %}
 
         {% endfor %}
