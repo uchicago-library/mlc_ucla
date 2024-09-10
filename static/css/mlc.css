@@ -427,6 +427,7 @@ border-color: inherit;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 5px 15px;
+	align-items: flex-start;
 }
 
 @media (min-width:420px){
