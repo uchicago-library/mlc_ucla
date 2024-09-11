@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-02-27 20:18-0600\n"
+"POT-Creation-Date: 2024-09-10 20:15-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Indigenous Mesoamerican Languages Portal"
 msgstr ""
 
-#: mlc_ucla_search.py:213
+#: mlc_ucla_search.py:216
 msgid "Error"
 msgstr ""
 
-#: mlc_ucla_search.py:214
+#: mlc_ucla_search.py:217
 msgid ""
 "There was a technical issue sending your request, and we can't determine "
 "its nature. Please try again. We apologize for any inconvenience. If the "
@@ -37,123 +37,123 @@ msgid ""
 "(DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu"
 msgstr ""
 
-#: mlc_ucla_search.py:219 mlc_ucla_search.py:225
+#: mlc_ucla_search.py:222 mlc_ucla_search.py:228
 msgid "Your request was successfully sent"
 msgstr ""
 
-#: mlc_ucla_search.py:220
+#: mlc_ucla_search.py:223
 msgid ""
 "Thank you for requesting an account. Requests are typically processed "
 "within 5 business days. You will be notified of any status change."
 msgstr ""
 
-#: mlc_ucla_search.py:226
+#: mlc_ucla_search.py:229
 msgid ""
 "Thank you for your interest in this content. Request to content access is"
-" typically processed within 3 businessdays. You will be notified of any "
+" typically processed within 3 business days. You will be notified of any "
 "status change to the email associated with your account. We ask each "
 "visitor to avoid making duplicate requests by keeping a record of them, "
 "as we have no way to display these for each user at the moment."
 msgstr ""
 
-#: mlc_ucla_search.py:235
+#: mlc_ucla_search.py:238
 msgid "Thank you for your submission"
 msgstr ""
 
-#: mlc_ucla_search.py:236
+#: mlc_ucla_search.py:239
 msgid ""
 "Your suggestions or correction is welcomed. We will revise it promptly "
 "and get back to you if we need any further information."
 msgstr ""
 
-#: mlc_ucla_search.py:276
+#: mlc_ucla_search.py:279
 msgid "Request Receipt"
 msgstr ""
 
-#: mlc_ucla_search.py:298
+#: mlc_ucla_search.py:301
 msgid "By Request"
 msgstr ""
 
-#: mlc_ucla_search.py:302
+#: mlc_ucla_search.py:305
 msgid "Account Required"
 msgstr ""
 
-#: mlc_ucla_search.py:306
+#: mlc_ucla_search.py:309
 msgid "Open"
 msgstr ""
 
-#: mlc_ucla_search.py:383
+#: mlc_ucla_search.py:405
 msgid "Browse by Contributors"
 msgstr ""
 
-#: mlc_ucla_search.py:384
+#: mlc_ucla_search.py:406
 msgid "Browse by Creator"
 msgstr ""
 
-#: mlc_ucla_search.py:385
+#: mlc_ucla_search.py:407
 msgid "Browse by Date"
 msgstr ""
 
-#: mlc_ucla_search.py:386
+#: mlc_ucla_search.py:408
 msgid "Browse by Decade"
 msgstr ""
 
-#: mlc_ucla_search.py:387
+#: mlc_ucla_search.py:409
 msgid "Browse by Language"
 msgstr ""
 
-#: mlc_ucla_search.py:388
+#: mlc_ucla_search.py:410
 msgid "Browse by Location"
 msgstr ""
 
-#: mlc_ucla_search.py:404
+#: mlc_ucla_search.py:426
 msgid "Results with"
 msgstr ""
 
-#: mlc_ucla_search.py:407
+#: mlc_ucla_search.py:429
 msgid "Results for search"
 msgstr ""
 
-#: mlc_ucla_search.py:470 mlc_ucla_search.py:472
+#: mlc_ucla_search.py:494 mlc_ucla_search.py:496
 msgid "Search Results for"
 msgstr ""
 
-#: mlc_ucla_search.py:474
+#: mlc_ucla_search.py:498
 msgid "Search Results"
 msgstr ""
 
-#: mlc_ucla_search.py:665
-#: templates/mlc_ucla_search/component-sidebar-right.html:84
+#: mlc_ucla_search.py:701
+#: templates/mlc_ucla_search/component-sidebar-right.html:103
 #: templates/mlc_ucla_search/form-suggest-corrections.html:6
 msgid "Suggest Corrections"
 msgstr ""
 
-#: mlc_ucla_search.py:683 ucla.py:78
+#: mlc_ucla_search.py:719 ucla.py:79
 msgid "Access Terms"
 msgstr ""
 
-#: templates/ucla/home.html:9 ucla.py:29 ucla.py:32
+#: ucla.py:30 ucla.py:33
 msgid "Online Language Archive"
 msgstr ""
 
-#: ucla.py:47
+#: ucla.py:48
 msgid "History"
 msgstr ""
 
-#: ucla.py:53
+#: ucla.py:54
 msgid "Contribute your Material"
 msgstr ""
 
-#: ucla.py:59
-msgid "About the Contributors"
+#: ucla.py:60
+msgid "About the Supporters"
 msgstr ""
 
-#: ucla.py:65
-msgid "Aquisitions Guidelines"
+#: ucla.py:66
+msgid "Acquisitions Guidelines"
 msgstr ""
 
-#: ucla.py:71
-msgid "Aquisitions Policy"
+#: ucla.py:72
+msgid "Acquisitions Policy"
 msgstr ""
 
 #: templates/mlc/home.html:13
@@ -204,16 +204,52 @@ msgid ""
 " colleagues."
 msgstr ""
 
-#: templates/mlc_ucla_search/base.html:45
+#: templates/mlc_ucla_search/base.html:54 templates/ucla/base.html:45
 msgid "Skip to Main Content"
 msgstr ""
 
-#: templates/mlc_ucla_search/base.html:64
+#: templates/mlc_ucla_search/base.html:73 templates/ucla/base.html:64
 msgid "Collections & Exhibits"
 msgstr ""
 
-#: templates/mlc_ucla_search/base.html:65
+#: templates/mlc_ucla_search/base.html:74 templates/ucla/base.html:65
 msgid "Collections"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:3
+#: templates/mlc_ucla_search/component-sidebar-right.html:16
+msgid "Browse Collection by"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:7
+#: templates/mlc_ucla_search/component-object-metadata.html:77
+#: templates/mlc_ucla_search/component-sidebar-right.html:19
+msgid "Language"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:8
+#: templates/mlc_ucla_search/component-object-metadata.html:90
+#: templates/mlc_ucla_search/component-sidebar-right.html:22
+msgid "Location"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:9
+#: templates/mlc_ucla_search/component-sidebar-right.html:25
+msgid "Creators"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:10
+#: templates/mlc_ucla_search/component-sidebar-right.html:28
+msgid "Contributors"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-browse-bar.html:11
+#: templates/mlc_ucla_search/component-sidebar-right.html:31
+msgid "Dates"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-format-label.html:2
+msgid "Format"
 msgstr ""
 
 #: templates/mlc_ucla_search/component-item-in-list-header.html:2
@@ -221,15 +257,12 @@ msgid "Format:"
 msgstr ""
 
 #: templates/mlc_ucla_search/component-item-in-list-header.html:4
-#: templates/mlc_ucla_search/form-request-account.html:19
-#: templates/mlc_ucla_search/form-request-account.html:41
 #: templates/mlc_ucla_search/form-suggest-corrections.html:31
 msgid "Name"
 msgstr ""
 
 #: templates/mlc_ucla_search/component-item-in-list-header.html:5
-#: templates/mlc_ucla_search/item.html:155
-#: templates/mlc_ucla_search/series.html:117
+#: templates/mlc_ucla_search/component-object-metadata.html:116
 msgid "Description"
 msgstr ""
 
@@ -237,91 +270,165 @@ msgstr ""
 msgid "Has conversions"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-item-in-list.html:7
-msgid "item has digital content"
+#: templates/mlc_ucla_search/component-item-list.html:5
+msgid "Items in the Series"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-item-in-list.html:12
-msgid "Type of Media"
+#: templates/mlc_ucla_search/component-item-list.html:20
+msgid "This series has no items to list."
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:30
+msgid "Conversions List"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:37
+msgid "This item has been converted to the following items:"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:40
+msgid "And further converted:"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:59
+msgid "This item has not been further converted."
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:68
+msgid "This item has been converted from:"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-item-list.html:81
+msgid "This item is an original recording."
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:8
+msgid "Alternative Series Title"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:17
+msgid "Collection"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:18
+msgid "Digital Media Archive"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:22
+msgid "Series"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:36
+msgid "Item Title"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:50
+msgid "Series Identifier"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:52
+msgid "Item Identifier"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:64
+msgid "Indigenous Language"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:68
+#: templates/mlc_ucla_search/component-object-metadata.html:81
+#: templates/mlc_ucla_search/component-object-metadata.html:94
+#: templates/mlc_ucla_search/component-object-metadata.html:107
+#: templates/mlc_ucla_search/component-object-metadata.html:144
+#: templates/mlc_ucla_search/component-object-metadata.html:172
+msgid "unknown"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:103
+msgid "Date"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:126
+msgid "Creator(s)"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:154
+msgid "Contributor(s)"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:182
+msgid "Linguistic Data Type"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:191
+msgid "Discourse Type"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:200
+msgid "Item Content Type"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:211
+msgid "Media Type"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:221
+msgid "Formats available"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-metadata.html:223
+msgid "Other Media Types"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-object-title.html:28
+msgid "Object title"
 msgstr ""
 
 #: templates/mlc_ucla_search/component-sidebar-left.html:4
-#: templates/ucla/component-sidebar-left.html:4
+#: templates/ucla/component-sidebar-left.html:3
 msgid "Project navigation"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:4
+#: templates/mlc_ucla_search/component-sidebar-right.html:6
 msgid "Search & Browse"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:8
+#: templates/mlc_ucla_search/component-sidebar-right.html:10
 msgid "Search language, location, people, etc."
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:16
-#: templates/mlc_ucla_search/elements-browse-bar.html:2
-msgid "Browse Collection by"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:19
-#: templates/mlc_ucla_search/elements-browse-bar.html:4
-#: templates/mlc_ucla_search/item.html:115
-#: templates/mlc_ucla_search/series.html:78
-msgid "Language"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:22
-#: templates/mlc_ucla_search/elements-browse-bar.html:5
-#: templates/mlc_ucla_search/item.html:128
-#: templates/mlc_ucla_search/search.html:58
-#: templates/mlc_ucla_search/series.html:91
-msgid "Location"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:25
-#: templates/mlc_ucla_search/elements-browse-bar.html:6
-msgid "Creators"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:28
-#: templates/mlc_ucla_search/elements-browse-bar.html:7
-msgid "Contributors"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:31
-#: templates/mlc_ucla_search/elements-browse-bar.html:8
-msgid "Dates"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:36
+#: templates/mlc_ucla_search/component-sidebar-right.html:40
 msgid "Access"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:40
+#: templates/mlc_ucla_search/component-sidebar-right.html:46
 msgid "Log In"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:43
-msgid "Request an Account"
-msgstr ""
-
-#: templates/mlc_ucla_search/component-sidebar-right.html:47
+#: templates/mlc_ucla_search/component-sidebar-right.html:57
 msgid "Logged in as"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:52
+#: templates/mlc_ucla_search/component-sidebar-right.html:62
 msgid "Request Access to this Series"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:56
+#: templates/mlc_ucla_search/component-sidebar-right.html:66
 msgid "Terms of Access"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:75
+#: templates/mlc_ucla_search/component-sidebar-right.html:78
+msgid "Contact Us"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-sidebar-right.html:83
+msgid "Online Media Archive"
+msgstr ""
+
+#: templates/mlc_ucla_search/component-sidebar-right.html:92
 msgid "Feedback"
 msgstr ""
 
-#: templates/mlc_ucla_search/component-sidebar-right.html:87
+#: templates/mlc_ucla_search/component-sidebar-right.html:106
 #: templates/mlc_ucla_search/credits.html:6
 msgid "Credits"
 msgstr ""
@@ -374,21 +481,26 @@ msgstr ""
 
 #: templates/mlc_ucla_search/form-request-access.html:8
 msgid ""
-"Logged in visitors may request access to the restricted content of this "
-"collection using this form. For more information read the <a href"
-"=\"/access-terms\">Terms of Access</a>."
+"Thank you for your interest in OLA materials. Although some of our "
+"holdings are subject to access restrictions—often related to issues of "
+"confidentiality—we do our best to make recordings available to scholars, "
+"members of speaker communities, and the curious public."
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:10
+#: templates/mlc_ucla_search/form-request-access.html:9
 msgid ""
-"An account is neccessary to request access to a restricted series. For "
-"those who do not have a UChicago ID, please <a href=\"/request-"
-"account\">request an account</a> and go back to request access to the "
-"selected series. Account requests are reviewed individually and typically"
-" processed within five business days."
+"Please complete the form below, and someone will be in touch with you "
+"shortly regarding your request. If you have questions or are experiencing"
+" issues, please write to <a "
+"href=\"mailto:OLA@uchicago.edu\">OLA@uchicago.edu</a>. For more "
+"information read the <a href=\"/access-terms\">Terms of Access</a>."
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:14
+#: templates/mlc_ucla_search/form-request-access.html:11
+msgid "An account is neccessary to request access to a restricted series."
+msgstr ""
+
+#: templates/mlc_ucla_search/form-request-access.html:17
 msgid ""
 "There was an issue loading your request. Request for access to a "
 "restricted series should be started from the series page or from one of "
@@ -396,82 +508,33 @@ msgid ""
 "      "
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:29
+#: templates/mlc_ucla_search/form-request-access.html:32
 msgid "Sample Item ID"
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:33
+#: templates/mlc_ucla_search/form-request-access.html:36
 msgid "Sample Item Title"
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:37
-msgid "Please describe the reason for your request."
+#: templates/mlc_ucla_search/form-request-access.html:40
+msgid ""
+"Please describe the educational or <a "
+"href=\"https://www.lib.uchicago.edu/copyrightinfo/fairuse.html\">fair "
+"use</a> reason to access this series."
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:38
-#: templates/mlc_ucla_search/form-request-account.html:42
+#: templates/mlc_ucla_search/form-request-access.html:41
 msgid "Please specify"
 msgstr ""
 
-#: templates/mlc_ucla_search/form-request-access.html:40
-#: templates/mlc_ucla_search/form-request-account.html:49
+#: templates/mlc_ucla_search/form-request-access.html:43
 #: templates/mlc_ucla_search/form-suggest-corrections.html:46
-#: templates/ucla/form-contribute-material.html:101
+#: templates/ucla/form-contribute-material.html:104
 msgid "Submit"
 msgstr ""
 
 #: templates/mlc_ucla_search/form-request-account.html:6
 msgid "Request Account for Access"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:9
-msgid ""
-"This form is for visitors who do not have a UChicago ID. It allows them "
-"to request an account for accessing the Mesoamerican Language Collection "
-"Portal. An account is required to access content that is restricted or "
-"under controlled access. For more information visit <a href=\"/access-"
-"terms\">/access-terms</a>."
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:12
-msgid ""
-"Please briefly describe the purpose of your access. Once you click "
-"'Submit,' you will be directed to a confirmation receipt of your request."
-" Account requests are reviewed individually and typically processed "
-"within five business days. You will receive an email with instructions on"
-" how to use your account."
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:20
-#: templates/mlc_ucla_search/form-suggest-corrections.html:32
-msgid "Enter your name"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:23
-#: templates/mlc_ucla_search/form-suggest-corrections.html:35
-#: templates/ucla/form-contribute-material.html:36
-msgid "Email address"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:24
-#: templates/mlc_ucla_search/form-suggest-corrections.html:36
-msgid "Enter your email address"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:27
-msgid "Birthdate"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:31
-msgid "Reason for Request"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:46
-msgid "I agree to the terms stated in the"
-msgstr ""
-
-#: templates/mlc_ucla_search/form-request-account.html:46
-msgid "policy"
 msgstr ""
 
 #: templates/mlc_ucla_search/form-suggest-corrections.html:14
@@ -484,6 +547,19 @@ msgstr ""
 
 #: templates/mlc_ucla_search/form-suggest-corrections.html:24
 msgid "Series or Item URL"
+msgstr ""
+
+#: templates/mlc_ucla_search/form-suggest-corrections.html:32
+msgid "Enter your name"
+msgstr ""
+
+#: templates/mlc_ucla_search/form-suggest-corrections.html:35
+#: templates/ucla/form-contribute-material.html:36
+msgid "Email address"
+msgstr ""
+
+#: templates/mlc_ucla_search/form-suggest-corrections.html:36
+msgid "Enter your email address"
 msgstr ""
 
 #: templates/mlc_ucla_search/form-suggest-corrections.html:39
@@ -511,103 +587,38 @@ msgstr ""
 msgid "MLC OLA Search"
 msgstr ""
 
-#: templates/mlc_ucla_search/item.html:17
+#: templates/mlc_ucla_search/item.html:13
+msgid "This item is a streamable file."
+msgstr ""
+
+#: templates/mlc_ucla_search/item.html:15
+msgid "<a href=\"/login\">Login</a> to access."
+msgstr ""
+
+#: templates/mlc_ucla_search/item.html:18
+msgid "<a href=\"/login\">Login</a> to this site."
+msgstr ""
+
+#: templates/mlc_ucla_search/item.html:19
+#, python-format
 msgid ""
-"This item is a streamable file but has an ‘Account Required’ label. "
-"Please <a href=\"/login\">login</a> and authenticate through the Panopto "
-"player, which might prompt a pop-up, or <a href=\"/request-"
-"account\">request an account</a> first. See the <a href=\"/access-"
-"terms\">terms of access page</a> for further information."
+"<a href=\"/request-"
+"access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s\">Request "
+"access</a> to this series."
 msgstr ""
 
 #: templates/mlc_ucla_search/item.html:20
-#, python-format
+msgid "Authenticate through the player (might prompt a pop-up)."
+msgstr ""
+
+#: templates/mlc_ucla_search/item.html:23
 msgid ""
-"This item is a streamable file but has a ‘By Request’ label. <a href"
-"=\"/request-"
-"access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s\">Request "
-"access</a> to this series. Please <a href=\"/login\">login</a> and "
-"authenticate through the Panopto player, which might prompt a pop-up, or "
-"<a href=\"/request-account\">request an account</a> first. See the <a "
-"href=\"/access-terms\">terms of access page</a> for further information."
+"Read the <a href=\"/access-terms\">terms of access page</a> for more "
+"information."
 msgstr ""
 
-#: templates/mlc_ucla_search/item.html:43
-#: templates/mlc_ucla_search/search.html:25
-msgid "Series"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:54
-msgid "Item Title"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:67
-msgid "Item Identifier"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:76
-#: templates/mlc_ucla_search/search.html:74
-#: templates/mlc_ucla_search/series.html:39
-msgid "Creator(s)"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:80
-#: templates/mlc_ucla_search/item.html:93
-#: templates/mlc_ucla_search/item.html:106
-#: templates/mlc_ucla_search/item.html:119
-#: templates/mlc_ucla_search/item.html:132
-#: templates/mlc_ucla_search/item.html:145
-#: templates/mlc_ucla_search/item.html:195
-#: templates/mlc_ucla_search/series.html:43
-#: templates/mlc_ucla_search/series.html:56
-#: templates/mlc_ucla_search/series.html:69
-#: templates/mlc_ucla_search/series.html:82
-#: templates/mlc_ucla_search/series.html:95
-#: templates/mlc_ucla_search/series.html:108
-msgid "unknown"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:89
-#: templates/mlc_ucla_search/search.html:89
-#: templates/mlc_ucla_search/series.html:52
-msgid "Contributor(s)"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:102
-#: templates/mlc_ucla_search/series.html:65
-msgid "Indigenous Language"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:164
-msgid "Linguistic Data Type"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:173
-msgid "Discourse Type"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:182
-msgid "Item Content Type"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:191
-msgid "Media Type"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:204
-msgid "Other Media Types"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:222
-msgid "This item has been converted to the following items:"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:225
-msgid "And further converted:"
-msgstr ""
-
-#: templates/mlc_ucla_search/item.html:246
-msgid "This item has been converted from:"
+#: templates/mlc_ucla_search/item.html:45
+msgid "Item Data"
 msgstr ""
 
 #: templates/mlc_ucla_search/search.html:11
@@ -615,54 +626,17 @@ msgstr ""
 msgid "Search found in %(num)s serie(s)"
 msgstr ""
 
-#: templates/mlc_ucla_search/search.html:42
-msgid "Indigenous Language(s)"
-msgstr ""
-
-#: templates/mlc_ucla_search/search.html:50
-msgid "Language(s)"
-msgstr ""
-
-#: templates/mlc_ucla_search/search.html:66
-#: templates/mlc_ucla_search/series.html:104
-msgid "Date"
-msgstr ""
-
-#: templates/mlc_ucla_search/search.html:104
-msgid "Resource Type"
-msgstr ""
-
-#: templates/mlc_ucla_search/search.html:117
+#: templates/mlc_ucla_search/search.html:48
 #, python-format
 msgid " \"%(query)s\" Found in %(num)s item(s): "
 msgstr ""
 
-#: templates/mlc_ucla_search/search.html:137
+#: templates/mlc_ucla_search/search.html:69
 msgid "No results found"
 msgstr ""
 
-#: templates/mlc_ucla_search/series.html:18
-msgid "Alternative Series Title"
-msgstr ""
-
-#: templates/mlc_ucla_search/series.html:27
-msgid "Series Identifier"
-msgstr ""
-
-#: templates/mlc_ucla_search/series.html:35
-msgid "Collection"
-msgstr ""
-
-#: templates/mlc_ucla_search/series.html:36
-msgid "Digital Media Archive"
-msgstr ""
-
-#: templates/mlc_ucla_search/series.html:126
-msgid "Formats"
-msgstr ""
-
-#: templates/mlc_ucla_search/series.html:144
-msgid "Items in the Series"
+#: templates/mlc_ucla_search/series.html:22
+msgid "Series Data"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:21
@@ -690,7 +664,7 @@ msgid "Please describe the format and quantity of your research materials"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:66
-msgid "What is your institutional affiliation?"
+msgid "What is your background?"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:69
@@ -702,11 +676,11 @@ msgid "Graduate student"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:75
-msgid "University faculty"
+msgid "Academic faculty"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:78
-msgid "University staff"
+msgid "Academic staff"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:81
@@ -714,16 +688,20 @@ msgid "Research associate"
 msgstr ""
 
 #: templates/ucla/form-contribute-material.html:84
+msgid "Community member"
+msgstr ""
+
+#: templates/ucla/form-contribute-material.html:87
 msgid "Other"
 msgstr ""
 
-#: templates/ucla/form-contribute-material.html:91
+#: templates/ucla/form-contribute-material.html:94
 msgid ""
 "Does your collection have any specific usage or access restrictions? If "
 "so, please describe."
 msgstr ""
 
-#: templates/ucla/form-contribute-material.html:97
+#: templates/ucla/form-contribute-material.html:100
 msgid "Any additional comments"
 msgstr ""
 
