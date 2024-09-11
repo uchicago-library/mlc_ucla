@@ -51,7 +51,7 @@ document.getElementById('accessRequestForm').addEventListener('submit', function
   event.preventDefault();
 
   // Send GA4 event
-  // not exactly required. if the form has a HTML name property it gets set automatically as form_name 
+  // not exactly required. if the form has an HTML name property it gets set automatically as form_name 
   gtag('event', 'collex_engagement', { 
     event_context: 'OLA',
     event_type: 'submit_form',
