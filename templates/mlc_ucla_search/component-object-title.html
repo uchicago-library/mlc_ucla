@@ -8,7 +8,7 @@
           <p><a href="/login">Login</a> to stream this file.</p>
         </div>
       {% else %}
-        <iframe class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
+        <iframe id="panoptoIframe" class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
       {% endif %}
     {% endif %}
   <div class="panel-body">
@@ -38,3 +38,18 @@
 
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const iframe = document.getElementById('panoptoIframe');
+    
+    iframe.addEventListener('load', function() {
+      // Send gtag event when iframe is loaded
+      gtag('event', 'collex_engagement', { 
+        event_context: 'OLA',
+        event_type: 'load_media',
+        form_name: 'load_panopto' 
+      });
+    });
+  });
+</script>

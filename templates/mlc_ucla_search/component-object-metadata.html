@@ -265,6 +265,13 @@
       }
       
       copyTextToClipboard(citationTextElement.textContent.trim());
+      
+      // Send GA4 event
+      gtag('event', 'collex_engagement', { 
+        event_context: 'OLA',
+        event_type: 'do_action',
+        form_name: 'copy_citation' 
+      });
     }
 
     function copyTextToClipboard(text) {
