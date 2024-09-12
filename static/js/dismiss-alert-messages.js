@@ -1,7 +1,5 @@
 $(document).ready(function(){
 	var pdata = $('#panopto-data').data();
-	var enough_time = 31536000000; // one year in millisecnods - 365*24*60*60*1000
-	var current = new Date().getTime();
 
 	function show_help(){
 		$('#panopto-help').removeClass('hidden')
@@ -12,7 +10,7 @@ $(document).ready(function(){
 	}
 
 	function show_alert(){
-		console.log('show_alert');
+		// console.log('show_alert');
 		//alert alert-warning alert-dismissible fade in
 		var alert;
 		var help_btn = $('#close-panopto-alert');
@@ -24,6 +22,7 @@ $(document).ready(function(){
 			alert = $('#alert-restricted');
 			user_var = "timestamp_closed_restricted_message";
 		}
+		window.localStorage.removeItem(user_var);
 
 		alert.removeClass('hidden');
 		help_btn.on('click', function () {
@@ -32,7 +31,6 @@ $(document).ready(function(){
 			window.localStorage.setItem(user_var, new Date().getTime());
 			show_help();
 		});
-		window.localStorage.removeItem(user_var);
 	}
 
 	if(pdata.identifier){
@@ -42,11 +40,12 @@ $(document).ready(function(){
 		}else if(pdata.rights == 'restricted'){
 			user_closed = parseInt(window.localStorage.getItem('timestamp_closed_restricted_message'));
 		}
-		console.log('user_closed: '+user_closed);
-		if( !user_closed || ( pdata.cnetid=='None' &&  pdata.rights == 'restricted') ){
-			show_alert();
-		}else{
+
+		// console.log('user_closed: '+user_closed);
+		if( user_closed && ( pdata.rights == 'restricted' || pdata.rights == 'campus' )){
 			show_help();
+		}else{
+			show_alert();
 		}
 	}
 });

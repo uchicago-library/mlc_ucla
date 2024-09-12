@@ -1,14 +1,46 @@
+
+
+{% if panopto_identifier %}
+  {# object to inform the right access message behaviour #}
+  <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
+{% endif %}
+
+{# PANOPTO ACCESS MESSAGE #}
+
+{% if panopto_identifier and (access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted') %}
+  <div id="alert-{{access_rights[0]|lower}}" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
+    <button id="close-panopto-alert" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <!-- <span class="label label-{{ access_rights[2] }}">{{ access_rights[1] }}</span><br> -->
+    {% trans %}This item is a streamable file.{% endtrans %}<br>
+    {% if access_rights[0]|lower == 'campus' %}
+      {% trans %}<a href="/login">Login</a> to access.{% endtrans %}<br>
+    {% elif access_rights[0]|lower == 'restricted' %}
+      <ol>
+        <li>{% trans %}<a href="/login">Login</a> to this site.{% endtrans %}</li>
+        <li>{% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}<a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series.{% endtrans %}</li>
+        <li>{% trans %}Authenticate through the player (might prompt a pop-up).{% endtrans %}</li>
+      </ol>
+    {% endif %}
+      {% trans %}Read the <a href="/access-terms">terms of access page</a> for more information.{% endtrans %}
+  </div>
+  <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i><span id="panopto-help-text">How to stream this audio?</span></button>
+{% endif %}
+
+
 <div class="panel panel-default comp-object-title">
     {% if panopto_identifier %}
       {# PANOPTO PLAYER #}
       <!-- {{ panopto_identifier }} -->
       {% if not cnet_id and ( access_rights[0]|lower == 'restricted' or access_rights[0]|lower == 'campus' ) %}
+        {#  ===== Not Allowed =====  #}
         <div class="placeholder-iframe">
           <i class="fa fa-headphones" aria-hidden="true" style="font-size: 42px"></i>
           <p><a href="/login">Login</a> to stream this file.</p>
         </div>
-      {% else %}
-        <iframe id="panoptoIframe" class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" height="100" width="720" style="border: 1px solid #464646; min-width: 100%" allowfullscreen allow="autoplay"></iframe>
+      {% else %}  
+        {#  ===== Allowed =====  #}
+        <iframe id="panoptoIframe" class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" 
+        height="100" width="720" style="    border: 1px solid #000000; min-width: 100%; border-radius: 4px 4px 0 0;" allowfullscreen allow="autoplay"></iframe>
       {% endif %}
     {% endif %}
   <div class="panel-body">

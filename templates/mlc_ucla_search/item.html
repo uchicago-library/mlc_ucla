@@ -2,29 +2,7 @@
 
 {% block content %}
   <div class="item-page" id="content" role="main">
-    <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
 
-
-    {# PANOPTO ACCESS MESSAGE #}
-    {% if panopto_identifier and (access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted') %}
-        <div id="alert-{{access_rights[0]|lower}}" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
-          <button id="close-panopto-alert" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <!-- <span class="label label-{{ access_rights[2] }}">{{ access_rights[1] }}</span><br> -->
-          {% trans %}This item is a streamable file.{% endtrans %}<br>
-          {% if access_rights[0]|lower == 'campus' %}
-            {% trans %}<a href="/login">Login</a> to access.{% endtrans %}<br>
-          {% elif access_rights[0]|lower == 'restricted' %}
-            <ol>
-              <li>{% trans %}<a href="/login">Login</a> to this site.{% endtrans %}</li>
-              <li>{% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}<a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series.{% endtrans %}</li>
-              <li>{% trans %}Authenticate through the player (might prompt a pop-up).{% endtrans %}</li>
-            </ol>
-          {% endif %}
-            {% trans %}Read the <a href="/access-terms">terms of access page</a> for more information.{% endtrans %}
-        </div>
-        <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i><span id="panopto-help-text">How to stream this audio?</span></button>
-    {% endif %}
-      
     {# OBJECT TITLE #}
     {% include 'component-object-title.html' %}
 
