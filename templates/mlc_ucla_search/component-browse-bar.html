@@ -1,13 +1,14 @@
-{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
-<div class="panel panel-default">
+<div class="panel panel-default browse-bar">
   <div class="panel-heading">
     <h2>{% trans %}Browse Collection by{% endtrans %}</h2>
   </div>
   <div class="panel-body">
-        <a class="btn btn-default" href="/browse/?type=language">{% trans %}Language{% endtrans %} </a> 
-        <a class="btn btn-default" href="/browse/?type=location">{% trans %}Location{% endtrans %} </a> 
-        <a class="btn btn-default" href="/browse/?type=creator">{% trans %}Creators{% endtrans %} </a> 
-        <a class="btn btn-default" href="/browse/?type=contributor">{% trans %}Contributors{% endtrans %} </a> 
-        <a class="btn btn-default" href="/browse/?type=decade">{% trans %}Dates{% endtrans %} </a>
+    <div class="browse-bar-buttons">
+      <a class="btn btn-default" href="/browse/?type=language">{% trans %}Language{% endtrans %} </a> 
+      <a class="btn btn-default" href="/browse/?type=location">{% trans %}Location{% endtrans %} </a> 
+      <a class="btn btn-default" href="/browse/?type=creator">{% trans %}Creators{% endtrans %} </a> 
+      <a class="btn btn-default" href="/browse/?type=contributor">{% trans %}Contributors{% endtrans %} </a> 
+      <a class="btn btn-default" href="/browse/?type=decade">{% trans %}Dates{% endtrans %} </a>
+    </div>
   </div>
 </div>

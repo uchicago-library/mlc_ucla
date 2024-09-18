@@ -5,10 +5,12 @@
   <div class="title-wrapper">
     <h1>{% trans %}Request Access to Series{% endtrans %}</h1>
   </div>
-  <p>{% trans %}Thank you for your interest in OLA materials. Although some of our holdings have are subject to access restrictions—often related to issues of confidentiality—we do our best to make recordings available to scholars, members of speaker communities, and the curious public.{% endtrans %}</p>
+  <p>{% trans %}Thank you for your interest in OLA materials. Although some of our holdings are subject to access restrictions—often related to issues of confidentiality—we do our best to make recordings available to scholars, members of speaker communities, and the curious public.{% endtrans %}</p>
   <p>{% trans %}Please complete the form below, and someone will be in touch with you shortly regarding your request. If you have questions or are experiencing issues, please write to <a href="mailto:OLA@uchicago.edu">OLA@uchicago.edu</a>. For more information read the <a href="/access-terms">Terms of Access</a>.{% endtrans %}</p>
   {% if not cnet_id %}
-    <div class="alert alert-warning" style="text-align:left !important" role="alert">{% trans %}An account is neccessary to request access to a restricted series. For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and go back to request access to the selected series. Account requests are reviewed individually and typically processed within five business days.{% endtrans %}</div>
+    <div class="alert alert-warning" style="text-align:left !important" role="alert">{% trans %}An account is neccessary to request access to a restricted series.{% endtrans %}
+      {# For those who do not have a UChicago ID, please <a href="/request-account">request an account</a> and go back to request access to the selected series. Account requests are reviewed individually and typically processed within five business days. #}
+    </div>
   {% else %}
     {% if request.args.get('series_id') == None or request.args.get('item_title') == None %}
       <div class="alert alert-warning" style="text-align:left !important" role="alert">
@@ -16,7 +18,7 @@
       {% endtrans %}
       </div>
     {% else %}
-      <form class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
+      <form id="accessRequestForm"name="request_access" class="gray-surface" action="/send-cgimail" method="POST" style="max-width: 600px">
         <input type="hidden" name="msg_type" value="request_access">
         <div class="form-group">
           <label for="cnet_id">CNET ID*</label>
@@ -35,7 +37,7 @@
           <input type="text" class="form-control" id="item_title" name="Item Title" value="{{ request.args.get('item_title') }}" readonly required>
         </div>
         <div class="form-group">
-          <label for="requestReason">{% trans %}Please describe the reason for your request.{% endtrans %}*</label>
+          <label for="requestReason">{% trans %}Please describe the educational or <a href="https://www.lib.uchicago.edu/copyrightinfo/fairuse.html">fair use</a> reason to access this series.{% endtrans %}*</label>
           <textarea type="text" class="form-control" id="requestReason" name="Series access request reason" placeholder="{% trans %}Please specify{% endtrans %}" required></textarea>
         </div>
         <button type="submit">{% trans %}Submit{% endtrans %}</button><br>
@@ -43,4 +45,23 @@
     {% endif %}
   {% endif %}
 </div>
+<script>
+document.getElementById('accessRequestForm').addEventListener('submit', function(event) {
+  // Prevent the form from submitting immediately
+  event.preventDefault();
+
+  // Send GA4 event
+  // not exactly required. if the form has an HTML name property it gets set automatically as form_name 
+  gtag('event', 'collex_engagement', { 
+    event_context: 'OLA',
+    event_type: 'submit_form',
+    event_label: 'request_access' 
+  });
+
+  // Submit the form after a short delay to ensure the event is sent
+  setTimeout(() => {
+    event.target.submit();
+  }, 100);
+});
+</script>
 {% endblock %}

@@ -1726,9 +1726,6 @@ class MLCDB:
             # Get Parent items
             if 'is_format_of' in info:
                 for medium in info['is_format_of']:
-                    print(" # Get Parent items ")
-                    print(" > medium: ")
-                    print(medium)
                     for parent_item_index in range(len(info['is_format_of'][medium])):
                         # identifier format: https://ark.lib.uchicago.edu/ark:61001/b29r8d35893d
                         url = info['is_format_of'][medium][parent_item_index]

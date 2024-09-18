@@ -1,15 +1,50 @@
-{# I realize now that each component should have documented its requirements and demand an object be passed for it, instead of matching every template that uses it. #}
+
+
+{% if panopto_identifier %}
+  {# object to inform the right access message behaviour #}
+  <span id="panopto-data" class="hidden" data-identifier="{{panopto_identifier}}" data-rights="{{access_rights[0]|lower}}" data-cnetid="{{cnet_id}}"></span>
+{% endif %}
+
+{# PANOPTO ACCESS MESSAGE #}
+
+{% if panopto_identifier and (access_rights[0]|lower == 'campus' or access_rights[0]|lower == 'restricted') %}
+  <div id="alert-{{access_rights[0]|lower}}" class="alert alert-warning alert-dismissible hidden fade in" style="margin: 0 auto 1rem; text-align:left !important" role="alert">
+    <button id="close-panopto-alert" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <!-- <span class="label label-{{ access_rights[2] }}">{{ access_rights[1] }}</span><br> -->
+    {% trans %}This item is a streamable file.{% endtrans %}<br>
+    {% if access_rights[0]|lower == 'campus' %}
+      {% trans %}<a href="/login">Login</a> to access.{% endtrans %}<br>
+    {% elif access_rights[0]|lower == 'restricted' %}
+      <ol>
+        <li>{% trans %}<a href="/login">Login</a> to this site.{% endtrans %}</li>
+        <li>{% trans sid=request_access_button.series_id,iid=request_access_button.item_id,itt=request_access_button.item_title %}<a href="/request-access?series_id={{sid}}&item_id={{iid}}&item_title={{itt}}">Request access</a> to this series.{% endtrans %}</li>
+        <li>{% trans %}Authenticate through the player (might prompt a pop-up).{% endtrans %}</li>
+      </ol>
+    {% endif %}
+      {% trans %}Read the <a href="/access-terms">terms of access page</a> for more information.{% endtrans %}
+  </div>
+  <button id="panopto-help" class="btn btn-link pull-right hidden" type="button" title="Panopto help" aria-label="Panopto help"><i class="fa fa-question-circle-o" aria-hidden="true"></i><span id="panopto-help-text">How to stream this audio?</span></button>
+{% endif %}
+
+
 <div class="panel panel-default comp-object-title">
-  <div class="panel-body">
-    {# CHARACTERIZATION #}
-      {% if not is_series and series %}
-        <span style="display:inline-block;">
-          <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
-            <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-            {{ series[0].1.titles.0 }}
-          </a><br>
-        </span>
+    {% if panopto_identifier %}
+      {# PANOPTO PLAYER #}
+      <!-- {{ panopto_identifier }} -->
+      {% if not cnet_id and ( access_rights[0]|lower == 'restricted' or access_rights[0]|lower == 'campus' ) %}
+        {#  ===== Not Allowed =====  #}
+        <div class="placeholder-iframe">
+          <i class="fa fa-headphones" aria-hidden="true" style="font-size: 42px"></i>
+          <p><a href="/login">Login</a> to stream this file.</p>
+        </div>
+      {% else %}  
+        {#  ===== Allowed =====  #}
+        <iframe id="panoptoIframe" class="panopto-iframe" src="https://uchicago.hosted.panopto.com/Panopto/Pages/Embed.aspx?id={{ panopto_identifier }}&autoplay=false&offerviewer=true&showtitle=true&showbrand=true&captions=false&interactivity=all" 
+        height="100" width="720" style="    border: 1px solid #000000; min-width: 100%; border-radius: 4px 4px 0 0;" allowfullscreen allow="autoplay"></iframe>
       {% endif %}
+    {% endif %}
+  <div class="panel-body">
+
     {# ACCESS and MEDIUM labels #}
     <div class="object-title-labels">
       <!-- {{ identifier.0 }} -->
@@ -22,60 +57,31 @@
     </div>
 
     {# TITLE #}
-    <h1  title="{% trans %}Object title{% endtrans %}">
-      {% if is_series %}
-        <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
+    <h1 title="{% trans %}Object title{% endtrans %}: {{series[0].1.titles.0}}">
+      {% if not is_series and series %}
+        <a href="/series/{{ series[0].0|replace('https://ark.lib.uchicago.edu/ark:61001/', '')|urlencode }}">
+          {{ series[0].1.titles.0|truncate(35, True, '...') }}
+          >
+        </a>
       {% endif %}
       {{ title_slug }}
     </h1>
 
-    {# DETAILS #}
-    <div>
-      {% if subject_language %}
-        {% set l = subject_language|length %}
-        {% for i in subject_language %}
-          {% if i=="(:unav)" %}
-            <span class="text-muted" title="{% trans %}Unknown indigenous language{% endtrans %}">{% trans %}unk{% endtrans %}</span>
-          {% else %}
-            <a href="/browse?type=language&term={{ i|urlencode }}" title="{% trans %}Indigenous language{% endtrans %}">{{ i }}</a>
-          {% endif %}
-        {% endfor %}
-      {% else %} 
-        <span class="text-muted" title="{% trans %}Unknown indigenous language{% endtrans %}">{% trans %}unk{% endtrans %}</span>
-      {% endif %} 
-
-      {% if location %}
-        <span> - </span>
-        {% set l = location|length %}
-        {% for i in location %}
-          {% if i=="(:unav)" %}
-            <span class="text-muted" title="{% trans %}Unknown Location{% endtrans %}">{% trans %}unk{% endtrans %} </span>
-          {% else %}
-            <a href="/browse?type=location&term={{ i|urlencode }}" title="{% trans %}Location{% endtrans %}">{{ i }}</a>
-          {% endif %}
-
-        {% endfor %}
-      {% else %} 
-        <span> - </span>
-        <span class="text-muted" title="{% trans %}Unknown Location{% endtrans %}">{% trans %}unk{% endtrans %} </span>  
-      {% endif %}
-
-      {% if date %}
-        <span> - </span>
-        {% set l = date|length %}
-        {% for i in date %}
-          {% if i=="(:unav)" %}
-            <span class="text-muted" title="{% trans %}Unknown date{% endtrans %}">{% trans %}unk{% endtrans %}</span>
-          {% else %}
-            <a href="/browse?type=date&term={{ i|urlencode }}" title="{% trans %}Date{% endtrans %}">{{ i }}</a>
-          {% endif %}
-
-        {% endfor %}
-      {% else %} 
-        <span> - </span>
-        <span class="text-muted" title="{% trans %}Unknown date{% endtrans %}">{% trans %}unk{% endtrans %}</span>
-      {% endif %}  
-    </div>
 
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const iframe = document.getElementById('panoptoIframe');
+    
+    iframe.addEventListener('load', function() {
+      // Send gtag event when iframe is loaded
+      gtag('event', 'collex_engagement', { 
+        event_context: 'OLA',
+        event_type: 'load_media',
+        event_label: 'load_panopto' 
+      });
+    });
+  });
+</script>
