@@ -231,21 +231,23 @@
         </dd>
       {% endif %}
   </dl>
-  <div class="panel-footer" style="display: flex; flex-wrap: wrap;justify-content: space-between; align-items: flex-end; gap: 5px 15px;">
-    <div>
-      <b>Citation</b>
-      <div class="citation-text" aria-hidden="true">
-        {% if is_item %}  
-          {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},
-          Online Language Archive, University of Chicago.
-        {% elif is_series %}
-          {{ titles[0] }}, {{creator[0]}}, {{date[0].split('/')[0]}},
-          Online Language Archive, University of Chicago.
-        {% endif %}
+  {% if is_item or is_series %}
+    <div class="panel-footer" style="display: flex; flex-wrap: wrap;justify-content: space-between; align-items: flex-end; gap: 5px 15px;">
+      <div>
+        <b>Citation</b>
+        <div class="citation-text" aria-hidden="true">
+          {% if is_item %}  
+            {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},
+            Online Language Archive, University of Chicago.
+          {% elif is_series %}
+              {{ titles[0] }}, {{creator[0]}}, {{date[0].split('/')[0]}},
+              Online Language Archive, University of Chicago.
+          {% endif %}
+        </div>
       </div>
+      <button id="copy-citation-btn" class="btn btn-tertiary" style="margin-bottom: 0; color: black">Copy Citation</button>
     </div>
-    <button id="copy-citation-btn" class="btn btn-tertiary" style="margin-bottom: 0;">Copy Citation</button>
-  </div>
+  {% endif %}
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {

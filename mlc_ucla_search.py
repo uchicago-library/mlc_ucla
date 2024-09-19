@@ -527,10 +527,7 @@ def series(noid):
             g.mlc_db.get_item(i)
         ))
 
-    # Iterate through all items to regroup and extract information
-    has_panopto = False 
-    item_id_with_panopto = ''
-    item_title_with_panopto = ''
+    # Iterate through all items to regroup
     grouped_items = {}
     available_formats = {}
     for i in items:
@@ -548,32 +545,18 @@ def series(noid):
             if format_obj[0] not in grouped_items:
                 grouped_items[format_obj[0]] = []
             grouped_items[format_obj[0]].append(i[1])
-        # Check if series has one item with a panopto file
-        # Get details about one item with panopto file 
-        #  to help locate series in panopto
-        if i[1]['panopto_identifiers']:
-            has_panopto = True # to display the Request Access button
-            item_id_with_panopto = i[1]['identifier'][0]
-            item_title_with_panopto = i[1]['titles'][0]
     available_formats = sortDictByFormatKey(available_formats)
     # Sort Items by ID
     for format_type, item_list in grouped_items.items():
         grouped_items[format_type].sort(key=sortListOfItemsByID)
 
+    # Get request access button info
+    series_data['request_access_button'] = g.mlc_db.get_series_request_access_info(BASE + noid)
+
     try:
         title_slug = ' '.join(series_data['titles'])
     except (IndexError, KeyError):
         title_slug = ''
-
-    # details for request access button
-    # TODO: better to check if user already has access. not possible atm
-    is_restricted = series_data['access_rights'][0].lower() == 'restricted'
-    request_access_button = {
-        'show' : is_restricted and has_panopto,
-        'series_id' : series_data['identifier'][0],
-        'item_id' : item_id_with_panopto,
-        'item_title' : item_title_with_panopto
-    }
 
     return render_template(
         'series.html',
@@ -581,9 +564,7 @@ def series(noid):
             'is_series' : True,
             'grouped_items': grouped_items,
             'title_slug': title_slug,
-            'has_panopto':has_panopto,
             'available_formats': available_formats,
-            'request_access_button' : request_access_button,
             'access_rights': get_access_label_obj(series_data)
         })
     )
@@ -613,18 +594,6 @@ def item(noid):
     series_id = []
     for s in series:
         series_id.append(s[1]['identifier'][0])
-
-    # details for request access button
-    # TODO: better to check if user already has access. not possible atm
-    # TODO: better to check if any item in the series has a panopto link
-    is_restricted = item_data['access_rights'][0].lower() == 'restricted'
-    has_panopto = item_data['panopto_identifiers'] and item_data['panopto_identifiers'][0]
-    request_access_button = {
-        'show' : is_restricted and has_panopto,
-        'series_id' : ','.join(series_id), #some items belong to multiple series
-        'item_id' : item_data['identifier'][0],
-        'item_title' : item_data['titles'][0] or 'Unknow item title',
-    }
 
     try:
         title_slug = item_data['titles'][0]
@@ -666,6 +635,12 @@ def item(noid):
             item_data['descendants'][level] = OrderedDict(sorted(item_data['descendants'][level].items(), key=sortDictByFormat  ))
             for medium, item_list in formats.items():
                 item_data['descendants'][level][medium].sort(key=sortListOfItemsByID)
+    
+    request_access_button = {'show': False}
+    for serie in series:
+        if serie[1]['request_access_button']['show']:
+            request_access_button = serie[1]['request_access_button']
+            break
 
     return render_template(
         'item.html',

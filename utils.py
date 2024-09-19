@@ -1950,6 +1950,41 @@ class MLCDB:
                     results.append(series_id)
             return results
 
+    def get_series_request_access_info(self, series_id):
+        """
+        Get info dict to inform the Request access to this series button for a series.
+        To be attributed to as value of request_access_button.
+
+        Parameters:
+            series_id (str): item identifier.
+
+        Returns:
+            dict: a dictionary of information.
+        """
+
+        info = self._series_info[series_id]
+        is_restricted = info.get('access_rights', [''])[0].lower() == 'restricted'
+        has_panopto = False
+        item_id = ''
+        item_title = ''
+
+        # Check if the series has an item with a panopto link
+        for item_id in self.get_items_for_series(series_id):
+            item = self.get_item(item_id)
+            if item.get('panopto_identifiers') and len(item['panopto_identifiers']) > 0:
+                has_panopto = True
+                item_id = item.get('identifier', [''])[0]
+                item_title = item.get('titles', [''])[0]
+                break
+        
+        # return request access button information
+        return {
+            'show': is_restricted and has_panopto,
+            'series_id': series_id,
+            'item_id': item_id,
+            'item_title': item_title,
+        }
+
     def get_series_info(self, series_id):
         """
         Get info dict for a series.
@@ -1960,7 +1995,10 @@ class MLCDB:
         Returns:
             dict: a dictionary of item information.
         """
-        return self._series_info[series_id]
+
+        info = self._series_info[series_id]
+        info['request_access_button'] = self.get_series_request_access_info(series_id)
+        return info
 
     def get_series_list(self):
         """
