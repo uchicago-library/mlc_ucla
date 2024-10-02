@@ -53,13 +53,6 @@ Start a development server on localhost:5000:
 flask run
 ```
 
-Alternatively, once you get a copy of local.py, you can run the site locally
-with mod_wsgi with Docker:
-```console
-docker build -t <imagename> .
-docker run -p 8080:80 -it <imagename>
-```
-
 ## Building the Website Database
 The website uses an SQLite database for full text search and browse. You'll need a set of linked data
 triples to build the database- check the production databases for files named "ucla.big.yyyymmdd.ttl" and
