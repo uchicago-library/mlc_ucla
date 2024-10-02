@@ -102,7 +102,10 @@ compile the translations
 
 ## Converting FileMaker to Linked Data
 
-Getting data from FileMaker to the triplestore is a multi-step process. First, export the FileMaker database as a sequence of XLSX files. Then import those XLSX files into a local SQLite database, and finally produce triples from that SQLite database. 
+Getting data from FileMaker to the triplestore is a multi-step process. Because OCHRE is the new definitive location for this data, I don't expect 
+this process to ever be used again, however it may be useful for future projects involving FileMaker Pro.
+
+To get data out of FileMaker Pro and into linked data triples, start by exporting the FileMaker database as a sequence of XLSX files. Then import those XLSX files into a local SQLite database, and finally produce triples from that SQLite database. 
 
 You need to use FileMaker 18 to work with this database. Do not upgrade to FileMaker 19. 
 
