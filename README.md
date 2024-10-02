@@ -60,15 +60,22 @@ docker build -t <imagename> .
 docker run -p 8080:80 -it <imagename>
 ```
 
-# Building the Website Database
-The website uses an SQLite database for full text search and browse. To build the database:
+## Building the Website Database
+The website uses an SQLite database for full text search and browse. You'll need a set of linked data
+triples to build the database- check the production databases for files named "ucla.big.yyyymmdd.ttl" and
+"meso.big.yyyymmdd.ttl". If these files aren't available see below for instructions on getting data out
+of FileMaker Pro and into these triples. 
+
+Once you have triples in hand, set the FLASK_APP environmental variable and APP variable in local.py to either
+'mlc' or 'ucla' to build the appropriate database. Then run the following command:
 
 ```console
 flask build-db
 ```
 
 Note that when you run this command, you'll get a large number of ISO8601Errors- this is because 
-of dirty data in our triples, you can ignore these. 
+of dirty data in our triples, you can ignore these. The mlc database takes about 10 minutes to run on my dev 
+machine, and the ucla database takes longer. 
 
 ## Translating
 - Strings can be labelled in templates with 
