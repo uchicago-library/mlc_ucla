@@ -31,7 +31,27 @@ pip install -r requirements.txt
 ```
 
 Get a copy of local.py from another developer or from one of the production
-servers and place it in the mlc directory.
+servers and place it in the mlc directory. Get a copy of either meso.db or 
+ucla.db from one of the production servers and update the path to the file
+in local.py. Get glottolog_lookup.json, glottolog_language.ttl, tgn.ttl, and
+the project triples (meso.big.yyyymmdd.ttl or ucla.big.yyyymmdd.ttl) from
+one of the production servers, and update the locations of those files in 
+local.py too. 
+
+Set an environmental variable for the FLASK_APP:
+```console
+export FLASK_APP=mlc
+```
+
+Or
+```console
+export FLASK_APP=ucla
+```
+
+Start a development server on localhost:5000:
+```console
+flask run
+```
 
 Alternatively, once you get a copy of local.py, you can run the site locally
 with mod_wsgi with Docker:
@@ -40,53 +60,16 @@ docker build -t <imagename> .
 docker run -p 8080:80 -it <imagename>
 ```
 
-Build a Glottolog lookup and SQLite database for the site.
+# Building the Website Database
+The website uses an SQLite database for full text search and browse. To build the database:
+
 ```console
-flask build-glottolog-lookup
 flask build-db
 ```
 
-Start a development server on localhost:5000:
-```console
-flask run
-```
+Note that when you run this command, you'll get a large number of ISO8601Errors- this is because 
+of dirty data in our triples, you can ignore these. 
 
-## Debugging
-
-The flask command has been extended with a few custom subcommands to
-browse data from the command line.
-
-Get a list of item identifiers in the system:
-```console
-flask list-items
-flask list-items --verbose
-```
-
-Get a list of series identifiers in the system:
-```console
-flask list-series
-flask list-series --verbose
-```
-
-Get information about a particular item:
-```console
-flask get-item flask get-item https://ark.lib.uchicago.edu/ark:61001/b2zz8gz9rf5z
-```
-
-Get information about a particular series:
-```console
-flask get-series https://ark.lib.uchicago.edu/ark:61001/b2zn98n7s774
-```
-
-Test some cluster browses:
-```console
-flask get-browse contributor
-flask get-browse creator
-flask get-browse date
-flask get-browse decade
-flask get-browse language
-flask get-browse location
-```
 ## Translating
 - Strings can be labelled in templates with 
 	`{% trans %}string to be translated{% endtrans %}`
