@@ -1,4 +1,6 @@
+import apsw
 import click
+import os
 import re
 import requests
 import sqlite3
@@ -96,7 +98,18 @@ def before_request():
 )
 def cli_build_db():
     """Build a SQLite database from linked data triples."""
-    g.mlc_db.build_db()
+    try: 
+        os.remove(DB)
+    except OSError:
+        pass
+    mlc_db = MLCDB({
+        'DB': DB,
+        'GLOTTO_LOOKUP': GLOTTO_LOOKUP,
+        'MESO_TRIPLES': MESO_TRIPLES,
+        'TGN_TRIPLES': TGN_TRIPLES
+    })
+    con = sqlite3.connect(DB)
+    mlc_db.build_db(con)
 
 
 @mlc_ucla_search.cli.command(

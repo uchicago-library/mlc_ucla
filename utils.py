@@ -4,6 +4,7 @@ import json
 import os
 import urllib.parse
 import rdflib
+import sqlite3
 import sys
 from rdflib.plugins.sparql import prepareQuery
 
@@ -352,7 +353,6 @@ class MLCGraph:
         return has_panopto_link
 
     def get_item_info(self, item_id):
-        print('get_item_info')
         """
         Get info for search snippets and page views of a given item.
 
@@ -504,11 +504,6 @@ class MLCGraph:
                 'item_id': rdflib.URIRef(item_id)
             }
         ):
-            print("what is this has_format")
-            print('format_id')
-            print(format_id)
-            print('medium')
-            print(medium)
             format_id = str(row[0])
             medium = str(row[1])
             if medium not in data['has_format']:
@@ -545,11 +540,6 @@ class MLCGraph:
         ):
             format_id = str(row[0])
             medium = str(row[1])
-            print("what is this is_format_of")
-            print('format_id')
-            print(format_id)
-            print('medium')
-            print(medium)
             if medium not in data['is_format_of']:
                 data['is_format_of'][medium] = []
             data['is_format_of'][medium].append(row[0])
@@ -1318,9 +1308,6 @@ class MLCDB:
         Parameters:
             con (sqlite3.Connection): connection to an SQLite database.
         """
-        if os.path.exists(self.config['DB']):
-            os.remove(self.config['DB'])
-
         cur = con.cursor()
 
         g = rdflib.Graph()
@@ -1339,8 +1326,6 @@ class MLCDB:
                 item_series_lookup[item_id].append(series_id)
 
         # build tables
-        cur.execute('begin')
-
         cur.execute('''
             create table browse(
                 type text,
@@ -1368,10 +1353,8 @@ class MLCDB:
                 text
             );
         ''')
-        cur.execute('commit')
 
         # load data
-        cur.execute('begin')
 
         # load browses
         for browse_type in (
@@ -1442,7 +1425,7 @@ class MLCDB:
                         )
                         )
 
-        cur.execute('commit')
+        con.commit()
 
     def connect(self):
         """
