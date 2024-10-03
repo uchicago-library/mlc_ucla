@@ -60,8 +60,8 @@ machine, and the ucla database takes longer.
 ## Translating
 - Strings can be labelled in templates with 
 	`{% trans %}string to be translated{% endtrans %}`
-	or in the code with	`gettet(u'string to be translated')` 
-	or	`lazy_gettet(u'string to be translated')` if outside a request
+	or in the code with	`gettext(u'string to be translated')` 
+	or	`lazy_gettext(u'string to be translated')` if outside a request
 - Two identical strings will be labeled together for translation.
 - Strings can be injected into all templates through `@app.context_processor`. There is a `dict()` that is already being injected.
 - The doc for the translation package is [Flask Babel](https://python-babel.github.io/flask-babel/)
