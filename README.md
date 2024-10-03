@@ -1,31 +1,18 @@
-# mlc
+# mlc_ucla
+
+The language archive sites, mlc and ucla, share the same codebase. They share a common Flask Blueprint
+with project-specific overrides for each site. The sites use SQLite databases with FTS5 tables for 
+full-text search. Note that these are separate from the SQLite database that is a direct copy of the 
+project's original FileMaker Pro database. 
 
 ## Running this site locally
 
-Set up a Python virtual environment:
+Set up a Python virtual environment. Clone the repo, install modules:
 
 ```console
 python3 -m venv venv
-```
-
-Activate the virtual environment:
-
-```console
 source venv/bin/activate
-```
-
-Clone this repo:
-```console
 git clone https://github.com/uchicago-library/mlc
-```
-
-Change into the repo directory:
-```console
-cd mlc
-```
-
-Install python modules:
-```console
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
