@@ -236,12 +236,16 @@
       <div>
         <b>Citation</b>
         <div class="citation-text" aria-hidden="true">
-          {% if is_item %}  
-            {{ series[0][1].titles[0] }}, {{series[0][1].creator[0].split(',')[0]}}, {{series[0][1].date[0]}},
+          {% if is_item and series %}  
+            {{ series[0][1].titles[0]+", " if series[0][1].titles|length>0 else ""}}
+            {{ series[0][1].creator[0].split(',')[0]+", " if series[0][1].creator|length > 0 else "" }}
+            {{ series[0][1].date[0].split('/')[0]+", " if series[0][1].date|length > 0 else "" }}
             Online Language Archive, University of Chicago.
           {% elif is_series %}
-              {{ titles[0] }}, {{creator[0]}}, {{date[0].split('/')[0]}},
-              Online Language Archive, University of Chicago.
+            {{ titles[0]+", " if titles|length>0 else ""}}
+            {{ creator[0].split(',')[0]+", " if creator|length > 0 else "" }}
+            {{ date[0].split('/')[0]+", " if date|length > 0 else "" }}
+            Online Language Archive, University of Chicago.
           {% endif %}
         </div>
       </div>
