@@ -72,9 +72,9 @@ def acquisitions_policy():
         title_slug = lazy_gettext(u'Acquisitions Policy'),
     )
 
-@app.route('/access-terms')
+@app.route('/terms-of-use')
 def access_terms_ucla():
     return render_template(
         'static-access-terms.html',
-        title_slug = lazy_gettext(u'Access Terms'),
+        title_slug = lazy_gettext(u'Terms of Use'),
     )
