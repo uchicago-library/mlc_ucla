@@ -700,11 +700,11 @@ def credits():
         'credits.html'
     )
 
-@mlc_ucla_search.route('/access-terms')
+@mlc_ucla_search.route('/terms-of-use')
 def access_terms():
     return render_template(
         'static-access-terms.html',
-        title_slug = lazy_gettext(u'Access Terms'),
+        title_slug = lazy_gettext(u'Terms of Use'),
     )
 
 # @mlc_ucla_search.route('/about-the-project')
