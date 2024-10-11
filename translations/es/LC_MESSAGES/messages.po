@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-10 20:23-0500\n"
+"POT-Creation-Date: 2024-10-11 08:37-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,7 @@ msgstr ""
 "Hubo un problema técnico al enviar su solicitud y no podemos determinar su "
 "naturaleza. Por favor inténtalo de nuevo. Pedimos disculpas por cualquier "
 "inconveniente. Si el problema persiste, envíe un correo electrónico al "
-"Centro de Desarrollo de Bibliotecas Digitales (DLDC) en la Biblioteca Joseph "
+"Centro de desarrollo de bibliotecas digitales (DLDC) en la Biblioteca Joseph "
 "Regenstein web-admin@lib.uchicago.edu"
 
 #: mlc_ucla_search.py:222+mlc_ucla_search.py:228
@@ -453,7 +453,7 @@ msgid ""
 "National Science Foundation under Grant No. 1953104."
 msgstr ""
 "La presentación de este material se basa en el trabajo apoyado por la "
-"National Science Foundation bajo la subvención No. 1953104."
+"National Science Foundation bajo la subvención n.º 1953104."
 
 #: templates/mlc_ucla_search/credits.html:10
 msgid "Principal Investigators"
@@ -653,7 +653,7 @@ msgid ""
 "Read the <a href=\"/access-terms\">terms of access page</a> for more "
 "information."
 msgstr ""
-"Lea la <a href=\"/access-terms\">página de condiciones de acceso</a> para "
+"Lea la <a href=\"/access-terms\">página de términos de acceso</a> para "
 "obtener más información."
 
 #: templates/mlc_ucla_search/item.html:45
@@ -714,7 +714,7 @@ msgstr "estudiante de posgrado"
 
 #: templates/ucla/form-contribute-material.html:75
 msgid "Academic faculty"
-msgstr "Facultad académica"
+msgstr "facultad academica"
 
 #: templates/ucla/form-contribute-material.html:78
 msgid "Academic staff"
