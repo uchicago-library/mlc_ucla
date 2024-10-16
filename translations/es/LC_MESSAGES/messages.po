@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-11 08:37-0500\n"
+"POT-Creation-Date: 2024-10-16 14:23-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,7 +34,7 @@ msgstr ""
 "Hubo un problema técnico al enviar su solicitud y no podemos determinar su "
 "naturaleza. Por favor inténtalo de nuevo. Pedimos disculpas por cualquier "
 "inconveniente. Si el problema persiste, envíe un correo electrónico al "
-"Centro de desarrollo de bibliotecas digitales (DLDC) en la Biblioteca Joseph "
+"Centro de Desarrollo de Bibliotecas Digitales (DLDC) en la Biblioteca Joseph "
 "Regenstein web-admin@lib.uchicago.edu"
 
 #: mlc_ucla_search.py:222+mlc_ucla_search.py:228
@@ -198,13 +198,14 @@ msgid ""
 "languages produced by their colleagues and students over the bulk of the "
 "20th and early 21st Centuries. "
 msgstr ""
-"La colección de idiomas mesoamericanos (MLC) reúnen múltiples colecciones "
-"de materiales que documentan idiomas mesoamericanos producidos por "
+"La Colección de Lenguas Mesoamericanas (MLC) reúne múltiples colecciones de "
+"materiales que documentan las lenguas mesoamericanas producidos por "
 "lingüistas y etnógrafos de la Universidad de Chicago desde 1932. Son el "
-"legado del trabajo iniciado por Norman McQuow y llevado a cabo por su ex "
-"alumno John Lucy, quien recolectó y conservó la documentación primaria sobre "
-"los idiomas mesoamericanos producidos por sus colegas y estudiantes en la "
-"mayor parte de los siglos XX y principios del XXI."
+"legado del trabajo iniciado por Norman McQuown (1914-2004), antropólogo y "
+"lingüista de la Universidad de Chicago, y continuado por su antiguo alumno "
+"John Lucy, quien recopiló y preservó documentación primaria sobre las "
+"lenguas mesoamericanas producida por sus colegas y estudiantes durante la "
+"mayor parte del siglo XX y principios del XXI. "
 
 #: templates/mlc/home.html:23
 msgid ""
@@ -325,7 +326,7 @@ msgstr "Este artículo es una grabación original."
 
 #: templates/mlc_ucla_search/component-object-metadata.html:8
 msgid "Alternative Series Title"
-msgstr "Título de la serie alternativa"
+msgstr "Título de serie alternativo"
 
 #: templates/mlc_ucla_search/component-object-metadata.html:17
 msgid "Collection"
@@ -453,7 +454,7 @@ msgid ""
 "National Science Foundation under Grant No. 1953104."
 msgstr ""
 "La presentación de este material se basa en el trabajo apoyado por la "
-"National Science Foundation bajo la subvención n.º 1953104."
+"National Science Foundation bajo la subvención No. 1953104."
 
 #: templates/mlc_ucla_search/credits.html:10
 msgid "Principal Investigators"
@@ -653,7 +654,7 @@ msgid ""
 "Read the <a href=\"/access-terms\">terms of access page</a> for more "
 "information."
 msgstr ""
-"Lea la <a href=\"/access-terms\">página de términos de acceso</a> para "
+"Lea la <a href=\"/access-terms\">página de condiciones de acceso</a> para "
 "obtener más información."
 
 #: templates/mlc_ucla_search/item.html:45
@@ -714,7 +715,7 @@ msgstr "estudiante de posgrado"
 
 #: templates/ucla/form-contribute-material.html:75
 msgid "Academic faculty"
-msgstr "facultad academica"
+msgstr "Facultad académica"
 
 #: templates/ucla/form-contribute-material.html:78
 msgid "Academic staff"
