@@ -1,43 +1,43 @@
 location,source,target
-mlc.py:29,Mesoamerican Language Collection,Colección de lenguas mesoamericanas
-mlc.py:32 templates/mlc/home.html:10,Indigenous Mesoamerican Languages Portal,Portal de Lenguas Indígenas Mesoamericanas
-mlc_ucla_search.py:216,Error,Error
-mlc_ucla_search.py:217,"There was a technical issue sending your request, and we can't determine its nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu","Hubo un problema técnico al enviar su solicitud y no podemos determinar su naturaleza. Por favor inténtalo de nuevo. Pedimos disculpas por cualquier inconveniente. Si el problema persiste, envíe un correo electrónico al Centro de Desarrollo de Bibliotecas Digitales (DLDC) en la Biblioteca Joseph Regenstein web-admin@lib.uchicago.edu"
-mlc_ucla_search.py:222 mlc_ucla_search.py:228,Your request was successfully sent,Su solicitud fue enviada exitosamente
-mlc_ucla_search.py:223,Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.,Gracias por solicitar una cuenta. Las solicitudes normalmente se procesan dentro de los 5 días hábiles. Se le notificará de cualquier cambio de estado.
-mlc_ucla_search.py:229,"Thank you for your interest in this content. Request to content access is typically processed within 3 business days. You will be notified of any status change to the email associated with your account. We ask each visitor to avoid making duplicate requests by keeping a record of them, as we have no way to display these for each user at the moment.","Gracias por su interés en este contenido. La solicitud de acceso al contenido normalmente se procesa dentro de los 3 días hábiles. Se le notificará cualquier cambio de estado en el correo electrónico asociado a su cuenta. Le pedimos a cada visitante que evite realizar solicitudes duplicadas manteniendo un registro de ellas, ya que no tenemos forma de mostrarlas para cada usuario en este momento."
-mlc_ucla_search.py:238,Thank you for your submission,Gracias por tu envío
-mlc_ucla_search.py:239,Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.,Sus sugerencias o correcciones son bienvenidas. Lo revisaremos de inmediato y nos comunicaremos con usted si necesitamos más información.
-mlc_ucla_search.py:279,Request Receipt,Solicitar recibo
-mlc_ucla_search.py:301,By Request,A petición
-mlc_ucla_search.py:305,Account Required,Cuenta requerida
-mlc_ucla_search.py:309,Open,Abierto
-mlc_ucla_search.py:405,Browse by Contributors,Buscar por colaboradores
-mlc_ucla_search.py:406,Browse by Creator,Explorar por creador
-mlc_ucla_search.py:407,Browse by Date,Buscar por fecha
-mlc_ucla_search.py:408,Browse by Decade,Explorar por década
-mlc_ucla_search.py:409,Browse by Language,Navegar por idioma
-mlc_ucla_search.py:410,Browse by Location,Navegar por ubicación
-mlc_ucla_search.py:426,Results with,Resultados con
-mlc_ucla_search.py:429,Results for search,Resultados de la búsqueda
-mlc_ucla_search.py:494 mlc_ucla_search.py:496,Search Results for,Resultados de la búsqueda para
-mlc_ucla_search.py:498,Search Results,Resultados de la búsqueda
-mlc_ucla_search.py:701 templates/mlc_ucla_search/component-sidebar-right.html:103 templates/mlc_ucla_search/form-suggest-corrections.html:6,Suggest Corrections,Sugerir correcciones
-mlc_ucla_search.py:719 ucla.py:79,Access Terms,Condiciones de acceso
+mlc.py:29 mlc.py:32,Mesoamerican Language Collection,Colección de lenguas mesoamericanas
+mlc_ucla_search.py:229,Error,Error
+mlc_ucla_search.py:230,"There was a technical issue sending your request, and we can't determine its nature. Please try again. We apologize for any inconvenience. If the issue persists, send an email to the Digital Library Development Center (DLDC) at the The Joseph Regenstein Library web-admin@lib.uchicago.edu","Hubo un problema técnico al enviar su solicitud y no podemos determinar su naturaleza. Por favor inténtalo de nuevo. Pedimos disculpas por cualquier inconveniente. Si el problema persiste, envíe un correo electrónico al Centro de Desarrollo de Bibliotecas Digitales (DLDC) en la Biblioteca Joseph Regenstein web-admin@lib.uchicago.edu"
+mlc_ucla_search.py:235 mlc_ucla_search.py:241,Your request was successfully sent,Su solicitud fue enviada exitosamente
+mlc_ucla_search.py:236,Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.,Gracias por solicitar una cuenta. Las solicitudes normalmente se procesan dentro de los 5 días hábiles. Se le notificará de cualquier cambio de estado.
+mlc_ucla_search.py:242,"Thank you for your interest in this content. Request to content access is typically processed within 3 business days. You will be notified of any status change to the email associated with your account. We ask each visitor to avoid making duplicate requests by keeping a record of them, as we have no way to display these for each user at the moment.","Gracias por su interés en este contenido. La solicitud de acceso al contenido normalmente se procesa dentro de los 3 días hábiles. Se le notificará cualquier cambio de estado en el correo electrónico asociado a su cuenta. Le pedimos a cada visitante que evite realizar solicitudes duplicadas manteniendo un registro de ellas, ya que no tenemos forma de mostrarlas para cada usuario en este momento."
+mlc_ucla_search.py:251,Thank you for your submission,Gracias por tu envío
+mlc_ucla_search.py:252,Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.,Sus sugerencias o correcciones son bienvenidas. Lo revisaremos de inmediato y nos comunicaremos con usted si necesitamos más información.
+mlc_ucla_search.py:292,Request Receipt,Solicitar recibo
+mlc_ucla_search.py:314,By Request,A petición
+mlc_ucla_search.py:318,Account Required,Cuenta requerida
+mlc_ucla_search.py:322,Open,Abierto
+mlc_ucla_search.py:418,Browse by Contributors,Buscar por colaboradores
+mlc_ucla_search.py:419,Browse by Creator,Explorar por creador
+mlc_ucla_search.py:420,Browse by Date,Buscar por fecha
+mlc_ucla_search.py:421,Browse by Decade,Explorar por década
+mlc_ucla_search.py:422,Browse by Language,Navegar por idioma
+mlc_ucla_search.py:423,Browse by Location,Navegar por ubicación
+mlc_ucla_search.py:439,Results with,Resultados con
+mlc_ucla_search.py:442,Results for search,Resultados de la búsqueda
+mlc_ucla_search.py:507 mlc_ucla_search.py:509,Search Results for,Resultados de la búsqueda para
+mlc_ucla_search.py:511,Search Results,Resultados de la búsqueda
+mlc_ucla_search.py:689 templates/mlc_ucla_search/component-sidebar-right.html:103 templates/mlc_ucla_search/form-suggest-corrections.html:6,Suggest Corrections,Sugerir correcciones
+mlc_ucla_search.py:707 templates/mlc_ucla_search/component-sidebar-right.html:66 ucla.py:79,Terms of Use,Condiciones de uso
 ucla.py:30 ucla.py:33,Online Language Archive,Archivo de idiomas en línea
 ucla.py:48,History,Historia
 ucla.py:54,Contribute your Material,Aporta tu Material
 ucla.py:60,About the Supporters,Acerca de los seguidores
 ucla.py:66,Acquisitions Guidelines,Directrices de adquisiciones
 ucla.py:72,Acquisitions Policy,Política de adquisiciones
+templates/mlc/home.html:10,Mesoamerican Languages Collection,Colección de lenguas mesoamericanas
 templates/mlc/home.html:13,Accessing the collection,Accediendo a la colección
-templates/mlc/home.html:15,"Some items require <a href=""/access-terms"">specific permission</a> to have access whether they are in digital or physical form. You can request access to a specific set of items, or request that your CNET ID be given privilege to access some of the restricted content. Access to the collection is managed by the Hanna Holborn Gray Special Collections Research Center.","Algunos elementos requieren <a href=""/access-terms""> permiso específico </a> para tener acceso, ya sea que estén en forma digital o física. Puede solicitar acceso a un conjunto específico de elementos, o solicitar que su CNET ID tenga privilegio para acceder a parte del contenido restringido. El acceso a la colección es administrado por el Centro de Investigación de Colecciones Especiales de Hanna Holborn Gray."
+templates/mlc/home.html:15,"Some items require <a href=""/terms-of-use"">specific permission</a> to have access whether they are in digital or physical form. You can request access to a specific set of items, or request that your CNET ID be given privilege to access some of the restricted content. Access to the collection is managed by the Hanna Holborn Gray Special Collections Research Center.","Algunos elementos requieren un <a href=""/terms-of-use"">permiso específico</a> para tener acceso, ya sea en formato digital o físico. Puede solicitar acceso a un conjunto específico de elementos o solicitar que su ID de CNET tenga privilegios para acceder a parte del contenido restringido. El acceso a la colección está gestionado por el Centro de Investigación de Colecciones Especiales Hanna Holborn Gray."
 templates/mlc/home.html:18,Welcome!,¡Bienvenido!
 templates/mlc/home.html:20,"The Mesoamerican Language Collection (MLC) brings together multiple collections of materials documenting Mesoamerican Languages produced by University of Chicago linguists and ethnographers since 1932. They are the legacy of work started by Norman McQuown (1914-2004), University of Chicago anthropologist and linguist, and carried on by his former student John Lucy, who collected and preserved primary documentation about Mesoamerican languages produced by their colleagues and students over the bulk of the 20th and early 21st Centuries. ","La Colección de Lenguas Mesoamericanas (MLC) reúne múltiples colecciones de materiales que documentan las lenguas mesoamericanas producidos por lingüistas y etnógrafos de la Universidad de Chicago desde 1932. Son el legado del trabajo iniciado por Norman McQuown (1914-2004), antropólogo y lingüista de la Universidad de Chicago, y continuado por su antiguo alumno John Lucy, quien recopiló y preservó documentación primaria sobre las lenguas mesoamericanas producida por sus colegas y estudiantes durante la mayor parte del siglo XX y principios del XXI. "
-templates/mlc/home.html:23,"These collections consist of the Manuscripts in Cultural Anthropology (MCA), a manuscript collections of field notes, vocabulary lists, dictionaries, grammars, corpora of texts and elicited sentences, concordances, and guides to holdings of other research collections; the Digital Media Archives (DMA), a broader digital collection of recorded audio one of the largest components of which are the field recordings of Mesoamerican linguists; the Chicago Archive of Indigenous Language Literatures of the Americas, published works in indigenous languages (again overwhelmingly Mesoamerican) collected by MCA and DMA contributors, including original prose and poetry, translations from other languages, children’s literature, pedagogical materials, periodicals, and more; and language teaching materials produced by University of Chicago linguists and anthropologists to train their future colleagues.","Estas colecciones consisten en los manuscritos en la antropología cultural (MCA), una colección de manuscritos de notas de campo, listas de vocabulario, diccionarios, gramáticas, corpus de textos y oraciones, concordancias y guías de otras colecciones de investigación; Los Archivos de Medios Digitales (DMA), una colección digital más amplia de audio grabado, uno de los componentes más grandes de los cuales son las grabaciones de campo de lingüistas mesoamericanos; El archivo de Chicago de literatura de lengua indígena de las Américas, publicadas en obras en lenguas indígenas (nuevamente abrumadoramente mesoamericanas) recolectados por colaboradores de MCA y DMA, incluidas la prosa y la poesía originales, traducciones de otros idiomas, literatura infantil, materiales pedagógicos, periódicos y más; y materiales de enseñanza de idiomas producidos por lingüistas y antropólogos de la Universidad de Chicago para capacitar a sus futuros colegas."
-templates/mlc_ucla_search/base.html:54 templates/ucla/base.html:45,Skip to Main Content,Saltar al contenido principal
-templates/mlc_ucla_search/base.html:73 templates/ucla/base.html:64,Collections & Exhibits,Colecciones y exhibiciones
-templates/mlc_ucla_search/base.html:74 templates/ucla/base.html:65,Collections,Colecciones
+templates/mlc/home.html:23,"These collections consist of the Manuscripts in Cultural Anthropology (MCA), a manuscript collections of field notes, vocabulary lists, dictionaries, grammars, corpora of texts and elicited sentences, concordances, and guides to holdings of other research collections; the Digital Media Archives (DMA), a broader digital collection of recorded audio one of the largest components of which are the field recordings of Mesoamerican linguists; the Chicago Archive of Indigenous Literatures of Latin America (CAILLA), published works in indigenous languages (again overwhelmingly Mesoamerican) collected by MCA and DMA contributors, including original prose and poetry, translations from other languages, children’s literature, pedagogical materials, periodicals, and more; and language teaching materials produced by University of Chicago linguists and anthropologists to train their future colleagues.","Estas colecciones consisten en Manuscripts in Cultural Anthropology (MCA), colecciones manuscritas de notas de campo, listas de vocabulario, diccionarios, gramáticas, corpus de textos y oraciones obtenidas, concordancias y guías de fondos de otras colecciones de investigación; los Archivos de Medios Digitales (DMA), una colección digital más amplia de audio grabado, uno de cuyos componentes más importantes son las grabaciones de campo de lingüistas mesoamericanos; el Archivo de Literatura Indígena de América Latina (CAILLA) de Chicago, publicó obras en lenguas indígenas (nuevamente abrumadoramente mesoamericanas) recopiladas por colaboradores de MCA y DMA, incluyendo prosa y poesía originales, traducciones de otras lenguas, literatura infantil, materiales pedagógicos, publicaciones periódicas y más; y materiales de enseñanza de idiomas producidos por lingüistas y antropólogos de la Universidad de Chicago para capacitar a sus futuros colegas."
+templates/mlc_ucla_search/base.html:54 templates/ucla/base.html:54,Skip to Main Content,Saltar al contenido principal
+templates/mlc_ucla_search/base.html:73 templates/ucla/base.html:73,Collections & Exhibits,Colecciones y exhibiciones
+templates/mlc_ucla_search/base.html:74 templates/ucla/base.html:74,Collections,Colecciones
 templates/mlc_ucla_search/component-browse-bar.html:3 templates/mlc_ucla_search/component-sidebar-right.html:16,Browse Collection by,Explorar colección por
 templates/mlc_ucla_search/component-browse-bar.html:7 templates/mlc_ucla_search/component-object-metadata.html:77 templates/mlc_ucla_search/component-sidebar-right.html:19,Language,Idioma
 templates/mlc_ucla_search/component-browse-bar.html:8 templates/mlc_ucla_search/component-object-metadata.html:90 templates/mlc_ucla_search/component-sidebar-right.html:22,Location,Ubicación
@@ -75,7 +75,13 @@ templates/mlc_ucla_search/component-object-metadata.html:200,Item Content Type,T
 templates/mlc_ucla_search/component-object-metadata.html:211,Media Type,Tipo de medio
 templates/mlc_ucla_search/component-object-metadata.html:221,Formats available,Formatos disponibles
 templates/mlc_ucla_search/component-object-metadata.html:223,Other Media Types,Otros tipos de medios
-templates/mlc_ucla_search/component-object-title.html:28,Object title,Título del objeto
+templates/mlc_ucla_search/component-object-title.html:14,This item is a streamable file.,Este elemento es un archivo que se puede transmitir.
+templates/mlc_ucla_search/component-object-title.html:16,"<a href=""/login"">Login</a> to access.","<a href=""/login"">Inicia sesión</a> para acceder."
+templates/mlc_ucla_search/component-object-title.html:19,"<a href=""/login"">Login</a> to this site.","<a href=""/login"">Iniciar sesión</a> en este sitio."
+templates/mlc_ucla_search/component-object-title.html:20,"<a href=""/request-access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s"">Request access</a> to this series.","<a href=""/request-access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s"">Solicitar acceso</a> a esta serie."
+templates/mlc_ucla_search/component-object-title.html:21,Authenticate through the player (might prompt a pop-up).,Autenticarse a través del reproductor (es posible que aparezca una ventana emergente).
+templates/mlc_ucla_search/component-object-title.html:24,"Read the <a href=""/access-terms"">terms of access page</a> for more information.","Lea la <a href=""/access-terms"">página de condiciones de acceso</a> para obtener más información."
+templates/mlc_ucla_search/component-object-title.html:60,Object title,Título del objeto
 templates/mlc_ucla_search/component-sidebar-left.html:4 templates/ucla/component-sidebar-left.html:3,Project navigation,Navegación del proyecto
 templates/mlc_ucla_search/component-sidebar-right.html:6,Search & Browse,Buscar y explorar
 templates/mlc_ucla_search/component-sidebar-right.html:10,"Search language, location, people, etc.","Buscar idioma, ubicación, personas, etc."
@@ -83,7 +89,6 @@ templates/mlc_ucla_search/component-sidebar-right.html:40,Access,Acceso
 templates/mlc_ucla_search/component-sidebar-right.html:46,Log In,Acceso
 templates/mlc_ucla_search/component-sidebar-right.html:57,Logged in as,Iniciado sesión como
 templates/mlc_ucla_search/component-sidebar-right.html:62,Request Access to this Series,Solicitar acceso a esta serie
-templates/mlc_ucla_search/component-sidebar-right.html:66,Terms of Access,Condiciones de acceso
 templates/mlc_ucla_search/component-sidebar-right.html:78,Contact Us,Contáctenos
 templates/mlc_ucla_search/component-sidebar-right.html:83,Online Media Archive,Archivo de medios en línea
 templates/mlc_ucla_search/component-sidebar-right.html:92,Feedback,Comentario
@@ -99,7 +104,7 @@ templates/mlc_ucla_search/credits.html:28,"User Experience and Digital Collectio
 templates/mlc_ucla_search/credits.html:31,"Indigenous Mesoamerican Languages Portal Intern, and Metcalf Odyssey Intern",Pasante del Portal de Lenguas Indígenas Mesoamericanas y Pasante de Metcalf Odyssey
 templates/mlc_ucla_search/form-request-access.html:6,Request Access to Series,Solicitar acceso a la serie
 templates/mlc_ucla_search/form-request-access.html:8,"Thank you for your interest in OLA materials. Although some of our holdings are subject to access restrictions—often related to issues of confidentiality—we do our best to make recordings available to scholars, members of speaker communities, and the curious public.","Gracias por su interés en los materiales de OLA. Aunque algunos de nuestros fondos están sujetos a restricciones de acceso (a menudo relacionadas con cuestiones de confidencialidad), hacemos todo lo posible para que las grabaciones estén disponibles para académicos, miembros de comunidades de oradores y público curioso."
-templates/mlc_ucla_search/form-request-access.html:9,"Please complete the form below, and someone will be in touch with you shortly regarding your request. If you have questions or are experiencing issues, please write to <a href=""mailto:OLA@uchicago.edu"">OLA@uchicago.edu</a>. For more information read the <a href=""/access-terms"">Terms of Access</a>.","Complete el formulario a continuación y alguien se comunicará con usted en breve con respecto a su solicitud. Si tiene preguntas o tiene problemas, escriba a <a href=""mailto:OLA@uchicago.edu"">OLA@uchicago.edu</a>. Para obtener más información, lea las <a href=""/access-terms"">Condiciones de acceso</a>."
+templates/mlc_ucla_search/form-request-access.html:9,"Please complete the form below, and someone will be in touch with you shortly regarding your request. If you have questions or are experiencing issues, please write to <a href=""mailto:OLA@uchicago.edu"">OLA@uchicago.edu</a>. For more information read the <a href=""/terms-of-use"">Terms of Use</a>.","Complete el formulario a continuación y alguien se comunicará con usted en breve con respecto a su solicitud. Si tiene preguntas o tiene problemas, escriba a <a href=""mailto:OLA@uchicago.edu"">OLA@uchicago.edu</a>. Para obtener más información, lea los <a href=""/terms-of-use"">Términos de uso</a>."
 templates/mlc_ucla_search/form-request-access.html:11,An account is neccessary to request access to a restricted series.,Es necesaria una cuenta para solicitar acceso a una serie restringida.
 templates/mlc_ucla_search/form-request-access.html:17,"There was an issue loading your request. Request for access to a restricted series should be started from the series page or from one of its items. 
       ","Hubo un problema al cargar tu solicitud. La solicitud de acceso a una serie restringida debe iniciarse desde la página de la serie o desde uno de sus elementos. 
@@ -121,13 +126,7 @@ templates/mlc_ucla_search/form-suggest-corrections.html:41,"Please use the area 
 templates/mlc_ucla_search/form-suggest-corrections.html:42,"Corrections may include misspellings, incorrect or missing dates, misidentified languages, individuals, locations, pointing out outdated or harmful terminology/language, etc.","Las correcciones pueden incluir errores ortográficos, fechas incorrectas o faltantes, idiomas, individuos o ubicaciones mal identificados, señalización de terminología/idioma obsoleto o dañino, etc."
 templates/mlc_ucla_search/form-suggest-corrections.html:44,Provide a description of the correction,Describe la corrección propuesta
 templates/mlc_ucla_search/home.html:9,MLC OLA Search,Búsqueda MLC OLA
-templates/mlc_ucla_search/item.html:13,This item is a streamable file.,Este elemento es un archivo que se puede transmitir.
-templates/mlc_ucla_search/item.html:15,"<a href=""/login"">Login</a> to access.","<a href=""/login"">Inicia sesión</a> para acceder."
-templates/mlc_ucla_search/item.html:18,"<a href=""/login"">Login</a> to this site.","<a href=""/login"">Iniciar sesión</a> en este sitio."
-templates/mlc_ucla_search/item.html:19,"<a href=""/request-access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s"">Request access</a> to this series.","<a href=""/request-access?series_id=%(sid)s&item_id=%(iid)s&item_title=%(itt)s"">Solicitar acceso</a> a esta serie."
-templates/mlc_ucla_search/item.html:20,Authenticate through the player (might prompt a pop-up).,Autenticarse a través del reproductor (es posible que aparezca una ventana emergente).
-templates/mlc_ucla_search/item.html:23,"Read the <a href=""/access-terms"">terms of access page</a> for more information.","Lea la <a href=""/access-terms"">página de condiciones de acceso</a> para obtener más información."
-templates/mlc_ucla_search/item.html:45,Item Data,Datos del artículo
+templates/mlc_ucla_search/item.html:23,Item Data,Datos del artículo
 templates/mlc_ucla_search/search.html:11,Search found in %(num)s serie(s),Búsqueda encontrada en %(num)s serie(s)
 templates/mlc_ucla_search/search.html:48," ""%(query)s"" Found in %(num)s item(s): ","""%(query)s"" encontrado en %(num)s ítem(s):"
 templates/mlc_ucla_search/search.html:69,No results found,No se encontraron resultados
@@ -148,3 +147,5 @@ templates/ucla/form-contribute-material.html:84,Community member,Miembro de la c
 templates/ucla/form-contribute-material.html:87,Other,Otro
 templates/ucla/form-contribute-material.html:94,"Does your collection have any specific usage or access restrictions? If so, please describe.","¿Su colección tiene alguna restricción específica de uso o acceso? Si es así, descríbalo."
 templates/ucla/form-contribute-material.html:100,Any additional comments,Cualquier comentario adicional
+,,
+,Access Terms,

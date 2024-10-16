@@ -30,7 +30,7 @@ def inject_dict():
                 'Mesoamerican Language Collection'
             ),
             'collection_title_banner': lazy_gettext(
-                'Indigenous Mesoamerican Languages Portal'
+                'Mesoamerican Language Collection'
             )
         }
     }
