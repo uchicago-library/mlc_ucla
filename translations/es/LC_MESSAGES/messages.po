@@ -13,8 +13,8 @@ msgstr ""
 "X-Generator: Translate Toolkit 3.10.1\n"
 
 #: mlc.py:29
-msgid "Mesoamerican Language Collections"
-msgstr "Colecciones de lenguas mesoamericanas"
+msgid "Mesoamerican Language Collection"
+msgstr "Colección de lenguas mesoamericanas"
 
 #: mlc.py:32+templates/mlc/home.html:10
 msgid "Indigenous Mesoamerican Languages Portal"
@@ -189,7 +189,7 @@ msgstr "¡Bienvenido!"
 
 #: templates/mlc/home.html:20
 msgid ""
-"The Mesoamerican Language Collections (MLC) brings together multiple "
+"The Mesoamerican Language Collection (MLC) brings together multiple "
 "collections of materials documenting Mesoamerican Languages produced by "
 "University of Chicago linguists and ethnographers since 1932. They are the "
 "legacy of work started by Norman McQuown (1914-2004), University of Chicago "
@@ -198,7 +198,7 @@ msgid ""
 "languages produced by their colleagues and students over the bulk of the "
 "20th and early 21st Centuries. "
 msgstr ""
-"Las colecciones de idiomas mesoamericanos (MLC) reúnen múltiples colecciones "
+"La colección de idiomas mesoamericanos (MLC) reúnen múltiples colecciones "
 "de materiales que documentan idiomas mesoamericanos producidos por "
 "lingüistas y etnógrafos de la Universidad de Chicago desde 1932. Son el "
 "legado del trabajo iniciado por Norman McQuow y llevado a cabo por su ex "

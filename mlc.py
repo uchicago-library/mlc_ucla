@@ -27,7 +27,7 @@ def inject_dict():
         'locale': get_locale(),
         'trans': {
             'collection_title': lazy_gettext(
-                'Mesoamerican Language Collections'
+                'Mesoamerican Language Collection'
             ),
             'collection_title_banner': lazy_gettext(
                 'Indigenous Mesoamerican Languages Portal'

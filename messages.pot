@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.12.1\n"
 
 #: mlc.py:29
-msgid "Mesoamerican Language Collections"
+msgid "Mesoamerican Language Collection"
 msgstr ""
 
 #: mlc.py:32 templates/mlc/home.html:10
@@ -176,7 +176,7 @@ msgstr ""
 
 #: templates/mlc/home.html:20
 msgid ""
-"The Mesoamerican Language Collections (MLC) brings together multiple "
+"The Mesoamerican Language Collection (MLC) brings together multiple "
 "collections of materials documenting Mesoamerican Languages produced by "
 "University of Chicago linguists and ethnographers since 1932. They are "
 "the legacy of work started by Norman McQuown (1914-2004), University of "
