@@ -72,7 +72,7 @@ machine, and the ucla database takes longer.
 extract all strings
 `pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .`
 
-create the first translation or update the translation
+create the first translation or update the translation. In case of significant changes to the text, it might be better to delete the root folder `translations` and start over.
 `pybabel init -i messages.pot -d translations -l es`
 `pybabel update -i messages.pot -d translations`
 
