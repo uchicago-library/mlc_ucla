@@ -66,7 +66,7 @@ machine, and the ucla database takes longer.
 - Strings can be injected into all templates through `@app.context_processor`. There is a `dict()` that is already being injected.
 - The doc for the translation package is [Flask Babel](https://python-babel.github.io/flask-babel/)
 - sheet being used for translation https://docs.google.com/spreadsheets/d/18m-8sN6Gqu6HFgZNIp1QST-3hy_ul_sm3QQCr_z4W6k/edit?usp=sharing
-- [po2csv](https://docs.translatehouse.org/projects/translate-toolkit/en/latest/commands/csv2po.html) is being used to convert the output `.po` files to `.csv` for easily translation. That's why the `translation-toolkit` required package.
+- [po2csv](https://docs.translatehouse.org/projects/translate-toolkit/en/latest/commands/csv2po.html) is being used to convert the output `.po` files to `.csv` for easy translation. That's why the `translation-toolkit` required package.
 - The current strings were translated using `=GOOGLETRANSLATE()`function from the Google Sheet.
 
 extract all strings
@@ -77,12 +77,13 @@ In case of confusion, one can delete the root folder `translations` and start ov
 `pybabel init -i messages.pot -d translations -l es`
 `pybabel update -i messages.pot -d translations`
 
-convert file to CSV
+The `.po` file can be used to translate strings directly, or it can be converted into CSV and translated elsewhere.
+convert po file to CSV
 `po2csv .\translations\es\LC_MESSAGES\messages.po .\translations-csv\messages-to-translate.csv`
 
-translate csv file into new file named `messages-translated.csv` in the same location
+translate CSV file into new file named `messages-translated.csv` in the same location
 
-convert csv back to po 
+convert CSV back to po 
 `csv2po .\translations-csv\messages-translated.csv .\translations\es\LC_MESSAGES\messages.po`
 
 compile the translations
