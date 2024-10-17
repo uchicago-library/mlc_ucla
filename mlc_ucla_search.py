@@ -247,7 +247,7 @@ cgimail_dic= {
     },
     'feedback': {
         'rcpt': 'woken',
-        'subject': 'Feedback about Mesoamerican Language Collection Portal',
+        'subject': 'Feedback about Mesoamerican Languages Collection Portal',
         'title': lazy_gettext('Thank you for your submission'),
         'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
     }

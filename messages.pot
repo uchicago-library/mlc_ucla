@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-16 14:32-0500\n"
+"POT-Creation-Date: 2024-10-17 09:49-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.12.1\n"
 
 #: mlc.py:29 mlc.py:32
-msgid "Mesoamerican Language Collection"
+msgid "Mesoamerican Languages Collection"
 msgstr ""
 
 #: mlc_ucla_search.py:229
@@ -153,10 +153,6 @@ msgstr ""
 msgid "Acquisitions Policy"
 msgstr ""
 
-#: templates/mlc/home.html:10
-msgid "Mesoamerican Languages Collection"
-msgstr ""
-
 #: templates/mlc/home.html:13
 msgid "Accessing the collection"
 msgstr ""
@@ -177,7 +173,7 @@ msgstr ""
 
 #: templates/mlc/home.html:20
 msgid ""
-"The Mesoamerican Language Collection (MLC) brings together multiple "
+"The Mesoamerican Languages Collection (MLC) brings together multiple "
 "collections of materials documenting Mesoamerican Languages produced by "
 "University of Chicago linguists and ethnographers since 1932. They are "
 "the legacy of work started by Norman McQuown (1914-2004), University of "
