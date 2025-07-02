@@ -43,6 +43,8 @@
             </p>
             <textarea class="form-control" rows="3" id="scSuggestions" name="User's Message" placeholder="{% trans %}Provide a description of the correction{% endtrans %}" required></textarea>
           </div>
+          <!-- Turnstile widget for spam protection -->
+          {{ turnstile }}
           <button type="submit" class="btn btn-primary">{% trans %}Submit{% endtrans %}</button>
       </div>
     </div>

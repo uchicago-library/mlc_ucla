@@ -10,9 +10,13 @@ from utils import GlottologLookup, MLCDB
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
 from collections import OrderedDict
+from flask_turnstile import Turnstile
+
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
+
+turnstile = Turnstile()
 
 # FUNCTIONS
 
@@ -255,6 +259,18 @@ cgimail_dic= {
 
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
+    
+    if turnstile:
+        if hasattr(turnstile, 'verify'):
+            if turnstile.verify():
+                return redirect('/submission-receipt?status=turnstile&view=VerifyTrue')
+            else:
+                return redirect('/submission-receipt?status=turnstile&view=hasVerifyFalse')
+        else:
+            return redirect('/submission-receipt?status=turnstile&view=hasTurnsitleNoVerify')
+    else:
+        return redirect('/submission-receipt?status=turnstile&view=noTurnstile')
+
     # msg_type specifies which form it is coming from.
     msg_type = request.form.get('msg_type')
 
@@ -283,7 +299,7 @@ def send_cgimail():
     # Interpret the request result and redirect to receipt.
     # cgimial returns a 200 even when it refuses a request.
     # developer says that cgimail is unlikely to be changed in any predictable future.
-    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else 'failed'
+    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
     return redirect(goto)
 
@@ -295,13 +311,30 @@ def submission_receipt():
     if request.args.get('status') == 'success' and request.args.get('view') in cgimail_dic:
         view = request.args.get('view')
 
-    return (render_template(
-        'cgimail-receipt.html',
-        title_slug = title_slug,
-        msg_title = cgimail_dic[view]['title'],
-        msg_text = cgimail_dic[view]['text']
-        ),400
-    )
+        return (render_template(
+            'cgimail-receipt.html',
+            title_slug = title_slug,
+            msg_title = cgimail_dic[view]['title'],
+            msg_text = cgimail_dic[view]['text']
+            ),400
+        )
+    elif request.args.get('status') == 'turnstile':
+        return (render_template(
+            'cgimail-receipt.html',
+            title_slug = title_slug,
+            msg_title = 'Error',
+            msg_text = request.args.get('view')
+            ),400
+        )
+    else:
+        return (render_template(
+            'cgimail-receipt.html',
+            title_slug = title_slug,
+            msg_title = 'Error',
+            msg_text = request.args.get('status')
+            ),400
+        )
+
 
 # WEB
 
