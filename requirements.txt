@@ -11,4 +11,4 @@ flask_babel
 flask_session
 sqlite_dump
 translate-toolkit
-flask-turnstile
+git+https://github.com/Tech1k/flask-turnstile.git
