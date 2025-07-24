@@ -250,7 +250,7 @@ cgimail_dic= {
             'as we have no way to display these for each user at the moment.')
     },
     'feedback': {
-        'rcpt': 'woken',
+        'rcpt': 'vitorg',
         'subject': '[TEST] Feedback about Mesoamerican Languages Collection Portal',
         'title': lazy_gettext('Thank you for your submission'),
         'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
@@ -259,19 +259,21 @@ cgimail_dic= {
 
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
-    current_app.logger.debug("send_cgimail()")
+    current_app.logger.debug("d_send_cgimail()")
+    print("p_send_cgimail()")
     
     # Temporary block for debugging
-    # if turnstile:
-    #     if hasattr(turnstile, 'verify'):
-    #         if turnstile.verify():
-    #             return redirect('/submission-receipt?status=turnstile&view=VerifyTrue')
-    #         else:
-    #             return redirect('/submission-receipt?status=turnstile&view=hasVerifyFalse')
-    #     else:
-    #         return redirect('/submission-receipt?status=turnstile&view=hasTurnsitleNoVerify')
-    # else:
-    #     return redirect('/submission-receipt?status=turnstile&view=noTurnstile')
+    debug_text = "nothing works."
+    if turnstile:
+        if hasattr(turnstile, 'verify'):
+            if turnstile.verify():
+                debug_text = "turnstile exists and Verify evaluates to True"
+            else:
+                debug_text = "turnstile exists and Verify evaluates to False"
+        else:
+            debug_text = "turnstile exists but verify does not"
+    else:
+        debug_text = "turnstile does not exist"
 
     # msg_type specifies which form it is coming from.
     msg_type = request.form.get('msg_type')
@@ -289,7 +291,7 @@ def send_cgimail():
 
     args['from'] = cgimail_dic['default']['from']
     args['rcpt'] = cgimail_dic[msg_type]['rcpt']
-    args['subject'] = cgimail_dic[msg_type]['subject']
+    args['subject'] = cgimail_dic[msg_type]['subject'] + " " + debug_text
 
     # Send the request to CGIMail.
     # CGIMail looks for a referer in the request header.
