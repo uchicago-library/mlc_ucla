@@ -314,30 +314,13 @@ def submission_receipt():
     if request.args.get('status') == 'success' and request.args.get('view') in cgimail_dic:
         view = request.args.get('view')
 
-        return (render_template(
-            'cgimail-receipt.html',
-            title_slug = title_slug,
-            msg_title = cgimail_dic[view]['title'],
-            msg_text = cgimail_dic[view]['text']
-            ),400
-        )
-    elif request.args.get('status') == 'turnstile':
-        return (render_template(
-            'cgimail-receipt.html',
-            title_slug = title_slug,
-            msg_title = 'Error',
-            msg_text = request.args.get('view')
-            ),400
-        )
-    else:
-        return (render_template(
-            'cgimail-receipt.html',
-            title_slug = title_slug,
-            msg_title = 'Error',
-            msg_text = request.args.get('status')
-            ),400
-        )
-
+    return (render_template(
+        'cgimail-receipt.html',
+        title_slug = title_slug,
+        msg_title = cgimail_dic[view]['title'],
+        msg_text = cgimail_dic[view]['text']
+        ),400
+    )
 
 # WEB
 
@@ -724,7 +707,6 @@ def suggest_corrections():
         item_url = request.args.get('iurl'),
         title_slug = lazy_gettext(u'Suggest Corrections'),
         hide_right_column = True,
-        # turnstile=turnstile
     )
 
 @mlc_ucla_search.route('/login')
