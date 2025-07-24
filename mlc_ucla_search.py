@@ -256,7 +256,7 @@ cgimail_dic= {
             'as we have no way to display these for each user at the moment.')
     },
     'feedback': {
-        'rcpt': 'vitor',
+        'rcpt': 'woken',
         'subject': {
             'mlc': 'Feedback about Mesoamerican Languages Collection Portal',
             'ucla': 'Feedback about Online Language Archive Portal',
