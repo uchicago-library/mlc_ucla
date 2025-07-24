@@ -8,6 +8,7 @@ from mlc_ucla_search import get_locale, mlc_ucla_search, turnstile
 BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
 
 app = Flask(__name__, template_folder='templates/ucla')
+app.config['APP_ID'] = 'ucla'
 app.config.from_pyfile('local.py')
 app.register_blueprint(mlc_ucla_search)
 
