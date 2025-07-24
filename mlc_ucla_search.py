@@ -311,7 +311,7 @@ def send_cgimail():
     # request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text.replace('\r', ' ').replace('\n', ' ')
     if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ):
         request_status = 'success'
-    else 
+    else:
         request_status = 'failed'
         print("debug r.text: ", r.text)
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
