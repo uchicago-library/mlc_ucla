@@ -270,8 +270,9 @@ def send_cgimail():
             #     debug_text = "turnstile exists and Verify evaluates to True"
             # else:
             #     debug_text = "turnstile exists and Verify evaluates to False"
-            debug_text = "turnstile exists na dhas verify"
+            debug_text = "turnstile exists and has verify"
         else:
+            debug_text = "turnstile exists but does not have verify"
     else:
         debug_text = "turnstile does not exist"
 
