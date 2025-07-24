@@ -259,7 +259,6 @@ cgimail_dic= {
 
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
-    current_app.logger.debug("d_send_cgimail()")
     print("p_send_cgimail()")
     
     # Temporary block for debugging
@@ -293,6 +292,11 @@ def send_cgimail():
     args['from'] = cgimail_dic['default']['from']
     args['rcpt'] = cgimail_dic[msg_type]['rcpt']
     args['subject'] = debug_text
+
+    # Remove newlines from all values to avoid header errors
+    for k, v in args.items():
+        if isinstance(v, str):
+            args[k] = v.replace('\r', ' ').replace('\n', ' ')
 
     # Send the request to CGIMail.
     # CGIMail looks for a referer in the request header.
