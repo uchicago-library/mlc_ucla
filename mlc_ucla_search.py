@@ -310,6 +310,7 @@ def send_cgimail():
     # developer says that cgimail is unlikely to be changed in any predictable future.
     # request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text.replace('\r', ' ').replace('\n', ' ')
     request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else 'failed'
+    print("debug r.text: ", r.text)
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
     return redirect(goto)
 
