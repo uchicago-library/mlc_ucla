@@ -294,9 +294,9 @@ def send_cgimail():
     args['subject'] = debug_text
 
     # Remove newlines from all values to avoid header errors
-    for k, v in args.items():
-        if isinstance(v, str):
-            args[k] = v.replace('\r', ' ').replace('\n', ' ')
+    # for k, v in args.items():
+    #     if isinstance(v, str):
+    #         args[k] = v.replace('\r', ' ').replace('\n', ' ')
 
     # Send the request to CGIMail.
     # CGIMail looks for a referer in the request header.
@@ -308,7 +308,7 @@ def send_cgimail():
     # Interpret the request result and redirect to receipt.
     # cgimial returns a 200 even when it refuses a request.
     # developer says that cgimail is unlikely to be changed in any predictable future.
-    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text
+    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text.replace('\r', ' ').replace('\n', ' ')
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
     return redirect(goto)
 
