@@ -284,7 +284,7 @@ def send_cgimail():
     # and add cgimail required fields
     args = {}
     for arg in request.form:
-        if arg == 'msg_type':
+        if arg == 'msg_type' or arg == 'cf-turnstile-response':
             continue
         args[arg] = request.form[arg]
 
