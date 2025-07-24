@@ -11,3 +11,4 @@ flask_babel
 flask_session
 sqlite_dump
 translate-toolkit
+flask-turnstile

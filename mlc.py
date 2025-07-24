@@ -2,14 +2,17 @@ from flask import Flask, request, session
 from flask_babel import Babel, lazy_gettext
 from flask_session import Session
 from utils import GlottologLookup, MLCDB
-from mlc_ucla_search import get_locale, mlc_ucla_search
+from mlc_ucla_search import get_locale, mlc_ucla_search, turnstile
 
 
 BASE = 'https://ark.lib.uchicago.edu/ark:61001/'
 
 app = Flask(__name__, template_folder='templates/mlc')
+app.config['APP_ID'] = 'mlc'
 app.config.from_pyfile('local.py')
 app.register_blueprint(mlc_ucla_search)
+
+turnstile.init_app(app)
 
 Session(app)
 

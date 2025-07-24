@@ -10,9 +10,13 @@ from utils import GlottologLookup, MLCDB
 from flask_babel import lazy_gettext
 from local import BASE, DB, GLOTTO_LOOKUP, MESO_TRIPLES, TGN_TRIPLES
 from collections import OrderedDict
+from flask_turnstile import Turnstile
+
 
 
 mlc_ucla_search = Blueprint('mlc_ucla_search', __name__, cli_group=None, template_folder='templates/mlc_ucla_search')
+
+turnstile = Turnstile()
 
 # FUNCTIONS
 
@@ -231,13 +235,19 @@ cgimail_dic= {
     },
     'request_account': {
         'rcpt': 'askscrc',
-        'subject': 'Request for MLC account',
+        'subject': {
+            'mlc': 'Request for MLC account',
+            'ucla': 'Request for OLA account',
+        },
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.')
     },
     'request_access': {
         'rcpt': 'askscrc',
-        'subject': 'Request for access to MLC restricted series',
+        'subject': {
+            'mlc': 'Request for access to MLC restricted series',
+            'ucla': 'Request for access to OCA restricted series',
+        },
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for your interest in this content. '
             'Request to content access is typically processed within 3 business days. '
@@ -247,14 +257,23 @@ cgimail_dic= {
     },
     'feedback': {
         'rcpt': 'woken',
-        'subject': 'Feedback about Mesoamerican Languages Collection Portal',
+        'subject': {
+            'mlc': 'Feedback about Mesoamerican Languages Collection Portal',
+            'ucla': 'Feedback about Online Language Archive Portal',
+        },
         'title': lazy_gettext('Thank you for your submission'),
-        'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
+        'text': lazy_gettext('Your suggestions or correction is welcome. We will revise it promptly and get back to you if we need any further information.')
     }
 }
 
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
+
+    # Check if Turnstile is enabled and verify the request.
+    if turnstile:
+        if not turnstile.verify():
+            return redirect('/probable-bot')
+
     # msg_type specifies which form it is coming from.
     msg_type = request.form.get('msg_type')
 
@@ -265,13 +284,14 @@ def send_cgimail():
     # and add cgimail required fields
     args = {}
     for arg in request.form:
-        if arg == 'msg_type':
+        if arg == 'msg_type' or arg == 'cf-turnstile-response':
             continue
         args[arg] = request.form[arg]
 
     args['from'] = cgimail_dic['default']['from']
     args['rcpt'] = cgimail_dic[msg_type]['rcpt']
-    args['subject'] = cgimail_dic[msg_type]['subject']
+    # Subject changes with app.
+    args['subject'] = cgimail_dic[msg_type]['subject'][current_app.config.get('APP_ID')]
 
     # Send the request to CGIMail.
     # CGIMail looks for a referer in the request header.
@@ -283,7 +303,11 @@ def send_cgimail():
     # Interpret the request result and redirect to receipt.
     # cgimial returns a 200 even when it refuses a request.
     # developer says that cgimail is unlikely to be changed in any predictable future.
-    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else 'failed'
+    if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ):
+        request_status = 'success'
+    else:
+        request_status = 'failed'
+        print("cgimail failure r.text: ", r.text)
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
     return redirect(goto)
 
@@ -300,8 +324,12 @@ def submission_receipt():
         title_slug = title_slug,
         msg_title = cgimail_dic[view]['title'],
         msg_text = cgimail_dic[view]['text']
-        ),400
+        ), 200
     )
+
+@mlc_ucla_search.route('/probable-bot')
+def prob_bot():
+    return (render_template('prob-bot.html'), 400)
 
 # WEB
 
@@ -687,7 +715,7 @@ def suggest_corrections():
         rec_id = request.args.get('rcid'),
         item_url = request.args.get('iurl'),
         title_slug = lazy_gettext(u'Suggest Corrections'),
-        hide_right_column = True
+        hide_right_column = True,
     )
 
 @mlc_ucla_search.route('/login')
