@@ -235,13 +235,13 @@ cgimail_dic= {
     },
     'request_account': {
         'rcpt': 'askscrc',
-        'subject': 'Request for MLC account',
+        'subject': '[TEST] Request for MLC account',
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for requesting an account. Requests are typically processed within 5 business days. You will be notified of any status change.')
     },
     'request_access': {
         'rcpt': 'askscrc',
-        'subject': 'Request for access to MLC restricted series',
+        'subject': '[TEST] Request for access to MLC restricted series',
         'title': lazy_gettext('Your request was successfully sent'),
         'text': lazy_gettext('Thank you for your interest in this content. '
             'Request to content access is typically processed within 3 business days. '
@@ -251,7 +251,7 @@ cgimail_dic= {
     },
     'feedback': {
         'rcpt': 'woken',
-        'subject': 'Feedback about Mesoamerican Languages Collection Portal',
+        'subject': '[TEST] Feedback about Mesoamerican Languages Collection Portal',
         'title': lazy_gettext('Thank you for your submission'),
         'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
     }
@@ -261,16 +261,17 @@ cgimail_dic= {
 def send_cgimail():
     current_app.logger.debug("send_cgimail()")
     
-    if turnstile:
-        if hasattr(turnstile, 'verify'):
-            if turnstile.verify():
-                return redirect('/submission-receipt?status=turnstile&view=VerifyTrue')
-            else:
-                return redirect('/submission-receipt?status=turnstile&view=hasVerifyFalse')
-        else:
-            return redirect('/submission-receipt?status=turnstile&view=hasTurnsitleNoVerify')
-    else:
-        return redirect('/submission-receipt?status=turnstile&view=noTurnstile')
+    # Temporary block for debugging
+    # if turnstile:
+    #     if hasattr(turnstile, 'verify'):
+    #         if turnstile.verify():
+    #             return redirect('/submission-receipt?status=turnstile&view=VerifyTrue')
+    #         else:
+    #             return redirect('/submission-receipt?status=turnstile&view=hasVerifyFalse')
+    #     else:
+    #         return redirect('/submission-receipt?status=turnstile&view=hasTurnsitleNoVerify')
+    # else:
+    #     return redirect('/submission-receipt?status=turnstile&view=noTurnstile')
 
     # msg_type specifies which form it is coming from.
     msg_type = request.form.get('msg_type')
