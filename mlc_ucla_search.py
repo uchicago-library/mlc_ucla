@@ -250,7 +250,7 @@ cgimail_dic= {
             'as we have no way to display these for each user at the moment.')
     },
     'feedback': {
-        'rcpt': 'vitorg',
+        'rcpt': 'vitor',
         'subject': '[TEST] Feedback about Mesoamerican Languages Collection Portal',
         'title': lazy_gettext('Thank you for your submission'),
         'text': lazy_gettext('Your suggestions or correction is welcomed. We will revise it promptly and get back to you if we need any further information.')
@@ -309,8 +309,11 @@ def send_cgimail():
     # cgimial returns a 200 even when it refuses a request.
     # developer says that cgimail is unlikely to be changed in any predictable future.
     # request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else r.text.replace('\r', ' ').replace('\n', ' ')
-    request_status = 'success' if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ) else 'failed'
-    print("debug r.text: ", r.text)
+    if ( r.text.find("Your message was delivered to the addressee") > -1 and r.status_code == 200 ):
+        request_status = 'success'
+    else 
+        request_status = 'failed'
+        print("debug r.text: ", r.text)
     goto = '/submission-receipt?status=' + request_status +"&view=" + request.form.get('msg_type')
     return redirect(goto)
 
