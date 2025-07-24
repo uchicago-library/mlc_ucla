@@ -292,7 +292,7 @@ def send_cgimail():
 
     args['from'] = cgimail_dic['default']['from']
     args['rcpt'] = cgimail_dic[msg_type]['rcpt']
-    args['subject'] = cgimail_dic[msg_type]['subject'] + " " + debug_text
+    args['subject'] = debug_text
 
     # Send the request to CGIMail.
     # CGIMail looks for a referer in the request header.
