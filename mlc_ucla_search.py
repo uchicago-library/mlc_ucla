@@ -259,6 +259,7 @@ cgimail_dic= {
 
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
+    current_app.logger.debug("send_cgimail()")
     
     if turnstile:
         if hasattr(turnstile, 'verify'):
@@ -720,7 +721,8 @@ def suggest_corrections():
         rec_id = request.args.get('rcid'),
         item_url = request.args.get('iurl'),
         title_slug = lazy_gettext(u'Suggest Corrections'),
-        hide_right_column = True
+        hide_right_column = True,
+        # turnstile=turnstile
     )
 
 @mlc_ucla_search.route('/login')
