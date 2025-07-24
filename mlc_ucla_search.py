@@ -266,12 +266,12 @@ def send_cgimail():
     debug_text = "nothing works."
     if turnstile:
         if hasattr(turnstile, 'verify'):
-            if turnstile.verify():
-                debug_text = "turnstile exists and Verify evaluates to True"
-            else:
-                debug_text = "turnstile exists and Verify evaluates to False"
+            # if turnstile.verify():
+            #     debug_text = "turnstile exists and Verify evaluates to True"
+            # else:
+            #     debug_text = "turnstile exists and Verify evaluates to False"
+            debug_text = "turnstile exists na dhas verify"
         else:
-            debug_text = "turnstile exists but verify does not"
     else:
         debug_text = "turnstile does not exist"
 
