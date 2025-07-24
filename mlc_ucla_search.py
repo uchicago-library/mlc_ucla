@@ -269,6 +269,11 @@ cgimail_dic= {
 @mlc_ucla_search.route('/send-cgimail', methods=['POST'])
 def send_cgimail():
 
+    # Check if Turnstile is enabled and verify the request.
+    if turnstile:
+        if not turnstile.verify():
+            return redirect('/probable-bot')
+
     # msg_type specifies which form it is coming from.
     msg_type = request.form.get('msg_type')
 
@@ -319,8 +324,12 @@ def submission_receipt():
         title_slug = title_slug,
         msg_title = cgimail_dic[view]['title'],
         msg_text = cgimail_dic[view]['text']
-        ),400
+        ), 200
     )
+
+@mlc_ucla_search.route('/probable-bot')
+def prob_bot():
+    return (render_template('prob-bot.html'), 400)
 
 # WEB
 
