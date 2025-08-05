@@ -17,13 +17,16 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Get a copy of local.py from another developer or from one of the production
-servers and place it in the mlc directory. Get a copy of either meso.db or 
-ucla.db from one of the production servers and update the path to the file
-in local.py. Get glottolog_lookup.json, glottolog_language.ttl, tgn.ttl, and
-the project triples (meso.big.yyyymmdd.ttl or ucla.big.yyyymmdd.ttl) from
-one of the production servers, and update the locations of those files in 
-local.py too. 
+Get a copy of the following files from the production server and place them in the root directory of the project:
+
+- `local.py`
+- One of the following: `meso.db` or `ucla.db`
+- `glottolog_lookup.json`
+- `glottolog_language.ttl`
+- `tgn.ttl`
+- One of the following: `meso.big.yyyymmdd.ttl` or `ucla.big.yyyymmdd.ttl`
+
+Don't forget to update the path to the file in `local.py` with the appropriate paths to the SQLite database file and the triples file.
 
 Set an environmental variable for the FLASK_APP:
 ```console
