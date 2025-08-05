@@ -12,3 +12,6 @@ data_import/export*
 *.db
 glottolog_lookup.json
 *.db-journal
+*.swp
+CLAUDE.md
+venv/
