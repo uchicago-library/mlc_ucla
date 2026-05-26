@@ -10,7 +10,10 @@ from rdflib.plugins.sparql import prepareQuery
 
 import regex as re
 
-apsw.config(apsw.SQLITE_CONFIG_MULTITHREAD)
+try:
+    apsw.config(apsw.SQLITE_CONFIG_MULTITHREAD)
+except:
+    pass
 
 def regularize_string(_):
     """Regularize a string for browses by trimming excess whitespace,
